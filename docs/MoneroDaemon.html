@@ -111,165 +111,6 @@
     
 
     
-    <h4 class="name" id=".parseNetworkType"><span class="type-signature">(static) </span>parseNetworkType<span class="signature">(network)</span><span class="type-signature"> &rarr; {<a href="MoneroNetworkType.html">MoneroNetworkType</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Parses a network string to an enumerated type.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>network</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">network string to parse</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="src_main_js_daemon_MoneroDaemon.js.html">src/main/js/daemon/MoneroDaemon.js</a>, <a href="src_main_js_daemon_MoneroDaemon.js.html#line692">line 692</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    enumerated network type
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="MoneroNetworkType.html">MoneroNetworkType</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
     <h4 class="name" id="addListener"><span class="type-signature">(async) </span>addListener<span class="signature">(listener)</span><span class="type-signature"></span></h4>
     
 
@@ -459,7 +300,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="src_main_js_daemon_MoneroDaemon.js.html">src/main/js/daemon/MoneroDaemon.js</a>, <a href="src_main_js_daemon_MoneroDaemon.js.html#line654">line 654</a>
+        <a href="src_main_js_daemon_MoneroDaemon.js.html">src/main/js/daemon/MoneroDaemon.js</a>, <a href="src_main_js_daemon_MoneroDaemon.js.html#line664">line 664</a>
     </li></ul></dd>
     
 
@@ -618,7 +459,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="src_main_js_daemon_MoneroDaemon.js.html">src/main/js/daemon/MoneroDaemon.js</a>, <a href="src_main_js_daemon_MoneroDaemon.js.html#line664">line 664</a>
+        <a href="src_main_js_daemon_MoneroDaemon.js.html">src/main/js/daemon/MoneroDaemon.js</a>, <a href="src_main_js_daemon_MoneroDaemon.js.html#line674">line 674</a>
     </li></ul></dd>
     
 
@@ -2197,6 +2038,188 @@
     
 
     
+    <h4 class="name" id="getBlockTemplate"><span class="type-signature">(async) </span>getBlockTemplate<span class="signature">(walletAddress, reserveSize)</span><span class="type-signature"> &rarr; {<a href="MoneroBlockTemplate.html">MoneroBlockTemplate</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Get a block template for mining a new block.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>walletAddress</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">address of the wallet to receive miner transactions if block is successfully mined</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>reserveSize</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">int</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">reserve size (optional)</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="src_main_js_daemon_MoneroDaemon.js.html">src/main/js/daemon/MoneroDaemon.js</a>, <a href="src_main_js_daemon_MoneroDaemon.js.html#line112">line 112</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    is a block template for mining a new block
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="MoneroBlockTemplate.html">MoneroBlockTemplate</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="getBlocksByHash"><span class="type-signature">(async) </span>getBlocksByHash<span class="signature">(blockHashes, startHeight, prune)</span><span class="type-signature"> &rarr; {<a href="Array.html">Array</a>.&lt;<a href="MoneroBlock.html">MoneroBlock</a>>}</span></h4>
     
 
@@ -2951,188 +2974,6 @@ not too big.
     
 
     
-    <h4 class="name" id="getBlockTemplate"><span class="type-signature">(async) </span>getBlockTemplate<span class="signature">(walletAddress, reserveSize)</span><span class="type-signature"> &rarr; {<a href="MoneroBlockTemplate.html">MoneroBlockTemplate</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Get a block template for mining a new block.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>walletAddress</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">address of the wallet to receive miner transactions if block is successfully mined</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>reserveSize</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">int</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">reserve size (optional)</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="src_main_js_daemon_MoneroDaemon.js.html">src/main/js/daemon/MoneroDaemon.js</a>, <a href="src_main_js_daemon_MoneroDaemon.js.html#line112">line 112</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    is a block template for mining a new block
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="MoneroBlockTemplate.html">MoneroBlockTemplate</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
     <h4 class="name" id="getDownloadLimit"><span class="type-signature">(async) </span>getDownloadLimit<span class="signature">()</span><span class="type-signature"> &rarr; {int}</span></h4>
     
 
@@ -3243,7 +3084,7 @@ not too big.
     
 
     
-    <h4 class="name" id="getFeeEstimate"><span class="type-signature">(async) </span>getFeeEstimate<span class="signature">(graceBlocks)</span><span class="type-signature"> &rarr; {BigInteger}</span></h4>
+    <h4 class="name" id="getFeeEstimate"><span class="type-signature">(async) </span>getFeeEstimate<span class="signature">(graceBlocks)</span><span class="type-signature"> &rarr; {<a href="MoneroFeeEstimate.html">MoneroFeeEstimate</a>}</span></h4>
     
 
     
@@ -3251,7 +3092,7 @@ not too big.
 
 
 <div class="description">
-    Get the fee estimate per kB.
+    Get mining fee estimates per kB.
 </div>
 
 
@@ -3293,7 +3134,7 @@ not too big.
             <td class="type">
             
                 
-<span class="param-type">int</span>
+<span class="param-type">number</span>
 
 
             
@@ -3373,7 +3214,7 @@ not too big.
 
         
 <div class="param-desc">
-    fee estimate per kB.
+    mining fee estimates per kB
 </div>
 
 
@@ -3384,7 +3225,7 @@ not too big.
     </dt>
     <dd>
         
-<span class="param-type">BigInteger</span>
+<span class="param-type"><a href="MoneroFeeEstimate.html">MoneroFeeEstimate</a></span>
 
 
     </dd>
@@ -5808,7 +5649,7 @@ request.
 
         
 <div class="param-desc">
-    transaction with the given hash
+    transaction with the given hash or undefined if not found
 </div>
 
 
@@ -6831,7 +6672,7 @@ as spent key image information for the tx pool.
 
         
 <div class="param-desc">
-    transactions with the given hashes
+    found transactions with the given hashes
 </div>
 
 
@@ -7283,6 +7124,165 @@ as spent key image information for the tx pool.
     <dd>
         
 <span class="param-type">boolean</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="pruneBlockchain"><span class="type-signature">(async) </span>pruneBlockchain<span class="signature">(check)</span><span class="type-signature"> &rarr; {<a href="MoneroPruneResult.html">MoneroPruneResult</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Prune the blockchain.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>check</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">specifies to check the pruning (default false)</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="src_main_js_daemon_MoneroDaemon.js.html">src/main/js/daemon/MoneroDaemon.js</a>, <a href="src_main_js_daemon_MoneroDaemon.js.html#line646">line 646</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    the prune result
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="MoneroPruneResult.html">MoneroPruneResult</a></span>
 
 
     </dd>
@@ -9050,7 +9050,7 @@ as spent key image information for the tx pool.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="src_main_js_daemon_MoneroDaemon.js.html">src/main/js/daemon/MoneroDaemon.js</a>, <a href="src_main_js_daemon_MoneroDaemon.js.html#line671">line 671</a>
+        <a href="src_main_js_daemon_MoneroDaemon.js.html">src/main/js/daemon/MoneroDaemon.js</a>, <a href="src_main_js_daemon_MoneroDaemon.js.html#line681">line 681</a>
     </li></ul></dd>
     
 
@@ -9412,7 +9412,7 @@ as spent key image information for the tx pool.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="src_main_js_daemon_MoneroDaemon.js.html">src/main/js/daemon/MoneroDaemon.js</a>, <a href="src_main_js_daemon_MoneroDaemon.js.html#line645">line 645</a>
+        <a href="src_main_js_daemon_MoneroDaemon.js.html">src/main/js/daemon/MoneroDaemon.js</a>, <a href="src_main_js_daemon_MoneroDaemon.js.html#line655">line 655</a>
     </li></ul></dd>
     
 
@@ -9682,7 +9682,7 @@ as spent key image information for the tx pool.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="src_main_js_daemon_MoneroDaemon.js.html">src/main/js/daemon/MoneroDaemon.js</a>, <a href="src_main_js_daemon_MoneroDaemon.js.html#line680">line 680</a>
+        <a href="src_main_js_daemon_MoneroDaemon.js.html">src/main/js/daemon/MoneroDaemon.js</a>, <a href="src_main_js_daemon_MoneroDaemon.js.html#line690">line 690</a>
     </li></ul></dd>
     
 
@@ -9735,6 +9735,165 @@ as spent key image information for the tx pool.
 
 
         
+            
+
+    
+
+    
+    <h4 class="name" id=".parseNetworkType"><span class="type-signature">(static) </span>parseNetworkType<span class="signature">(network)</span><span class="type-signature"> &rarr; {<a href="MoneroNetworkType.html">MoneroNetworkType</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Parses a network string to an enumerated type.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>network</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">network string to parse</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="src_main_js_daemon_MoneroDaemon.js.html">src/main/js/daemon/MoneroDaemon.js</a>, <a href="src_main_js_daemon_MoneroDaemon.js.html#line702">line 702</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    enumerated network type
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="MoneroNetworkType.html">MoneroNetworkType</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
     
 
     
@@ -9750,13 +9909,13 @@ as spent key image information for the tx pool.
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ConnectionType.html">ConnectionType</a></li><li><a href="GenUtils.html">GenUtils</a></li><li><a href="HttpClient.html">HttpClient</a></li><li><a href="LibraryUtils.html">LibraryUtils</a></li><li><a href="MoneroAccount.html">MoneroAccount</a></li><li><a href="MoneroAccountTag.html">MoneroAccountTag</a></li><li><a href="MoneroAddressBookEntry.html">MoneroAddressBookEntry</a></li><li><a href="MoneroAltChain.html">MoneroAltChain</a></li><li><a href="MoneroBan.html">MoneroBan</a></li><li><a href="MoneroBlock.html">MoneroBlock</a></li><li><a href="MoneroBlockHeader.html">MoneroBlockHeader</a></li><li><a href="MoneroBlockTemplate.html">MoneroBlockTemplate</a></li><li><a href="MoneroCheck.html">MoneroCheck</a></li><li><a href="MoneroCheckReserve.html">MoneroCheckReserve</a></li><li><a href="MoneroCheckTx.html">MoneroCheckTx</a></li><li><a href="MoneroConnectionManager.html">MoneroConnectionManager</a></li><li><a href="MoneroConnectionManagerListener.html">MoneroConnectionManagerListener</a></li><li><a href="MoneroConnectionSpan.html">MoneroConnectionSpan</a></li><li><a href="MoneroDaemonInfo.html">MoneroDaemonInfo</a></li><li><a href="MoneroDaemonListener.html">MoneroDaemonListener</a></li><li><a href="MoneroDaemonRpc.html">MoneroDaemonRpc</a></li><li><a href="MoneroDaemonSyncInfo.html">MoneroDaemonSyncInfo</a></li><li><a href="MoneroDaemonUpdateCheckResult.html">MoneroDaemonUpdateCheckResult</a></li><li><a href="MoneroDaemonUpdateDownloadResult.html">MoneroDaemonUpdateDownloadResult</a></li><li><a href="MoneroDestination.html">MoneroDestination</a></li><li><a href="MoneroError.html">MoneroError</a></li><li><a href="MoneroHardForkInfo.html">MoneroHardForkInfo</a></li><li><a href="MoneroIncomingTransfer.html">MoneroIncomingTransfer</a></li><li><a href="MoneroIntegratedAddress.html">MoneroIntegratedAddress</a></li><li><a href="MoneroKeyImage.html">MoneroKeyImage</a></li><li><a href="MoneroKeyImageImportResult.html">MoneroKeyImageImportResult</a></li><li><a href="MoneroKeyImageSpentStatus.html">MoneroKeyImageSpentStatus</a></li><li><a href="MoneroMessageSignatureResult.html">MoneroMessageSignatureResult</a></li><li><a href="MoneroMessageSignatureType.html">MoneroMessageSignatureType</a></li><li><a href="MoneroMinerTxSum.html">MoneroMinerTxSum</a></li><li><a href="MoneroMiningStatus.html">MoneroMiningStatus</a></li><li><a href="MoneroMultisigInfo.html">MoneroMultisigInfo</a></li><li><a href="MoneroMultisigInitResult.html">MoneroMultisigInitResult</a></li><li><a href="MoneroMultisigSignResult.html">MoneroMultisigSignResult</a></li><li><a href="MoneroNetworkType.html">MoneroNetworkType</a></li><li><a href="MoneroOutgoingTransfer.html">MoneroOutgoingTransfer</a></li><li><a href="MoneroOutput.html">MoneroOutput</a></li><li><a href="MoneroOutputHistogramEntry.html">MoneroOutputHistogramEntry</a></li><li><a href="MoneroOutputQuery.html">MoneroOutputQuery</a></li><li><a href="MoneroOutputWallet.html">MoneroOutputWallet</a></li><li><a href="MoneroPeer.html">MoneroPeer</a></li><li><a href="MoneroRpcConnection.html">MoneroRpcConnection</a></li><li><a href="MoneroRpcError.html">MoneroRpcError</a></li><li><a href="MoneroSubaddress.html">MoneroSubaddress</a></li><li><a href="MoneroSubmitTxResult.html">MoneroSubmitTxResult</a></li><li><a href="MoneroSyncResult.html">MoneroSyncResult</a></li><li><a href="MoneroTransfer.html">MoneroTransfer</a></li><li><a href="MoneroTransferQuery.html">MoneroTransferQuery</a></li><li><a href="MoneroTx.html">MoneroTx</a></li><li><a href="MoneroTxConfig.html">MoneroTxConfig</a></li><li><a href="MoneroTxPoolStats.html">MoneroTxPoolStats</a></li><li><a href="MoneroTxPriority.html">MoneroTxPriority</a></li><li><a href="MoneroTxQuery.html">MoneroTxQuery</a></li><li><a href="MoneroTxSet.html">MoneroTxSet</a></li><li><a href="MoneroTxWallet.html">MoneroTxWallet</a></li><li><a href="MoneroUtils.html">MoneroUtils</a></li><li><a href="MoneroVersion.html">MoneroVersion</a></li><li><a href="MoneroWalletConfig.html">MoneroWalletConfig</a></li><li><a href="MoneroWalletFull.html">MoneroWalletFull</a></li><li><a href="MoneroWalletKeys.html">MoneroWalletKeys</a></li><li><a href="MoneroWalletListener.html">MoneroWalletListener</a></li><li><a href="MoneroWalletRpc.html">MoneroWalletRpc</a></li><li><a href="SslOptions.html">SslOptions</a></li><li><a href="TaskLooper.html">TaskLooper</a></li><li><a href="ThreadPool.html">ThreadPool</a></li></ul><h3>Interfaces</h3><ul><li><a href="MoneroDaemon.html">MoneroDaemon</a></li><li><a href="MoneroWallet.html">MoneroWallet</a></li></ul><h3>Global</h3><ul><li><a href="global.html#connectToDaemonRpc">connectToDaemonRpc</a></li><li><a href="global.html#connectToWalletRpc">connectToWalletRpc</a></li><li><a href="global.html#createWalletFull">createWalletFull</a></li><li><a href="global.html#createWalletKeys">createWalletKeys</a></li><li><a href="global.html#getVersion">getVersion</a></li><li><a href="global.html#openWalletFull">openWalletFull</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ConnectionType.html">ConnectionType</a></li><li><a href="GenUtils.html">GenUtils</a></li><li><a href="HttpClient.html">HttpClient</a></li><li><a href="LibraryUtils.html">LibraryUtils</a></li><li><a href="MoneroAccount.html">MoneroAccount</a></li><li><a href="MoneroAccountTag.html">MoneroAccountTag</a></li><li><a href="MoneroAddressBookEntry.html">MoneroAddressBookEntry</a></li><li><a href="MoneroAltChain.html">MoneroAltChain</a></li><li><a href="MoneroBan.html">MoneroBan</a></li><li><a href="MoneroBlock.html">MoneroBlock</a></li><li><a href="MoneroBlockHeader.html">MoneroBlockHeader</a></li><li><a href="MoneroBlockTemplate.html">MoneroBlockTemplate</a></li><li><a href="MoneroCheck.html">MoneroCheck</a></li><li><a href="MoneroCheckReserve.html">MoneroCheckReserve</a></li><li><a href="MoneroCheckTx.html">MoneroCheckTx</a></li><li><a href="MoneroConnectionManager.html">MoneroConnectionManager</a></li><li><a href="MoneroConnectionManagerListener.html">MoneroConnectionManagerListener</a></li><li><a href="MoneroConnectionSpan.html">MoneroConnectionSpan</a></li><li><a href="MoneroDaemonInfo.html">MoneroDaemonInfo</a></li><li><a href="MoneroDaemonListener.html">MoneroDaemonListener</a></li><li><a href="MoneroDaemonRpc.html">MoneroDaemonRpc</a></li><li><a href="MoneroDaemonSyncInfo.html">MoneroDaemonSyncInfo</a></li><li><a href="MoneroDaemonUpdateCheckResult.html">MoneroDaemonUpdateCheckResult</a></li><li><a href="MoneroDaemonUpdateDownloadResult.html">MoneroDaemonUpdateDownloadResult</a></li><li><a href="MoneroDestination.html">MoneroDestination</a></li><li><a href="MoneroError.html">MoneroError</a></li><li><a href="MoneroFeeEstimate.html">MoneroFeeEstimate</a></li><li><a href="MoneroHardForkInfo.html">MoneroHardForkInfo</a></li><li><a href="MoneroIncomingTransfer.html">MoneroIncomingTransfer</a></li><li><a href="MoneroIntegratedAddress.html">MoneroIntegratedAddress</a></li><li><a href="MoneroKeyImage.html">MoneroKeyImage</a></li><li><a href="MoneroKeyImageImportResult.html">MoneroKeyImageImportResult</a></li><li><a href="MoneroKeyImageSpentStatus.html">MoneroKeyImageSpentStatus</a></li><li><a href="MoneroMessageSignatureResult.html">MoneroMessageSignatureResult</a></li><li><a href="MoneroMessageSignatureType.html">MoneroMessageSignatureType</a></li><li><a href="MoneroMinerTxSum.html">MoneroMinerTxSum</a></li><li><a href="MoneroMiningStatus.html">MoneroMiningStatus</a></li><li><a href="MoneroMultisigInfo.html">MoneroMultisigInfo</a></li><li><a href="MoneroMultisigInitResult.html">MoneroMultisigInitResult</a></li><li><a href="MoneroMultisigSignResult.html">MoneroMultisigSignResult</a></li><li><a href="MoneroNetworkType.html">MoneroNetworkType</a></li><li><a href="MoneroOutgoingTransfer.html">MoneroOutgoingTransfer</a></li><li><a href="MoneroOutput.html">MoneroOutput</a></li><li><a href="MoneroOutputHistogramEntry.html">MoneroOutputHistogramEntry</a></li><li><a href="MoneroOutputQuery.html">MoneroOutputQuery</a></li><li><a href="MoneroOutputWallet.html">MoneroOutputWallet</a></li><li><a href="MoneroPeer.html">MoneroPeer</a></li><li><a href="MoneroPruneResult.html">MoneroPruneResult</a></li><li><a href="MoneroRpcConnection.html">MoneroRpcConnection</a></li><li><a href="MoneroRpcError.html">MoneroRpcError</a></li><li><a href="MoneroSubaddress.html">MoneroSubaddress</a></li><li><a href="MoneroSubmitTxResult.html">MoneroSubmitTxResult</a></li><li><a href="MoneroSyncResult.html">MoneroSyncResult</a></li><li><a href="MoneroTransfer.html">MoneroTransfer</a></li><li><a href="MoneroTransferQuery.html">MoneroTransferQuery</a></li><li><a href="MoneroTx.html">MoneroTx</a></li><li><a href="MoneroTxConfig.html">MoneroTxConfig</a></li><li><a href="MoneroTxPoolStats.html">MoneroTxPoolStats</a></li><li><a href="MoneroTxPriority.html">MoneroTxPriority</a></li><li><a href="MoneroTxQuery.html">MoneroTxQuery</a></li><li><a href="MoneroTxSet.html">MoneroTxSet</a></li><li><a href="MoneroTxWallet.html">MoneroTxWallet</a></li><li><a href="MoneroUtils.html">MoneroUtils</a></li><li><a href="MoneroVersion.html">MoneroVersion</a></li><li><a href="MoneroWalletConfig.html">MoneroWalletConfig</a></li><li><a href="MoneroWalletFull.html">MoneroWalletFull</a></li><li><a href="MoneroWalletKeys.html">MoneroWalletKeys</a></li><li><a href="MoneroWalletListener.html">MoneroWalletListener</a></li><li><a href="MoneroWalletRpc.html">MoneroWalletRpc</a></li><li><a href="SslOptions.html">SslOptions</a></li><li><a href="TaskLooper.html">TaskLooper</a></li><li><a href="ThreadPool.html">ThreadPool</a></li></ul><h3>Interfaces</h3><ul><li><a href="MoneroDaemon.html">MoneroDaemon</a></li><li><a href="MoneroWallet.html">MoneroWallet</a></li></ul><h3>Global</h3><ul><li><a href="global.html#connectToDaemonRpc">connectToDaemonRpc</a></li><li><a href="global.html#connectToWalletRpc">connectToWalletRpc</a></li><li><a href="global.html#createWalletFull">createWalletFull</a></li><li><a href="global.html#createWalletKeys">createWalletKeys</a></li><li><a href="global.html#getVersion">getVersion</a></li><li><a href="global.html#openWalletFull">openWalletFull</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Sun Aug 28 2022 17:32:38 GMT-0400 (Eastern Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a>
 </footer>
 
 <script> prettyPrint(); </script>

@@ -127,7 +127,7 @@ class MoneroConnectionManager {
   async removeConnection(uri) {
     let connection = this.getConnectionByUri(uri);
     if (!connection) throw new MoneroError("No connection exists with URI: " + uri);
-    GenUtils.remove(connections, connection);
+    GenUtils.remove(this._connections, connection);
     if (connection === this._currentConnection) {
       this._currentConnection = undefined;
       this._onConnectionChanged(this._currentConnection);
@@ -138,10 +138,11 @@ class MoneroConnectionManager {
   /**
    * Indicates if the connection manager is connected to a node.
    * 
-   * @return {boolean} true if the current connection is set, online, and not unauthenticated. false otherwise
+   * @return {boolean|undefined} true if the current connection is set, online, and not unauthenticated, undefined if unknown, false otherwise
    */
   isConnected() {
-    return this._currentConnection && this._currentConnection.isConnected();
+    if (!this._currentConnection) return false;
+    return this._currentConnection.isConnected();
   }
   
   /**
@@ -195,7 +196,7 @@ class MoneroConnectionManager {
           checkPromises.push(new Promise(async function(resolve, reject) {
             await connection.checkConnection(that._timeoutInMs);
             if (connection.isConnected()) resolve(connection);
-            reject();
+            else reject();
           }));
         }
         
@@ -212,7 +213,7 @@ class MoneroConnectionManager {
   /**
    * Set the current connection.
    * Provide a URI to select an existing connection without updating its credentials.
-   * Provide a MoneroRpcConnection to add new connection or update credentials of existing connection with same URI.
+   * Provide a MoneroRpcConnection to add new connection or replace existing connection with the same URI.
    * Notify if current connection changes.
    * Does not check the connection.
    * 
@@ -241,25 +242,13 @@ class MoneroConnectionManager {
     // validate connection
     if (!(connection instanceof MoneroRpcConnection)) throw new MoneroError("Must provide string or MoneroRpcConnection to set connection");
     if (!connection.getUri()) throw new MoneroError("Connection is missing URI");
-    
-    // check if adding new connection
+
+    // add or replace connection
     let prevConnection = this.getConnectionByUri(connection.getUri());
-    if (!prevConnection) {
-      this.addConnection(connection);
-      this._currentConnection = connection;
-      if (this._proxyToWorker !== undefined) connection.setProxyToWorker(this._proxyToWorker);
-      this._onConnectionChanged(this._currentConnection);
-      return this;
-    }
-    
-    // check if updating current connection
-    if (prevConnection !== this._currentConnection || prevConnection.getUsername() !== connection.getUsername() || prevConnection.getPassword() !== connection.getPassword() || prevConnection.getPriority() !== connection.getPriority()) {
-      prevConnection.setCredentials(connection.getUsername(), connection.getPassword());
-      prevConnection.setPriority(connection.getPriority());
-      this._currentConnection = prevConnection;
-      if (this._proxyToWorker !== undefined) connection.setProxyToWorker(this._proxyToWorker);
-      this._onConnectionChanged(this._currentConnection);
-    }
+    if (prevConnection) GenUtils.remove(this._connections, prevConnection);
+    this.addConnection(connection);
+    this._currentConnection = connection;
+    this._onConnectionChanged(this._currentConnection);
     
     return this;
   }
@@ -455,6 +444,15 @@ class MoneroConnectionManager {
     this._timeoutMs = MoneroConnectionManager.DEFAULT_TIMEOUT;
     this._autoSwitch = false;
     return this;
+  }
+
+  /**
+   * Get all listeners.
+   * 
+   * @return {MoneroConnectionManagerListener[]} all listeners
+   */
+  getListeners() {
+    return this._listeners
   }
   
   // ------------------------------ PRIVATE HELPERS ---------------------------

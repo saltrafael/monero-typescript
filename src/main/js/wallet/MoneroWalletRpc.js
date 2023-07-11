@@ -199,12 +199,15 @@ class MoneroWalletRpc extends MoneroWallet {
   
   /**
    * Stop the internal process running monero-wallet-rpc, if applicable.
+   * 
+   * @param {boolean} force specifies if the process should be destroyed forcibly
+   * @return {Promise<number|undefined>} the exit code from stopping the process
    */
-  async stopProcess() {
+  async stopProcess(force) {
     if (this.process === undefined) throw new MoneroError("MoneroWalletRpc instance not created from new process");
     let listenersCopy = GenUtils.copyArray(this.getListeners());
     for (let listener of listenersCopy) await this.removeListener(listener);
-    return GenUtils.killProcess(this.process);
+    return GenUtils.killProcess(this.process, force ? "sigkill" : undefined);
   }
   
   /**
@@ -246,12 +249,11 @@ class MoneroWalletRpc extends MoneroWallet {
   async openWallet(pathOrConfig, password) {
     
     // normalize and validate config
-    let config = new MoneroWalletConfig(typeof pathOrConfig === "string" ? {path: pathOrConfig, password: password} : pathOrConfig);
+    let config = new MoneroWalletConfig(typeof pathOrConfig === "string" ? {path: pathOrConfig, password: password ? password : ""} : pathOrConfig);
     // TODO: ensure other fields are uninitialized?
     
     // open wallet on rpc server
     if (!config.getPath()) throw new MoneroError("Must provide name of wallet to open");
-    if (!config.getPassword()) throw new MoneroError("Must provide password of wallet to open");
     await this.rpc.sendJsonRequest("open_wallet", {filename: config.getPath(), password: config.getPassword()});
     await this._clear();
     this.path = config.getPath();
@@ -306,6 +308,8 @@ class MoneroWalletRpc extends MoneroWallet {
       throw new MoneroError("Wallet may be initialized with a mnemonic or keys but not both");
     }
     if (config.getNetworkType() !== undefined) throw new MoneroError("Cannot provide networkType when creating RPC wallet because server's network type is already set");
+    if (config.getAccountLookahead() !== undefined || config.getSubaddressLookahead() !== undefined) throw new MoneroError("monero-wallet-rpc does not support creating wallets with subaddress lookahead over rpc");
+    if (config.getPassword() === undefined) config.setPassword("");
     
     // create wallet
     if (config.getMnemonic() !== undefined) {
@@ -335,7 +339,6 @@ class MoneroWalletRpc extends MoneroWallet {
    */
   async _createWalletRandom(name, password, language) {
     if (!name) throw new MoneroError("Name is not initialized");
-    if (!password) throw new MoneroError("Password is not initialized");
     if (!language) language = MoneroWallet.DEFAULT_LANGUAGE;
     let params = { filename: name, password: password, language: language };
     try {
@@ -601,7 +604,7 @@ class MoneroWalletRpc extends MoneroWallet {
   async sync(startHeight, onProgress) {
     assert(onProgress === undefined, "Monero Wallet RPC does not support reporting sync progress");
     try {
-      let resp = await this.rpc.sendJsonRequest("refresh", {start_height: startHeight});
+      let resp = await this.rpc.sendJsonRequest("refresh", {start_height: startHeight}, 0);
       await this._poll();
       return new MoneroSyncResult(resp.result.blocks_fetched, resp.result.received_money);
     } catch (err) {
@@ -640,11 +643,11 @@ class MoneroWalletRpc extends MoneroWallet {
   }
   
   async rescanSpent() {
-    await this.rpc.sendJsonRequest("rescan_spent");
+    await this.rpc.sendJsonRequest("rescan_spent", undefined, 0);
   }
   
   async rescanBlockchain() {
-    await this.rpc.sendJsonRequest("rescan_blockchain");
+    await this.rpc.sendJsonRequest("rescan_blockchain", undefined, 0);
   }
   
   async getBalance(accountIdx, subaddressIdx) {
@@ -804,6 +807,10 @@ class MoneroWalletRpc extends MoneroWallet {
     subaddress.setIsUsed(false);
     subaddress.setNumBlocksToUnlock(0);
     return subaddress;
+  }
+
+  async setSubaddressLabel(accountIdx, subaddressIdx, label) {
+    await this.rpc.sendJsonRequest("label_address", {index: {major: accountIdx, minor: subaddressIdx}, label: label});
   }
   
   async getTxs(query, missingTxHashes) {
@@ -1480,6 +1487,7 @@ class MoneroWalletRpc extends MoneroWallet {
   
   async prepareMultisig() {
     let resp = await this.rpc.sendJsonRequest("prepare_multisig", {enable_multisig_experimental: true});
+    this.addressCache = {};
     let result = resp.result;
     return result.multisig_info;
   }
@@ -1490,11 +1498,13 @@ class MoneroWalletRpc extends MoneroWallet {
       threshold: threshold,
       password: password
     });
+    this.addressCache = {};
     return resp.result.multisig_info;
   }
   
   async exchangeMultisigKeys(multisigHexes, password) {
     let resp = await this.rpc.sendJsonRequest("exchange_multisig_keys", {multisig_info: multisigHexes, password: password});
+    this.addressCache = {};
     let msResult = new MoneroMultisigInitResult();
     msResult.setAddress(resp.result.address);
     msResult.setMultisigHex(resp.result.multisig_info);
@@ -1529,7 +1539,7 @@ class MoneroWalletRpc extends MoneroWallet {
   }
   
   async changePassword(oldPassword, newPassword) {
-    return this.rpc.sendJsonRequest("change_wallet_password", {old_password: oldPassword, new_password: newPassword});
+    return this.rpc.sendJsonRequest("change_wallet_password", {old_password: oldPassword || "", new_password: newPassword || ""});
   }
   
   async save() {
@@ -1615,18 +1625,18 @@ class MoneroWalletRpc extends MoneroWallet {
   
   async _getTransfersAux(query) {
     
-    // check if pool txs explicitly requested without daemon connection
-    let isConnectedToDaemon = await this.isConnectedToDaemon();
-    let txQuery = query.getTxQuery();
-    if (txQuery.inTxPool() !== undefined && txQuery.inTxPool() && !isConnectedToDaemon) {
-      throw new MoneroError("Cannot fetch pool transactions because wallet has no daemon connection");
-    }
-    
     // build params for get_transfers rpc call
+    let txQuery = query.getTxQuery();
     let canBeConfirmed = txQuery.isConfirmed() !== false && txQuery.inTxPool() !== true && txQuery.isFailed() !== true && txQuery.isRelayed() !== false;
-    let canBeInTxPool = isConnectedToDaemon && txQuery.isConfirmed() !== true && txQuery.inTxPool() !== false && txQuery.isFailed() !== true && txQuery.isRelayed() !== false && txQuery.getHeight() === undefined && txQuery.getMaxHeight() === undefined && txQuery.isLocked() !== false;
+    let canBeInTxPool = txQuery.isConfirmed() !== true && txQuery.inTxPool() !== false && txQuery.isFailed() !== true && txQuery.getHeight() === undefined && txQuery.getMaxHeight() === undefined && txQuery.isLocked() !== false;
     let canBeIncoming = query.isIncoming() !== false && query.isOutgoing() !== true && query.hasDestinations() !== true;
     let canBeOutgoing = query.isOutgoing() !== false && query.isIncoming() !== true;
+
+    // check if fetching pool txs contradicted by configuration
+    if (txQuery.inTxPool() === true && !canBeInTxPool) {
+      throw new MoneroError("Cannot fetch pool transactions because it contradicts configuration");
+    }
+
     let params = {};
     params.in = canBeIncoming && canBeConfirmed;
     params.out = canBeOutgoing && canBeConfirmed;
@@ -2500,7 +2510,6 @@ class WalletPoller {
       } catch (err) {
         that._numPolling--;
         console.error("Failed to background poll " + await that._wallet.getPath());
-        console.error(err);
       }
     });
   }

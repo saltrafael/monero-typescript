@@ -43,7 +43,8 @@ self.onmessage = async function(e) {
   try {
     postMessage([objectId, callbackId, {result: await self[fnName].apply(null, e.data)}]);
   } catch (e) {
-    postMessage([objectId, callbackId, {error: e.message}]);
+    if (!(e instanceof Error)) e = new Error(e);
+    postMessage([objectId, callbackId, {error: LibraryUtils.serializeError(e)}]);
   }
 }
 
@@ -239,7 +240,7 @@ self.daemonGetMinerTxSum = async function(daemonId, height, numBlocks) {
 }
 
 self.daemonGetFeeEstimate = async function(daemonId, graceBlocks) {
-  return (await self.WORKER_OBJECTS[daemonId].getFeeEstimate(graceBlocks)).toString();
+  return (await self.WORKER_OBJECTS[daemonId].getFeeEstimate(graceBlocks)).toJson();
 }
 
 self.daemonSubmitTxHex = async function(daemonId, txHex, doNotRelay) {
@@ -385,6 +386,10 @@ self.daemonGetMiningStatus = async function(daemonId) {
   return (await self.WORKER_OBJECTS[daemonId].getMiningStatus()).toJson();
 }
 
+self.daemonPruneBlockchain = async function(daemonId, check) {
+  return (await self.WORKER_OBJECTS[daemonId].pruneBlockchain(check)).toJson();
+}
+
 //
 //async submitBlocks(blockBlobs) {
 //  throw new MoneroError("Not implemented");
@@ -472,6 +477,10 @@ self.getAddressIndex = async function(walletId, address) {
   return (await self.WORKER_OBJECTS[walletId].getAddressIndex(address)).toJson();
 }
 
+self.setSubaddressLabel = async function(walletId, accountIdx, subaddressIdx, label) {
+  await self.WORKER_OBJECTS[walletId].setSubaddressLabel(accountIdx, subaddressIdx, label);
+}
+
 self.getIntegratedAddress = async function(walletId, standardAddress, paymentId) {
   return (await self.WORKER_OBJECTS[walletId].getIntegratedAddress(standardAddress, paymentId)).toJson();
 }
@@ -481,7 +490,7 @@ self.decodeIntegratedAddress = async function(walletId, integratedAddress) {
 }
 
 self.setDaemonConnection = async function(walletId, config) {
-  return self.WORKER_OBJECTS[walletId].setDaemonConnection(config ? new MoneroRpcConnection(config) : undefined);
+  return self.WORKER_OBJECTS[walletId].setDaemonConnection(config ? new MoneroRpcConnection(Object.assign(config, {proxyToWorker: false})) : undefined);
 }
 
 self.getDaemonConnection = async function(walletId) {
@@ -493,12 +502,12 @@ self.isConnectedToDaemon = async function(walletId) {
   return self.WORKER_OBJECTS[walletId].isConnectedToDaemon();
 }
 
-self.getSyncHeight = async function(walletId) {
-  return self.WORKER_OBJECTS[walletId].getSyncHeight();
+self.getRestoreHeight = async function(walletId) {
+  return self.WORKER_OBJECTS[walletId].getRestoreHeight();
 }
 
-self.setSyncHeight = async function(walletId, syncHeight) {
-  return self.WORKER_OBJECTS[walletId].setSyncHeight(syncHeight);
+self.setRestoreHeight = async function(walletId, restoreHeight) {
+  return self.WORKER_OBJECTS[walletId].setRestoreHeight(restoreHeight);
 }
 
 self.getDaemonHeight = async function(walletId) {

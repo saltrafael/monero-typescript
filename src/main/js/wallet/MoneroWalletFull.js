@@ -184,7 +184,7 @@ class MoneroWalletFull extends MoneroWalletKeys {
     if (config.getSaveCurrent() === true) throw new MoneroError("Cannot save current wallet when creating full WASM wallet");
     if (config.getPath() === undefined) config.setPath("");
     if (config.getPath() && MoneroWalletFull.walletExists(config.getPath(), config.getFs())) throw new MoneroError("Wallet already exists: " + config.getPath());
-    if (!config.getPassword()) throw new MoneroError("Must provide a password to create the wallet with");
+    if (config.getPassword() === undefined) config.setPassword("");
     
     // create wallet
     if (config.getMnemonic() !== undefined) {
@@ -439,24 +439,24 @@ class MoneroWalletFull extends MoneroWalletKeys {
    * 
    * @return {number} the height of the first block that the wallet scans
    */
-  async getSyncHeight() {
+  async getRestoreHeight() {
     let that = this;
     return that._module.queueTask(async function() {
       that._assertNotClosed();
-      return that._module.get_sync_height(that._cppAddress);
+      return that._module.get_restore_height(that._cppAddress);
     });
   }
   
   /**
    * Set the height of the first block that the wallet scans.
    * 
-   * @param {number} syncHeight - height of the first block that the wallet scans
+   * @param {number} restoreHeight - height of the first block that the wallet scans
    */
-  async setSyncHeight(syncHeight) {
+  async setRestoreHeight(restoreHeight) {
     let that = this;
     return that._module.queueTask(async function() {
       that._assertNotClosed();
-      return that._module.set_sync_height(that._cppAddress, syncHeight);
+      return that._module.set_restore_height(that._cppAddress, restoreHeight);
     });
   }
   
@@ -662,7 +662,7 @@ class MoneroWalletFull extends MoneroWalletKeys {
     // normalize params
     startHeight = listenerOrStartHeight === undefined || listenerOrStartHeight instanceof MoneroWalletListener ? startHeight : listenerOrStartHeight;
     let listener = listenerOrStartHeight instanceof MoneroWalletListener ? listenerOrStartHeight : undefined;
-    if (startHeight === undefined) startHeight = Math.max(await this.getHeight(), await this.getSyncHeight());
+    if (startHeight === undefined) startHeight = Math.max(await this.getHeight(), await this.getRestoreHeight());
     
     // register listener if given
     if (listener) await this.addListener(listener);
@@ -852,6 +852,15 @@ class MoneroWalletFull extends MoneroWalletKeys {
       return MoneroWalletFull._sanitizeSubaddress(new MoneroSubaddress(subaddressJson));
     });
   }
+
+  async setSubaddressLabel(accountIdx, subaddressIdx, label) {
+    if (label === undefined) label = "";
+    let that = this;
+    return that._module.queueTask(async function() {
+      that._assertNotClosed();
+      that._module.set_subaddress_label(that._cppAddress, accountIdx, subaddressIdx, label);
+    });
+  }
   
   async getTxs(query, missingTxHashes) {
     this._assertNotClosed();
@@ -984,6 +993,7 @@ class MoneroWalletFull extends MoneroWalletKeys {
       that._assertNotClosed();
       return new Promise(function(resolve, reject) {
         let callback = function(keyImagesStr) {
+          if (keyImagesStr.charAt(0) !== '{') reject(new MoneroError(keyImagesStr)); // json expected, else error
           let keyImages = [];
           for (let keyImageJson of JSON.parse(GenUtils.stringifyBIs(keyImagesStr)).keyImages) keyImages.push(new MoneroKeyImage(keyImageJson));
           resolve(keyImages);
@@ -1614,7 +1624,10 @@ class MoneroWalletFull extends MoneroWalletKeys {
     return that._module.queueTask(async function() {
       that._assertNotClosed();
       return new Promise(function(resolve, reject) {
-        let callbackFn = function(resp) { resolve(JSON.parse(resp).txHashes); }
+        let callbackFn = function(resp) { 
+          if (resp.charAt(0) !== "{") reject(new MoneroError(resp));
+          else resolve(JSON.parse(resp).txHashes);
+        }
         that._module.submit_multisig_tx_hex(that._cppAddress, signedMultisigTxHex, callbackFn);
       });
     });
@@ -1623,7 +1636,7 @@ class MoneroWalletFull extends MoneroWalletKeys {
   /**
    * Get the wallet's keys and cache data.
    * 
-   * @return {DataView[]} is the keys and cache data respectively
+   * @return {DataView[]} is the keys and cache data, respectively
    */
   async getData() {
     this._assertNotClosed();
@@ -1672,6 +1685,7 @@ class MoneroWalletFull extends MoneroWalletKeys {
   
   async changePassword(oldPassword, newPassword) {
     if (oldPassword !== this._password) throw new MoneroError("Invalid original password."); // wallet2 verify_password loads from disk so verify password here
+    if (newPassword === undefined) newPassword = "";
     let that = this;
     await that._module.queueTask(async function() {
       that._assertNotClosed();
@@ -1724,7 +1738,6 @@ class MoneroWalletFull extends MoneroWalletKeys {
     if (proxyToWorker) return MoneroWalletFullProxy.openWalletData(path, password, networkType, keysData, cacheData, daemonUriOrConnection, fs);
     
     // validate and normalize parameters
-    assert(password, "Must provide a password to open the wallet");
     if (networkType === undefined) throw new MoneroError("Must provide the wallet's network type");
     MoneroNetworkType.validate(networkType);
     let daemonConnection = typeof daemonUriOrConnection === "string" ? new MoneroRpcConnection(daemonUriOrConnection) : daemonUriOrConnection;
@@ -1971,6 +1984,7 @@ class MoneroWalletFullProxy extends MoneroWallet {
   
   static async openWalletData(path, password, networkType, keysData, cacheData, daemonUriOrConnection, fs) {
     let walletId = GenUtils.getUUID();
+    if (password === undefined) password = "";
     let daemonUriOrConfig = daemonUriOrConnection instanceof MoneroRpcConnection ? daemonUriOrConnection.getConfig() : daemonUriOrConnection;
     await LibraryUtils.invokeWorker(walletId, "openWalletData", [path, password, networkType, keysData, cacheData, daemonUriOrConfig]);
     let wallet = new MoneroWalletFullProxy(walletId, await LibraryUtils.getWorker(), path, fs);
@@ -2059,6 +2073,10 @@ class MoneroWalletFullProxy extends MoneroWallet {
     let subaddressJson = await this._invokeWorker("getAddressIndex", Array.from(arguments));
     return MoneroWalletFull._sanitizeSubaddress(new MoneroSubaddress(subaddressJson));
   }
+
+  async setSubaddressLabel(accountIdx, subaddressIdx, label) {
+    return this._invokeWorker("setSubaddressLabel", Array.from(arguments));
+  }
   
   async getIntegratedAddress(standardAddress, paymentId) {
     return new MoneroIntegratedAddress(await this._invokeWorker("getIntegratedAddress", Array.from(arguments)));
@@ -2085,12 +2103,12 @@ class MoneroWalletFullProxy extends MoneroWallet {
     return this._invokeWorker("isConnectedToDaemon");
   }
   
-  async getSyncHeight() {
-    return this._invokeWorker("getSyncHeight");
+  async getRestoreHeight() {
+    return this._invokeWorker("getRestoreHeight");
   }
   
-  async setSyncHeight(syncHeight) {
-    return this._invokeWorker("setSyncHeight", [syncHeight]);
+  async setRestoreHeight(restoreHeight) {
+    return this._invokeWorker("setRestoreHeight", [restoreHeight]);
   }
   
   async getDaemonHeight() {
@@ -2157,7 +2175,7 @@ class MoneroWalletFullProxy extends MoneroWallet {
     // normalize params
     startHeight = listenerOrStartHeight instanceof MoneroWalletListener ? startHeight : listenerOrStartHeight;
     let listener = listenerOrStartHeight instanceof MoneroWalletListener ? listenerOrStartHeight : undefined;
-    if (startHeight === undefined) startHeight = Math.max(await this.getHeight(), await this.getSyncHeight());
+    if (startHeight === undefined) startHeight = Math.max(await this.getHeight(), await this.getRestoreHeight());
     
     // register listener if given
     if (listener) await this.addListener(listener);
@@ -2525,7 +2543,7 @@ class MoneroWalletFullProxy extends MoneroWallet {
   // --------------------------- PRIVATE HELPERS ------------------------------
   
   async _invokeWorker(fnName, args) {
-    return LibraryUtils.invokeWorker(this._walletId, fnName, args);
+    return await LibraryUtils.invokeWorker(this._walletId, fnName, args);
   }
 }
 

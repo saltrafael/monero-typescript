@@ -40,7 +40,7 @@ class TestUtils {
   }
   
   /**
-   * Get a singleton instance of a monero-daemon-rpc client.
+   * Get a singleton instance of a monerod client.
    */
   static getDaemonRpcConnection() {
     return new MoneroRpcConnection(TestUtils.DAEMON_RPC_CONFIG);
@@ -173,8 +173,8 @@ class TestUtils {
         }
         
         // create wallet with connection
-        TestUtils.walletFull = await createWalletFull({path: TestUtils.WALLET_FULL_PATH, password: TestUtils.WALLET_PASSWORD, networkType: TestUtils.NETWORK_TYPE, mnemonic: TestUtils.MNEMONIC, server: TestUtils.getDaemonRpcConnection(), restoreHeight: TestUtils.FIRST_RECEIVE_HEIGHT, proxyToWorker: TestUtils.PROXY_TO_WORKER, fs: fs});
-        assert.equal(await TestUtils.walletFull.getSyncHeight(), TestUtils.FIRST_RECEIVE_HEIGHT);
+        TestUtils.walletFull = await monerojs.createWalletFull({path: TestUtils.WALLET_FULL_PATH, password: TestUtils.WALLET_PASSWORD, networkType: TestUtils.NETWORK_TYPE, mnemonic: TestUtils.MNEMONIC, server: TestUtils.getDaemonRpcConnection(), restoreHeight: TestUtils.FIRST_RECEIVE_HEIGHT, proxyToWorker: TestUtils.PROXY_TO_WORKER, fs: fs});
+        assert.equal(await TestUtils.walletFull.getRestoreHeight(), TestUtils.FIRST_RECEIVE_HEIGHT);
         await TestUtils.walletFull.sync(new WalletSyncPrinter());
         await TestUtils.walletFull.save();
         await TestUtils.walletFull.startSyncing(TestUtils.SYNC_PERIOD_IN_MS);
@@ -208,7 +208,43 @@ class TestUtils {
     return TestUtils.walletKeys;
   }
   
-  static testUnsignedBigInt(num, nonZero) {
+  /**
+   * Creates a new wallet considered to be "ground truth".
+   * 
+   * @param networkType - ground truth wallet's network type
+   * @param mnemonic - ground truth wallet's mnemonic
+   * @param startHeight - height to start syncing from
+   * @param restoreHeight - ground truth wallet's restore height
+   * @return {MoneroWalletFull} the created wallet
+   */
+  static async createWalletGroundTruth(networkType, mnemonic, startHeight, restoreHeight) {
+
+    // create directory for test wallets if it doesn't exist
+    let fs = TestUtils.getDefaultFs();
+    if (!fs.existsSync(TestUtils.TEST_WALLETS_DIR)) {
+      if (!fs.existsSync(process.cwd())) fs.mkdirSync(process.cwd(), { recursive: true });  // create current process directory for relative paths which does not exist in memory fs
+      fs.mkdirSync(TestUtils.TEST_WALLETS_DIR);
+    }
+
+    // create ground truth wallet
+    let daemonConnection = new MoneroRpcConnection(TestUtils.DAEMON_RPC_CONFIG);
+    let path = TestUtils.TEST_WALLETS_DIR + "/gt_wallet_" + new Date().getTime();
+    let gtWallet = await monerojs.createWalletFull({
+      path: path,
+      password: TestUtils.WALLET_PASSWORD,
+      networkType: networkType,
+      mnemonic: mnemonic,
+      server: daemonConnection,
+      restoreHeight: restoreHeight,
+      fs: fs
+    });
+    assert.equal(await gtWallet.getRestoreHeight(), restoreHeight ? restoreHeight : 0);
+    await gtWallet.sync(startHeight, new WalletSyncPrinter());
+    await gtWallet.startSyncing(TestUtils.SYNC_PERIOD_IN_MS);
+    return gtWallet;
+  }
+  
+  static testUnsignedBigInteger(num, nonZero) {
     assert(num);
     assert(num instanceof BigInt);
     let comparison = GenUtils.compareBigInt(num, BigInt(0));

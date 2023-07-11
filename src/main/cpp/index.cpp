@@ -9,6 +9,7 @@ EMSCRIPTEN_BINDINGS(module)
 {
   // ------------------------------ UTILITIES ---------------------------------
 
+  emscripten::function("set_log_level", &monero_wasm_bridge::set_log_level);
   emscripten::function("get_integrated_address_util", &monero_wasm_bridge::get_integrated_address_util);
   emscripten::function("validate_address", &monero_wasm_bridge::validate_address);
   emscripten::function("get_exception_message", &monero_wasm_bridge::get_exception_message);
@@ -51,8 +52,8 @@ EMSCRIPTEN_BINDINGS(module)
   emscripten::function("is_daemon_synced", &monero_wasm_bridge::is_daemon_synced);
   emscripten::function("is_synced", &monero_wasm_bridge::is_synced);
   emscripten::function("get_network_type", &monero_wasm_bridge::get_network_type);
-  emscripten::function("get_sync_height", &monero_wasm_bridge::get_sync_height);
-  emscripten::function("set_sync_height", &monero_wasm_bridge::set_sync_height);
+  emscripten::function("get_restore_height", &monero_wasm_bridge::get_restore_height);
+  emscripten::function("set_restore_height", &monero_wasm_bridge::set_restore_height);
   emscripten::function("set_listener", &monero_wasm_bridge::set_listener);
   emscripten::function("sync", &monero_wasm_bridge::sync);
   emscripten::function("stop_syncing", &monero_wasm_bridge::stop_syncing);
@@ -70,6 +71,7 @@ EMSCRIPTEN_BINDINGS(module)
   emscripten::function("create_account", &monero_wasm_bridge::create_account);
   emscripten::function("get_subaddresses", &monero_wasm_bridge::get_subaddresses);
   emscripten::function("create_subaddress", &monero_wasm_bridge::create_subaddress);
+  emscripten::function("set_subaddress_label", &monero_wasm_bridge::set_subaddress_label);
   emscripten::function("get_txs", &monero_wasm_bridge::get_txs);
   emscripten::function("get_transfers", &monero_wasm_bridge::get_transfers);
   emscripten::function("get_outputs", &monero_wasm_bridge::get_outputs);

@@ -69,8 +69,7 @@ include_directories("${MONERO_PROJECT}/build/release/generated_include")
 # Unbound
 #############
 
-include_directories("/usr/include") # linux
-include_directories("/usr/local/opt/unbound/include") # mac
+include_directories("~/unbound-1.17.0/libunbound")
 
 #############
 # OpenSSL
@@ -194,6 +193,7 @@ set(
     ${MONERO_PROJECT}/contrib/epee/src/string_tools.cpp
     ${MONERO_PROJECT}/contrib/epee/src/memwipe.c
     ${MONERO_PROJECT}/contrib/epee/src/mlocker.cpp
+    ${MONERO_PROJECT}/contrib/epee/src/mlog.cpp
     ${MONERO_PROJECT}/contrib/epee/src/wipeable_string.cpp
     ${MONERO_PROJECT}/contrib/epee/src/portable_storage.cpp
     ${MONERO_PROJECT}/contrib/epee/src/net_parse_helpers.cpp
@@ -201,6 +201,7 @@ set(
     ${MONERO_PROJECT_SRC}/common/base58.cpp
     ${MONERO_PROJECT_SRC}/device/device.cpp
     ${MONERO_PROJECT_SRC}/device/device_default.cpp
+    ${MONERO_PROJECT_SRC}/hardforks/hardforks.cpp
     ${MONERO_PROJECT_SRC}/multisig/multisig.cpp
     ${MONERO_PROJECT_SRC}/multisig/multisig_account.cpp
     ${MONERO_PROJECT_SRC}/multisig/multisig_account_kex_impl.cpp

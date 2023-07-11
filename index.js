@@ -25,6 +25,8 @@ import SslOptions from "./src/main/js/common/SslOptions";
 export {SslOptions};
 import TaskLooper from "./src/main/js/common/TaskLooper";
 export {TaskLooper};
+import ThreadPool from "./src/main/js/common/ThreadPool";
+export {ThreadPool};
 
 // export daemon models
 import ConnectionType from "./src/main/js/daemon/model/ConnectionType";
@@ -67,6 +69,8 @@ import MoneroOutput from "./src/main/js/daemon/model/MoneroOutput";
 export {MoneroOutput};
 import MoneroOutputHistogramEntry from "./src/main/js/daemon/model/MoneroOutputHistogramEntry";
 export {MoneroOutputHistogramEntry};
+import MoneroPruneResult from "./src/main/js/daemon/model/MoneroPruneResult";
+export {MoneroPruneResult};
 import MoneroSubmitTxResult from "./src/main/js/daemon/model/MoneroSubmitTxResult";
 export {MoneroSubmitTxResult};
 import MoneroTx from "./src/main/js/daemon/model/MoneroTx";
@@ -172,7 +176,7 @@ export function getVersion() {
 }
 
 /**
- * <p>Create a client connected to monero-daemon-rpc.<p>
+ * <p>Create a client connected to monerod.<p>
  * 
  * <p>Examples:<p>
  * 
@@ -186,15 +190,15 @@ export function getVersion() {
  * });
  * </code>
  * 
- * @param {string|object|MoneroRpcConnection} uriOrConfig - uri of monero-daemon-rpc or JS config object or MoneroRpcConnection
- * @param {string} uriOrConfig.uri - uri of monero-daemon-rpc
- * @param {string} uriOrConfig.username - username to authenticate with monero-daemon-rpc (optional)
- * @param {string} uriOrConfig.password - password to authenticate with monero-daemon-rpc (optional)
+ * @param {string|object|MoneroRpcConnection} uriOrConfig - uri of monerod or JS config object or MoneroRpcConnection
+ * @param {string} uriOrConfig.uri - uri of monerod
+ * @param {string} uriOrConfig.username - username to authenticate with monerod (optional)
+ * @param {string} uriOrConfig.password - password to authenticate with monerod (optional)
  * @param {boolean} uriOrConfig.rejectUnauthorized - rejects self-signed certificates if true (default true)
  * @param {number} uriOrConfig.pollInterval - poll interval to query for updates in ms (default 5000)
  * @param {boolean} uriOrConfig.proxyToWorker - run the daemon client in a web worker if true (default true)
- * @param {string} username - username to authenticate with monero-daemon-rpc (optional)
- * @param {string} password - password to authenticate with monero-daemon-rpc (optional)
+ * @param {string} username - username to authenticate with monerod (optional)
+ * @param {string} password - password to authenticate with monerod (optional)
  * @param {boolean} rejectUnauthorized - rejects self-signed certificates if true (default true)
  * @param {number} pollInterval - poll interval to query for updates in ms (default 5000)
  * @param {boolean} proxyToWorker - runs the daemon client in a web worker if true (default true)

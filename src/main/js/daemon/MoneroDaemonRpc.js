@@ -1,4 +1,5 @@
 import assert from "assert";
+import {BigInteger} from "../common/biginteger";
 import GenUtils from "../common/GenUtils";
 import LibraryUtils from "../common/LibraryUtils";
 import TaskLooper from "../common/TaskLooper";
@@ -212,12 +213,15 @@ class MoneroDaemonRpc extends MoneroDaemon {
   
   /**
    * Stop the internal process running monerod, if applicable.
+   * 
+   * @param {boolean} force specifies if the process should be destroyed forcibly
+   * @return {Promise<number|undefined>} the exit code from stopping the process
    */
-  async stopProcess() {
+  async stopProcess(force) {
     if (this.process === undefined) throw new MoneroError("MoneroDaemonRpc instance not created from new process");
     let listenersCopy = GenUtils.copyArray(this.getListeners());
     for (let listener of listenersCopy) await this.removeListener(listener);
-    return GenUtils.killProcess(this.process);
+    return GenUtils.killProcess(this.process, force ? "sigkill" : undefined);
   }
   
   async addListener(listener) {
@@ -429,14 +433,6 @@ class MoneroDaemonRpc extends MoneroDaemon {
       }
     }
     
-    // fetch unconfirmed txs from pool and merge additional fields  // TODO monerod: merge rpc calls so this isn't necessary?
-    let poolTxs = await this.getTxPool();
-    for (let tx of txs) {
-      for (let poolTx of poolTxs) {
-        if (tx.getHash() === poolTx.getHash()) tx.merge(poolTx);
-      }
-    }
-    
     return txs;
   }
   
@@ -462,7 +458,13 @@ class MoneroDaemonRpc extends MoneroDaemon {
   async getFeeEstimate(graceBlocks) {
     let resp = await this.rpc.sendJsonRequest("get_fee_estimate", {grace_blocks: graceBlocks});
     MoneroDaemonRpc._checkResponseStatus(resp.result);
-    return BigInt(resp.result.fee);
+    let feeEstimate = new MoneroFeeEstimate();
+    feeEstimate.setFee(new BigInteger(resp.result.fee));
+    let fees = [];
+    for (let i = 0; i < resp.result.fees.length; i++) fees.push(new BigInteger(resp.result.fees[i]));
+    feeEstimate.setFees(fees);
+    feeEstimate.setQuantizationMask(new BigInteger(resp.result.quantization_mask));
+    return feeEstimate;
   }
   
   async submitTxHex(txHex, doNotRelay) {
@@ -516,22 +518,9 @@ class MoneroDaemonRpc extends MoneroDaemon {
   }
 
   async getTxPoolStats() {
-    throw new MoneroError("Response contains field 'histo' which is binary'");
     let resp = await this.rpc.sendPathRequest("get_transaction_pool_stats");
     MoneroDaemonRpc._checkResponseStatus(resp);
-    let stats = MoneroDaemonRpc._convertRpcTxPoolStats(resp.pool_stats);
-    
-    // uninitialize some stats if not applicable
-    if (stats.getHisto98pc() === 0) stats.setHisto98pc(undefined);
-    if (stats.getNumTxs() === 0) {
-      stats.setBytesMin(undefined);
-      stats.setBytesMed(undefined);
-      stats.setBytesMax(undefined);
-      stats.setHisto98pc(undefined);
-      stats.setOldestTimestamp(undefined);
-    }
-    
-    return stats;
+    return MoneroDaemonRpc._convertRpcTxPoolStats(resp.pool_stats);
   }
   
   async flushTxPool(hashes) {
@@ -784,6 +773,15 @@ class MoneroDaemonRpc extends MoneroDaemon {
     let resp = await this.rpc.sendJsonRequest("submit_block", blockBlobs);
     MoneroDaemonRpc._checkResponseStatus(resp.result);
   }
+
+  async pruneBlockchain(check) {
+    let resp = await this.rpc.sendJsonRequest("prune_blockchain", {check: check}, 0);
+    MoneroDaemonRpc._checkResponseStatus(resp.result);
+    let result = new MoneroPruneResult();
+    result.setIsPruned(resp.result.pruned);
+    result.setPruningSeed(resp.result.pruning_seed);
+    return result;
+  }
   
   async checkForUpdate() {
     let resp = await this.rpc.sendPathRequest("update", {command: "check"});
@@ -1027,7 +1025,10 @@ class MoneroDaemonRpc extends MoneroDaemon {
         }
       }
       else if (key === "vout") tx.setOutputs(val.map(rpcOutput => MoneroDaemonRpc._convertRpcOutput(rpcOutput, tx)));
-      else if (key === "rct_signatures") GenUtils.safeSet(tx, tx.getRctSignatures, tx.setRctSignatures, val);
+      else if (key === "rct_signatures") {
+        GenUtils.safeSet(tx, tx.getRctSignatures, tx.setRctSignatures, val);
+        if (val.txnFee) GenUtils.safeSet(tx, tx.getFee, tx.setFee, BigInteger.parse(val.txnFee));
+      } 
       else if (key === "rctsig_prunable") GenUtils.safeSet(tx, tx.getRctSigPrunable, tx.setRctSigPrunable, val);
       else if (key === "unlock_time") GenUtils.safeSet(tx, tx.getUnlockHeight, tx.setUnlockHeight, val);
       else if (key === "as_json" || key === "tx_json") { }  // handled last so tx is as initialized as possible
@@ -1306,6 +1307,7 @@ class MoneroDaemonRpc extends MoneroDaemon {
       else if (key === "credits") result.setCredits(BigInt(val))
       else if (key === "status" || key === "untrusted") {}  // handled elsewhere
       else if (key === "top_hash") result.setTopBlockHash("" === val ? undefined : val);
+      else if (key === "tx_extra_too_big") result.setIsTxExtraTooBig(val);
       else console.log("WARNING: ignoring unexpected field in submit tx hex result: " + key + ": " + val);
     }
     return result;
@@ -1327,10 +1329,24 @@ class MoneroDaemonRpc extends MoneroDaemon {
       else if (key === "num_not_relayed") stats.setNumNotRelayed(val);
       else if (key === "oldest") stats.setOldestTimestamp(val);
       else if (key === "txs_total") stats.setNumTxs(val);
-      else if (key === "fee_total") stats.setFeeTotal(BigInt(val));
-      else if (key === "histo") throw new MoneroError("Not implemented");
+      else if (key === "fee_total") stats.setFeeTotal(BigInteger.parse(val));
+      else if (key === "histo") {
+        stats.setHisto(new Map());
+        for (let elem of val) stats.getHisto().set(elem.bytes, elem.txs);
+      }
       else console.log("WARNING: ignoring unexpected field in tx pool stats: " + key + ": " + val);
     }
+
+    // uninitialize some stats if not applicable
+    if (stats.getHisto98pc() === 0) stats.setHisto98pc(undefined);
+    if (stats.getNumTxs() === 0) {
+      stats.setBytesMin(undefined);
+      stats.setBytesMed(undefined);
+      stats.setBytesMax(undefined);
+      stats.setHisto98pc(undefined);
+      stats.setOldestTimestamp(undefined);
+    }
+
     return stats;
   }
   
@@ -1501,11 +1517,11 @@ class MoneroDaemonRpcProxy extends MoneroDaemon {
     return undefined; // proxy does not have access to process
   }
   
-  async stopProcess() {
+  async stopProcess(force) {
     if (this.process === undefined) throw new MoneroError("MoneroDaemonRpcProxy instance not created from new process");
     let listenersCopy = GenUtils.copyArray(this.getListeners());
     for (let listener of listenersCopy) await this.removeListener(listener);
-    this.process.kill();
+    return GenUtils.killProcess(this.process, force ? "sigkill" : undefined);
   }
   
   async addListener(listener) {
@@ -1652,7 +1668,7 @@ class MoneroDaemonRpcProxy extends MoneroDaemon {
   }
   
   async getFeeEstimate(graceBlocks) {
-    return BigInt(await this._invokeWorker("daemonGetFeeEstimate", Array.from(arguments)));
+    return new MoneroFeeEstimate(await this._invokeWorker("daemonGetFeeEstimate", Array.from(arguments)));
   }
   
   async submitTxHex(txHex, doNotRelay) {
@@ -1798,6 +1814,10 @@ class MoneroDaemonRpcProxy extends MoneroDaemon {
   
   async submitBlocks(blockBlobs) {
     throw new MoneroError("Not implemented");
+  }
+
+  async pruneBlockchain(check) {
+    return new MoneroPruneResult(await this._invokeWorker("daemonPruneBlockchain"));
   }
   
   async checkForUpdate() {

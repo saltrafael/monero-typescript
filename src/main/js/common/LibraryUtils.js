@@ -30,6 +30,7 @@ class LibraryUtils {
   static async setLogLevel(level) {
     assert(level === parseInt(level, 10) && level >= 0, "Log level must be an integer >= 0");
     LibraryUtils.LOG_LEVEL = level;
+    if (LibraryUtils.WASM_MODULE) LibraryUtils.WASM_MODULE.set_log_level(level);
     if (LibraryUtils.WORKER) await LibraryUtils.invokeWorker(GenUtils.getUUID(), "setLogLevel", [level]);
   }
   
@@ -180,11 +181,19 @@ class LibraryUtils {
         // invoke callback function with this arg and arguments
         callbackFn.apply(thisArg, e.data.slice(2));
       }
-      
-      // set worker log level
-      await LibraryUtils.setLogLevel(LibraryUtils.getLogLevel());
     }
     return LibraryUtils.WORKER;
+  }
+  
+  /**
+   * Terminate monero-javascript's singleton worker.
+   */
+  static async terminateWorker() {
+    if (LibraryUtils.WORKER) {
+      LibraryUtils.WORKER.terminate();
+      delete LibraryUtils.WORKER;
+      LibraryUtils.WORKER = undefined;
+    }
   }
   
   /**
@@ -193,20 +202,34 @@ class LibraryUtils {
    * @param {objectId} identifies the worker object to invoke
    * @param {string} fnName is the name of the function to invoke
    * @param {Object[]} args are function arguments to invoke with
-   * @return {Promise} resolves with response payload from the worker or an error
+   * @return {any} resolves with response payload from the worker or an error
    */
   static async invokeWorker(objectId, fnName, args) {
     assert(fnName.length >= 2);
     let worker;
     worker = await LibraryUtils.getWorker();
     if (!LibraryUtils.WORKER_OBJECTS[objectId]) LibraryUtils.WORKER_OBJECTS[objectId] = {callbacks: {}};
-    return new Promise(function(resolve, reject) {
+    return await new Promise(function(resolve, reject) {
       let callbackId = GenUtils.getUUID();
       LibraryUtils.WORKER_OBJECTS[objectId].callbacks[callbackId] = function(resp) {  // TODO: this defines function once per callback
-        resp ? (resp.error ? reject(new MoneroError(resp.error)) : resolve(resp.result)) : resolve();
+        resp ? (resp.error ? reject(LibraryUtils.deserializeError(resp.error)) : resolve(resp.result)) : resolve();
+        delete LibraryUtils.WORKER_OBJECTS[objectId].callbacks[callbackId];
       };
       worker.postMessage([objectId, fnName, callbackId].concat(args === undefined ? [] : GenUtils.listify(args)));
     });
+  }
+
+  static serializeError(err) {
+    const serializedErr = { name: err.name, message: err.message, stack: err.stack };
+    if (err instanceof MoneroError) serializedErr.type = "MoneroError";
+    return serializedErr;
+  }
+
+  static deserializeError(serializedErr) {
+    const err = serializedErr.type === "MoneroError" ? new MoneroError(serializedErr.message) : new Error(serializedErr.message);
+    err.name = serializedErr.name;
+    err.stack = serializedErr.stack;
+    return err;
   }
   
   // ------------------------------ PRIVATE HELPERS ---------------------------

@@ -60,13 +60,13 @@ class TestSampleCode {
       
       it("Sample code demonstration", async function() {
         // import library
-        //const monerojs = require("../../index");  // *** CHANGE README TO "monero-javascript" ***
+        const monerojs = require("../../index");  // *** CHANGE README TO "monero-javascript" ***
         
         // connect to daemon
-        let daemon: MoneroDaemonRpc = await connectToDaemonRpc({uri: "http://localhost:28081", proxyToWorker: TestUtils.PROXY_TO_WORKER});
-        let height: number = await daemon.getHeight();            // 1523651
-        let feeEstimate: BigInt = await daemon.getFeeEstimate();  // 1014313512
-        let txsInPool: Array<MoneroTx> = await daemon.getTxPool();         // get transactions in the pool
+        let daemon = await monerojs.connectToDaemonRpc("http://localhost:28081");
+        let height = await daemon.getHeight();            // 1523651
+        let txsInPool = await daemon.getTxPool();         // get transactions in the pool
+        
         // open wallet on monero-wallet-rpc
         let walletRpc = await connectToWalletRpc({uri: "http://localhost:28084", username:"rpc_user", password:"abc123"});
 
