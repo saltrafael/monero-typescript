@@ -116,7 +116,7 @@ class MoneroOutputQuery extends MoneroOutputWallet {
     // filter on output's key image
     if (this.getKeyImage() !== undefined) {
       if (output.getKeyImage() === undefined) return false;
-      if (this.getKeyImage().getHex() !== undefined && this.getKeyImage().getHex() !== output.getKeyImage().getHex()) return false;
+      if (this.getKeyImage().hex !== undefined && this.getKeyImage().hex !== output.getKeyImage().hex) return false;
       if (this.getKeyImage().getSignature() !== undefined && this.getKeyImage().getSignature() !== output.getKeyImage().getSignature()) return false;
     }
     

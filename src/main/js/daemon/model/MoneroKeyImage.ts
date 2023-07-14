@@ -9,21 +9,28 @@ class MoneroKeyImage {
 
   /**
    * Construct the model.
-   * 
+   *
    * @param {MoneroKeyImage|object|string} stateOrHex is a MoneroKeyImage, JS object, or hex string to initialize from (optional)
    * @param {string} signature is the key image's signature
    */
-  constructor(stateOrHex: any, signature: any) {
+  constructor(
+    stateOrHex?: MoneroKeyImage | object | string,
+    signature?: string
+  ) {
     if (!stateOrHex) this.state = {};
-    else if (stateOrHex instanceof MoneroKeyImage) this.state = stateOrHex.toJson();
-    else if (typeof stateOrHex === "object") this.state = Object.assign({}, stateOrHex);
+    else if (stateOrHex instanceof MoneroKeyImage)
+      this.state = stateOrHex.toJson();
+    else if (typeof stateOrHex === "object")
+      this.state = Object.assign({}, stateOrHex);
     else if (typeof stateOrHex === "string") {
       this.state = {};
       this.setHex(stateOrHex);
       this.setSignature(signature);
     } else {
       // @ts-expect-error TS(2304): Cannot find name 'MoneroError'.
-      throw new MoneroError("stateOrHex must be a MoneroKeyImage, JavaScript object, or string");
+      throw new MoneroError(
+        "stateOrHex must be a MoneroKeyImage, JavaScript object, or string"
+      );
     }
   }
 
@@ -58,17 +65,19 @@ class MoneroKeyImage {
     assert(keyImage instanceof MoneroKeyImage);
     if (keyImage === this) return this;
     // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
-    this.setHex(GenUtils.reconcile(this.getHex(), keyImage.getHex()));
+    this.setHex(GenUtils.reconcile(this.hex, keyImage.hex));
     // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
-    this.setSignature(GenUtils.reconcile(this.getSignature(), keyImage.getSignature()));
+    this.setSignature(
+      GenUtils.reconcile(this.getSignature(), keyImage.getSignature())
+    );
     return this;
   }
 
   toString(indent = 0) {
     let str = "";
-    str += GenUtils.kvLine("Hex", this.getHex(), indent);
+    str += GenUtils.kvLine("Hex", this.hex, indent);
     str += GenUtils.kvLine("Signature", this.getSignature(), indent);
-    return str.slice(0, str.length - 1);  // strip last newline
+    return str.slice(0, str.length - 1); // strip last newline
   }
 }
 

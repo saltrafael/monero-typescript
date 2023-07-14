@@ -156,7 +156,7 @@ class MoneroWalletRpc extends MoneroWallet {
       // handle stdout
       that.process.stdout.on('data', function(data) {
         let line = data.toString();
-        LibraryUtils.log(2, line);
+        LibraryUtils.instance.log(2, line);
         output += line + '\n'; // capture output in case of error
         
         // extract uri from e.g. "I Binding on 127.0.0.1 (IPv4):38085"
@@ -192,7 +192,7 @@ class MoneroWalletRpc extends MoneroWallet {
       
       // handle stderr
       that.process.stderr.on('data', function(data) {
-        if (LibraryUtils.getLogLevel() >= 2) console.error(data);
+        if (LibraryUtils.instance.LOG_LEVEL >= 2) console.error(data);
       });
       
       // handle exit
@@ -447,8 +447,8 @@ class MoneroWalletRpc extends MoneroWallet {
   }
   
   _handleCreateWalletError(name, err) {
-    if (err.message === "Cannot create wallet. Already exists.") throw new MoneroRpcError("Wallet already exists: " + name, err.getCode(), err.getRpcMethod(), err.getRpcParams());
-    if (err.message === "Electrum-style word list failed verification") throw new MoneroRpcError("Invalid mnemonic", err.getCode(), err.getRpcMethod(), err.getRpcParams());
+    if (err.message === "Cannot create wallet. Already exists.") throw new MoneroRpcError("Wallet already exists: " + name, err.getCode(), err.rpcMethod, err.rpcParams);
+    if (err.message === "Electrum-style word list failed verification") throw new MoneroRpcError("Invalid mnemonic", err.getCode(), err.rpcMethod, err.rpcParams);
     throw err;
   }
   
@@ -901,7 +901,7 @@ class MoneroWalletRpc extends MoneroWallet {
     let txsQueried = [];
     for (let tx of txs) {
       if (query.meetsCriteria(tx)) txsQueried.push(tx);
-      else if (tx.getBlock() !== undefined) tx.getBlock().getTxs().splice(tx.getBlock().getTxs().indexOf(tx), 1);
+      else if (tx.getBlock() !== undefined) tx.getBlock().txs.splice(tx.getBlock().txs.indexOf(tx), 1);
     }
     txs = txsQueried;
     
@@ -997,7 +997,7 @@ class MoneroWalletRpc extends MoneroWallet {
   async importKeyImages(keyImages) {
     
     // convert key images to rpc parameter
-    let rpcKeyImages = keyImages.map(keyImage => ({key_image: keyImage.getHex(), signature: keyImage.getSignature()}));
+    let rpcKeyImages = keyImages.map(keyImage => ({key_image: keyImage.hex, signature: keyImage.getSignature()}));
     
     // send request
     let resp = await this.rpc.sendJsonRequest("import_key_images", {signed_key_images: rpcKeyImages});
@@ -1086,8 +1086,8 @@ class MoneroWalletRpc extends MoneroWallet {
     if (config.getRelay()) await this._poll();
     
     // initialize tx set from rpc response with pre-initialized txs
-    if (config.getCanSplit()) return MoneroWalletRpc._convertRpcSentTxsToTxSet(result, txs).getTxs();
-    else return MoneroWalletRpc._convertRpcTxToTxSet(result, txs === undefined ? undefined : txs[0], true).getTxs();
+    if (config.getCanSplit()) return MoneroWalletRpc._convertRpcSentTxsToTxSet(result, txs).txs;
+    else return MoneroWalletRpc._convertRpcTxToTxSet(result, txs === undefined ? undefined : txs[0], true).txs;
   }
   
   async sweepOutput(config) {
@@ -1189,12 +1189,12 @@ class MoneroWalletRpc extends MoneroWallet {
     if (relay) await this._poll();
     let result = resp.result;
     let txSet = MoneroWalletRpc._convertRpcSentTxsToTxSet(result);
-    if (txSet.getTxs() === undefined) return [];
-    for (let tx of txSet.getTxs()) {
+    if (txSet.txs === undefined) return [];
+    for (let tx of txSet.txs) {
       tx.setIsRelayed(!relay);
       tx.setInTxPool(tx.isRelayed());
     }
-    return txSet.getTxs();
+    return txSet.txs;
   }
   
   async relayTxs(txsOrMetadatas) {
@@ -1263,7 +1263,7 @@ class MoneroWalletRpc extends MoneroWallet {
     try {
       return (await this.rpc.sendJsonRequest("get_tx_key", {txid: txHash})).result.tx_key;
     } catch (e) {
-      if (e instanceof MoneroRpcError &amp;&amp; e.getCode() === -8 &amp;&amp; e.message.includes("TX ID has invalid format")) e = new MoneroRpcError("TX hash has invalid format", e.getCode(), e.getRpcMethod(), e.getRpcParams());  // normalize error message
+      if (e instanceof MoneroRpcError &amp;&amp; e.getCode() === -8 &amp;&amp; e.message.includes("TX ID has invalid format")) e = new MoneroRpcError("TX hash has invalid format", e.getCode(), e.rpcMethod, e.rpcParams);  // normalize error message
       throw e;
     }
   }
@@ -1282,7 +1282,7 @@ class MoneroWalletRpc extends MoneroWallet {
       check.setReceivedAmount(new BigInteger(resp.result.received));
       return check;
     } catch (e) {
-      if (e instanceof MoneroRpcError &amp;&amp; e.getCode() === -8 &amp;&amp; e.message.includes("TX ID has invalid format")) e = new MoneroRpcError("TX hash has invalid format", e.getCode(), e.getRpcMethod(), e.getRpcParams());  // normalize error message
+      if (e instanceof MoneroRpcError &amp;&amp; e.getCode() === -8 &amp;&amp; e.message.includes("TX ID has invalid format")) e = new MoneroRpcError("TX hash has invalid format", e.getCode(), e.rpcMethod, e.rpcParams);  // normalize error message
       throw e;
     }
   }
@@ -1292,7 +1292,7 @@ class MoneroWalletRpc extends MoneroWallet {
       let resp = await this.rpc.sendJsonRequest("get_tx_proof", {txid: txHash, address: address, message: message});
       return resp.result.signature;
     } catch (e) {
-      if (e instanceof MoneroRpcError &amp;&amp; e.getCode() === -8 &amp;&amp; e.message.includes("TX ID has invalid format")) e = new MoneroRpcError("TX hash has invalid format", e.getCode(), e.getRpcMethod(), e.getRpcParams());  // normalize error message
+      if (e instanceof MoneroRpcError &amp;&amp; e.getCode() === -8 &amp;&amp; e.message.includes("TX ID has invalid format")) e = new MoneroRpcError("TX hash has invalid format", e.getCode(), e.rpcMethod, e.rpcParams);  // normalize error message
       throw e;
     }
   }
@@ -1320,7 +1320,7 @@ class MoneroWalletRpc extends MoneroWallet {
       return check;
     } catch (e) {
       if (e instanceof MoneroRpcError &amp;&amp; e.getCode() === -1 &amp;&amp; e.message === "basic_string") e = new MoneroRpcError("Must provide signature to check tx proof", -1);
-      if (e instanceof MoneroRpcError &amp;&amp; e.getCode() === -8 &amp;&amp; e.message.includes("TX ID has invalid format")) e = new MoneroRpcError("TX hash has invalid format", e.getCode(), e.getRpcMethod(), e.getRpcParams());
+      if (e instanceof MoneroRpcError &amp;&amp; e.getCode() === -8 &amp;&amp; e.message.includes("TX ID has invalid format")) e = new MoneroRpcError("TX hash has invalid format", e.getCode(), e.rpcMethod, e.rpcParams);
       throw e;
     }
   }
@@ -1330,7 +1330,7 @@ class MoneroWalletRpc extends MoneroWallet {
       let resp = await this.rpc.sendJsonRequest("get_spend_proof", {txid: txHash, message: message});
       return resp.result.signature;
     } catch (e) {
-      if (e instanceof MoneroRpcError &amp;&amp; e.getCode() === -8 &amp;&amp; e.message.includes("TX ID has invalid format")) e = new MoneroRpcError("TX hash has invalid format", e.getCode(), e.getRpcMethod(), e.getRpcParams());  // normalize error message
+      if (e instanceof MoneroRpcError &amp;&amp; e.getCode() === -8 &amp;&amp; e.message.includes("TX ID has invalid format")) e = new MoneroRpcError("TX hash has invalid format", e.getCode(), e.rpcMethod, e.rpcParams);  // normalize error message
       throw e;
     }
   }
@@ -1344,7 +1344,7 @@ class MoneroWalletRpc extends MoneroWallet {
       });
       return resp.result.good;
     } catch (e) {
-      if (e instanceof MoneroRpcError &amp;&amp; e.getCode() === -8 &amp;&amp; e.message.includes("TX ID has invalid format")) e = new MoneroRpcError("TX hash has invalid format", e.getCode(), e.getRpcMethod(), e.getRpcParams());  // normalize error message
+      if (e instanceof MoneroRpcError &amp;&amp; e.getCode() === -8 &amp;&amp; e.message.includes("TX ID has invalid format")) e = new MoneroRpcError("TX hash has invalid format", e.getCode(), e.rpcMethod, e.rpcParams);  // normalize error message
       throw e;
     }
   }
@@ -1701,7 +1701,7 @@ class MoneroWalletRpc extends MoneroWallet {
       for (let rpcTx of resp.result[key]) {
         //if (rpcTx.txid === query.debugTxId) console.log(rpcTx);
         let tx = MoneroWalletRpc._convertRpcTxWithTransfer(rpcTx);
-        if (tx.isConfirmed()) assert(tx.getBlock().getTxs().indexOf(tx) > -1);
+        if (tx.isConfirmed()) assert(tx.getBlock().txs.indexOf(tx) > -1);
         
         // replace transfer amount with destination sum
         // TODO monero-wallet-rpc: confirmed tx from/to same account has amount 0 but cached transfers
@@ -1740,7 +1740,7 @@ class MoneroWalletRpc extends MoneroWallet {
       
       // remove txs without requested transfer
       if (tx.getBlock() !== undefined &amp;&amp; tx.getOutgoingTransfer() === undefined &amp;&amp; tx.getIncomingTransfers() === undefined) {
-        tx.getBlock().getTxs().splice(tx.getBlock().getTxs().indexOf(tx), 1);
+        tx.getBlock().txs.splice(tx.getBlock().txs.indexOf(tx), 1);
       }
     }
     
@@ -1801,7 +1801,7 @@ class MoneroWalletRpc extends MoneroWallet {
       
       // remove excluded txs from block
       if (tx.getOutputs() === undefined &amp;&amp; tx.getBlock() !== undefined) {
-        tx.getBlock().getTxs().splice(tx.getBlock().getTxs().indexOf(tx), 1);
+        tx.getBlock().txs.splice(tx.getBlock().txs.indexOf(tx), 1);
       }
     }
     return outputs;
@@ -1864,7 +1864,7 @@ class MoneroWalletRpc extends MoneroWallet {
     let txSet = MoneroWalletRpc._convertRpcSentTxsToTxSet(result);
     
     // initialize remaining known fields
-    for (let tx of txSet.getTxs()) {
+    for (let tx of txSet.txs) {
       tx.setIsLocked(true);
       tx.setIsConfirmed(false);
       tx.setNumConfirmations(0);
@@ -1887,7 +1887,7 @@ class MoneroWalletRpc extends MoneroWallet {
         if (tx.isDoubleSpendSeen() === undefined) tx.setIsDoubleSpend(false);
       }
     }
-    return txSet.getTxs();
+    return txSet.txs;
   }
   
   _refreshListening() {
@@ -2302,7 +2302,7 @@ class MoneroWalletRpc extends MoneroWallet {
         for (let txMap of val) {
           let tx = MoneroWalletRpc._convertRpcTxWithTransfer(txMap, undefined, true);
           tx.setTxSet(txSet);
-          txSet.getTxs().push(tx);
+          txSet.txs.push(tx);
         }
       }
       else if (key === "summary") { } // TODO: support tx set summary fields?
@@ -2409,7 +2409,7 @@ class MoneroWalletRpc extends MoneroWallet {
     else if (tx2.getHeight() === undefined) return -1;  // tx2 is unconfirmed
     let diff = tx1.getHeight() - tx2.getHeight();
     if (diff !== 0) return diff;
-    return tx1.getBlock().getTxs().indexOf(tx1) - tx2.getBlock().getTxs().indexOf(tx2); // txs are in the same block so retain their original order
+    return tx1.getBlock().txs.indexOf(tx1) - tx2.getBlock().txs.indexOf(tx2); // txs are in the same block so retain their original order
   }
   
   /**
@@ -2437,7 +2437,7 @@ class MoneroWalletRpc extends MoneroWallet {
     if (compare !== 0) return compare;
     compare = o1.getIndex() - o2.getIndex();
     if (compare !== 0) return compare;
-    return o1.getKeyImage().getHex().localeCompare(o2.getKeyImage().getHex());
+    return o1.getKeyImage().hex.localeCompare(o2.getKeyImage().hex);
   }
 }
 
@@ -2612,7 +2612,7 @@ module.exports = MoneroWalletRpc;</code></pre>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ConnectionType.html">ConnectionType</a></li><li><a href="GenUtils.html">GenUtils</a></li><li><a href="HttpClient.html">HttpClient</a></li><li><a href="LibraryUtils.html">LibraryUtils</a></li><li><a href="MoneroAccount.html">MoneroAccount</a></li><li><a href="MoneroAccountTag.html">MoneroAccountTag</a></li><li><a href="MoneroAddressBookEntry.html">MoneroAddressBookEntry</a></li><li><a href="MoneroAltChain.html">MoneroAltChain</a></li><li><a href="MoneroBan.html">MoneroBan</a></li><li><a href="MoneroBlock.html">MoneroBlock</a></li><li><a href="MoneroBlockHeader.html">MoneroBlockHeader</a></li><li><a href="MoneroBlockTemplate.html">MoneroBlockTemplate</a></li><li><a href="MoneroCheck.html">MoneroCheck</a></li><li><a href="MoneroCheckReserve.html">MoneroCheckReserve</a></li><li><a href="MoneroCheckTx.html">MoneroCheckTx</a></li><li><a href="MoneroConnectionManager.html">MoneroConnectionManager</a></li><li><a href="MoneroConnectionManagerListener.html">MoneroConnectionManagerListener</a></li><li><a href="MoneroConnectionSpan.html">MoneroConnectionSpan</a></li><li><a href="MoneroDaemonInfo.html">MoneroDaemonInfo</a></li><li><a href="MoneroDaemonListener.html">MoneroDaemonListener</a></li><li><a href="MoneroDaemonRpc.html">MoneroDaemonRpc</a></li><li><a href="MoneroDaemonSyncInfo.html">MoneroDaemonSyncInfo</a></li><li><a href="MoneroDaemonUpdateCheckResult.html">MoneroDaemonUpdateCheckResult</a></li><li><a href="MoneroDaemonUpdateDownloadResult.html">MoneroDaemonUpdateDownloadResult</a></li><li><a href="MoneroDestination.html">MoneroDestination</a></li><li><a href="MoneroError.html">MoneroError</a></li><li><a href="MoneroFeeEstimate.html">MoneroFeeEstimate</a></li><li><a href="MoneroHardForkInfo.html">MoneroHardForkInfo</a></li><li><a href="MoneroIncomingTransfer.html">MoneroIncomingTransfer</a></li><li><a href="MoneroIntegratedAddress.html">MoneroIntegratedAddress</a></li><li><a href="MoneroKeyImage.html">MoneroKeyImage</a></li><li><a href="MoneroKeyImageImportResult.html">MoneroKeyImageImportResult</a></li><li><a href="MoneroKeyImageSpentStatus.html">MoneroKeyImageSpentStatus</a></li><li><a href="MoneroMessageSignatureResult.html">MoneroMessageSignatureResult</a></li><li><a href="MoneroMessageSignatureType.html">MoneroMessageSignatureType</a></li><li><a href="MoneroMinerTxSum.html">MoneroMinerTxSum</a></li><li><a href="MoneroMiningStatus.html">MoneroMiningStatus</a></li><li><a href="MoneroMultisigInfo.html">MoneroMultisigInfo</a></li><li><a href="MoneroMultisigInitResult.html">MoneroMultisigInitResult</a></li><li><a href="MoneroMultisigSignResult.html">MoneroMultisigSignResult</a></li><li><a href="MoneroNetworkType.html">MoneroNetworkType</a></li><li><a href="MoneroOutgoingTransfer.html">MoneroOutgoingTransfer</a></li><li><a href="MoneroOutput.html">MoneroOutput</a></li><li><a href="MoneroOutputHistogramEntry.html">MoneroOutputHistogramEntry</a></li><li><a href="MoneroOutputQuery.html">MoneroOutputQuery</a></li><li><a href="MoneroOutputWallet.html">MoneroOutputWallet</a></li><li><a href="MoneroPeer.html">MoneroPeer</a></li><li><a href="MoneroPruneResult.html">MoneroPruneResult</a></li><li><a href="MoneroRpcConnection.html">MoneroRpcConnection</a></li><li><a href="MoneroRpcError.html">MoneroRpcError</a></li><li><a href="MoneroSubaddress.html">MoneroSubaddress</a></li><li><a href="MoneroSubmitTxResult.html">MoneroSubmitTxResult</a></li><li><a href="MoneroSyncResult.html">MoneroSyncResult</a></li><li><a href="MoneroTransfer.html">MoneroTransfer</a></li><li><a href="MoneroTransferQuery.html">MoneroTransferQuery</a></li><li><a href="MoneroTx.html">MoneroTx</a></li><li><a href="MoneroTxConfig.html">MoneroTxConfig</a></li><li><a href="MoneroTxPoolStats.html">MoneroTxPoolStats</a></li><li><a href="MoneroTxPriority.html">MoneroTxPriority</a></li><li><a href="MoneroTxQuery.html">MoneroTxQuery</a></li><li><a href="MoneroTxSet.html">MoneroTxSet</a></li><li><a href="MoneroTxWallet.html">MoneroTxWallet</a></li><li><a href="MoneroUtils.html">MoneroUtils</a></li><li><a href="MoneroVersion.html">MoneroVersion</a></li><li><a href="MoneroWalletConfig.html">MoneroWalletConfig</a></li><li><a href="MoneroWalletFull.html">MoneroWalletFull</a></li><li><a href="MoneroWalletKeys.html">MoneroWalletKeys</a></li><li><a href="MoneroWalletListener.html">MoneroWalletListener</a></li><li><a href="MoneroWalletRpc.html">MoneroWalletRpc</a></li><li><a href="SslOptions.html">SslOptions</a></li><li><a href="TaskLooper.html">TaskLooper</a></li><li><a href="ThreadPool.html">ThreadPool</a></li></ul><h3>Interfaces</h3><ul><li><a href="MoneroDaemon.html">MoneroDaemon</a></li><li><a href="MoneroWallet.html">MoneroWallet</a></li></ul><h3>Global</h3><ul><li><a href="global.html#connectToDaemonRpc">connectToDaemonRpc</a></li><li><a href="global.html#connectToWalletRpc">connectToWalletRpc</a></li><li><a href="global.html#createWalletFull">createWalletFull</a></li><li><a href="global.html#createWalletKeys">createWalletKeys</a></li><li><a href="global.html#getVersion">getVersion</a></li><li><a href="global.html#openWalletFull">openWalletFull</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ConnectionType.html">ConnectionType</a></li><li><a href="GenUtils.html">GenUtils</a></li><li><a href="HttpClient.html">HttpClient</a></li><li><a href="LibraryUtils.instance.html">LibraryUtils</a></li><li><a href="MoneroAccount.html">MoneroAccount</a></li><li><a href="MoneroAccountTag.html">MoneroAccountTag</a></li><li><a href="MoneroAddressBookEntry.html">MoneroAddressBookEntry</a></li><li><a href="MoneroAltChain.html">MoneroAltChain</a></li><li><a href="MoneroBan.html">MoneroBan</a></li><li><a href="MoneroBlock.html">MoneroBlock</a></li><li><a href="MoneroBlockHeader.html">MoneroBlockHeader</a></li><li><a href="MoneroBlockTemplate.html">MoneroBlockTemplate</a></li><li><a href="MoneroCheck.html">MoneroCheck</a></li><li><a href="MoneroCheckReserve.html">MoneroCheckReserve</a></li><li><a href="MoneroCheckTx.html">MoneroCheckTx</a></li><li><a href="MoneroConnectionManager.html">MoneroConnectionManager</a></li><li><a href="MoneroConnectionManagerListener.html">MoneroConnectionManagerListener</a></li><li><a href="MoneroConnectionSpan.html">MoneroConnectionSpan</a></li><li><a href="MoneroDaemonInfo.html">MoneroDaemonInfo</a></li><li><a href="MoneroDaemonListener.html">MoneroDaemonListener</a></li><li><a href="MoneroDaemonRpc.html">MoneroDaemonRpc</a></li><li><a href="MoneroDaemonSyncInfo.html">MoneroDaemonSyncInfo</a></li><li><a href="MoneroDaemonUpdateCheckResult.html">MoneroDaemonUpdateCheckResult</a></li><li><a href="MoneroDaemonUpdateDownloadResult.html">MoneroDaemonUpdateDownloadResult</a></li><li><a href="MoneroDestination.html">MoneroDestination</a></li><li><a href="MoneroError.html">MoneroError</a></li><li><a href="MoneroFeeEstimate.html">MoneroFeeEstimate</a></li><li><a href="MoneroHardForkInfo.html">MoneroHardForkInfo</a></li><li><a href="MoneroIncomingTransfer.html">MoneroIncomingTransfer</a></li><li><a href="MoneroIntegratedAddress.html">MoneroIntegratedAddress</a></li><li><a href="MoneroKeyImage.html">MoneroKeyImage</a></li><li><a href="MoneroKeyImageImportResult.html">MoneroKeyImageImportResult</a></li><li><a href="MoneroKeyImageSpentStatus.html">MoneroKeyImageSpentStatus</a></li><li><a href="MoneroMessageSignatureResult.html">MoneroMessageSignatureResult</a></li><li><a href="MoneroMessageSignatureType.html">MoneroMessageSignatureType</a></li><li><a href="MoneroMinerTxSum.html">MoneroMinerTxSum</a></li><li><a href="MoneroMiningStatus.html">MoneroMiningStatus</a></li><li><a href="MoneroMultisigInfo.html">MoneroMultisigInfo</a></li><li><a href="MoneroMultisigInitResult.html">MoneroMultisigInitResult</a></li><li><a href="MoneroMultisigSignResult.html">MoneroMultisigSignResult</a></li><li><a href="MoneroNetworkType.html">MoneroNetworkType</a></li><li><a href="MoneroOutgoingTransfer.html">MoneroOutgoingTransfer</a></li><li><a href="MoneroOutput.html">MoneroOutput</a></li><li><a href="MoneroOutputHistogramEntry.html">MoneroOutputHistogramEntry</a></li><li><a href="MoneroOutputQuery.html">MoneroOutputQuery</a></li><li><a href="MoneroOutputWallet.html">MoneroOutputWallet</a></li><li><a href="MoneroPeer.html">MoneroPeer</a></li><li><a href="MoneroPruneResult.html">MoneroPruneResult</a></li><li><a href="MoneroRpcConnection.html">MoneroRpcConnection</a></li><li><a href="MoneroRpcError.html">MoneroRpcError</a></li><li><a href="MoneroSubaddress.html">MoneroSubaddress</a></li><li><a href="MoneroSubmitTxResult.html">MoneroSubmitTxResult</a></li><li><a href="MoneroSyncResult.html">MoneroSyncResult</a></li><li><a href="MoneroTransfer.html">MoneroTransfer</a></li><li><a href="MoneroTransferQuery.html">MoneroTransferQuery</a></li><li><a href="MoneroTx.html">MoneroTx</a></li><li><a href="MoneroTxConfig.html">MoneroTxConfig</a></li><li><a href="MoneroTxPoolStats.html">MoneroTxPoolStats</a></li><li><a href="MoneroTxPriority.html">MoneroTxPriority</a></li><li><a href="MoneroTxQuery.html">MoneroTxQuery</a></li><li><a href="MoneroTxSet.html">MoneroTxSet</a></li><li><a href="MoneroTxWallet.html">MoneroTxWallet</a></li><li><a href="MoneroUtils.html">MoneroUtils</a></li><li><a href="MoneroVersion.html">MoneroVersion</a></li><li><a href="MoneroWalletConfig.html">MoneroWalletConfig</a></li><li><a href="MoneroWalletFull.html">MoneroWalletFull</a></li><li><a href="MoneroWalletKeys.html">MoneroWalletKeys</a></li><li><a href="MoneroWalletListener.html">MoneroWalletListener</a></li><li><a href="MoneroWalletRpc.html">MoneroWalletRpc</a></li><li><a href="SslOptions.html">SslOptions</a></li><li><a href="TaskLooper.html">TaskLooper</a></li><li><a href="ThreadPool.html">ThreadPool</a></li></ul><h3>Interfaces</h3><ul><li><a href="MoneroDaemon.html">MoneroDaemon</a></li><li><a href="MoneroWallet.html">MoneroWallet</a></li></ul><h3>Global</h3><ul><li><a href="global.html#connectToDaemonRpc">connectToDaemonRpc</a></li><li><a href="global.html#connectToWalletRpc">connectToWalletRpc</a></li><li><a href="global.html#createWalletFull">createWalletFull</a></li><li><a href="global.html#createWalletKeys">createWalletKeys</a></li><li><a href="global.html#getVersion">getVersion</a></li><li><a href="global.html#openWalletFull">openWalletFull</a></li></ul>
 </nav>
 
 <br class="clear">

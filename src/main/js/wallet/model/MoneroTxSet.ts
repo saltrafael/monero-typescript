@@ -34,9 +34,9 @@ class MoneroTxSet {
 
   toJson() {
     let json = Object.assign({}, this.state); // copy state
-    if (this.getTxs() !== undefined) {
+    if (this.txs !== undefined) {
       json.txs = [];
-      for (let tx of this.getTxs()) json.txs.push(tx.toJson());
+      for (let tx of this.txs) json.txs.push(tx.toJson());
     }
     return json;
   }
@@ -90,10 +90,10 @@ class MoneroTxSet {
     this.setSignedTxHex(GenUtils.reconcile(this.getSignedTxHex(), txSet.getSignedTxHex()));
     
     // merge txs
-    if (txSet.getTxs() !== undefined) {
-      for (let tx of txSet.getTxs()) {
+    if (txSet.txs !== undefined) {
+      for (let tx of txSet.txs) {
         tx.setTxSet(this);
-        MoneroUtils.mergeTx(this.getTxs(), tx);
+        MoneroUtils.mergeTx(this.txs, tx);
       }
     }
 
@@ -105,9 +105,9 @@ class MoneroTxSet {
     str += GenUtils.kvLine("Multisig tx hex: ", this.getMultisigTxHex(), indent);
     str += GenUtils.kvLine("Unsigned tx hex: ", this.getUnsignedTxHex(), indent);
     str += GenUtils.kvLine("Signed tx hex: ", this.getSignedTxHex(), indent);
-    if (this.getTxs() !== undefined) {
+    if (this.txs !== undefined) {
       str += GenUtils.kvLine("Txs", "", indent);
-      for (let tx of this.getTxs()) {
+      for (let tx of this.txs) {
         str += tx.toString(indent + 1) + "\n";
       }
     }

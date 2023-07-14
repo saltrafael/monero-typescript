@@ -694,7 +694,7 @@ class MoneroTx {
     if (this.getBlock() !== tx.getBlock()) {
       if (this.getBlock() === undefined) {
         this.setBlock(tx.getBlock());
-        this.getBlock().getTxs[this.getBlock().getTxs().indexOf(tx)] = this; // update block to point to this tx
+        this.getBlock().getTxs[this.getBlock().txs.indexOf(tx)] = this; // update block to point to this tx
       } else if (tx.getBlock() !== undefined) {
         this.getBlock().merge(tx.getBlock()); // comes back to merging txs
         return this;
@@ -772,7 +772,7 @@ class MoneroTx {
         merger.setTx(this);
         if (!this.getInputs()) this.setInputs([]);
         for (let mergee of this.getInputs()) {
-          if (mergee.getKeyImage().getHex() === merger.getKeyImage().getHex()) {
+          if (mergee.getKeyImage().hex === merger.getKeyImage().hex) {
             mergee.merge(merger);
             merged = true;
             break;
@@ -793,7 +793,7 @@ class MoneroTx {
           let merged = false;
           merger.setTx(this);
           for (let mergee of this.getOutputs()) {
-            if ((merger.getKeyImage() && mergee.getKeyImage().getHex() === merger.getKeyImage().getHex()) ||
+            if ((merger.getKeyImage() && mergee.getKeyImage().hex === merger.getKeyImage().hex) ||
                 (merger.getStealthPublicKey() && mergee.getStealthPublicKey() === merger.getStealthPublicKey())) {
              mergee.merge(merger);
              merged = true;

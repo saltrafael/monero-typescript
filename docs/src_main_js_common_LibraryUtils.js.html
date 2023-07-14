@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: src/main/js/common/LibraryUtils.js</title>
+    <title>JSDoc: Source: src/main/js/common/LibraryUtils.instance.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: src/main/js/common/LibraryUtils.js</h1>
+    <h1 class="page-title">Source: src/main/js/common/LibraryUtils.instance.js</h1>
 
     
 
@@ -46,7 +46,7 @@ class LibraryUtils {
    */
   static log(level, msg) {
     assert(level === parseInt(level, 10) &amp;&amp; level >= 0, "Log level must be an integer >= 0");
-    if (LibraryUtils.LOG_LEVEL >= level) console.log(msg);
+    if (LibraryUtils.instance.LOG_LEVEL >= level) console.log(msg);
   }
   
   /**
@@ -56,8 +56,8 @@ class LibraryUtils {
    */
   static async setLogLevel(level) {
     assert(level === parseInt(level, 10) &amp;&amp; level >= 0, "Log level must be an integer >= 0");
-    LibraryUtils.LOG_LEVEL = level;
-    if (LibraryUtils.WORKER) await LibraryUtils.invokeWorker(GenUtils.getUUID(), "setLogLevel", [level]);
+    LibraryUtils.instance.LOG_LEVEL = level;
+    if (LibraryUtils.instance.WORKER) await LibraryUtils.instance.invokeWorker(GenUtils.getUUID(), "setLogLevel", [level]);
   }
   
   /**
@@ -66,7 +66,7 @@ class LibraryUtils {
    * @return {int} the library's log level
    */
   static getLogLevel() {
-    return LibraryUtils.LOG_LEVEL;
+    return LibraryUtils.instance.LOG_LEVEL;
   }
   
   /**
@@ -76,8 +76,8 @@ class LibraryUtils {
    */
   static async getWasmMemoryUsed() {
     let total = 0;
-    if (LibraryUtils.WORKER) total += await LibraryUtils.invokeWorker(GenUtils.getUUID(), "getWasmMemoryUsed", []);
-    if (LibraryUtils.WASM_MODULE &amp;&amp; LibraryUtils.WASM_MODULE.HEAP8) total += LibraryUtils.WASM_MODULE.HEAP8.length;
+    if (LibraryUtils.instance.WORKER) total += await LibraryUtils.instance.invokeWorker(GenUtils.getUUID(), "getWasmMemoryUsed", []);
+    if (LibraryUtils.instance.WASM_MODULE &amp;&amp; LibraryUtils.instance.WASM_MODULE.HEAP8) total += LibraryUtils.instance.WASM_MODULE.HEAP8.length;
     return total;
   }
   
@@ -85,7 +85,7 @@ class LibraryUtils {
    * Get the WebAssembly module in the current context (nodejs, browser main thread or worker).
    */
   static getWasmModule() {
-    return LibraryUtils.WASM_MODULE;
+    return LibraryUtils.instance.WASM_MODULE;
   }
   
   /**
@@ -94,17 +94,17 @@ class LibraryUtils {
   static async loadKeysModule() {
     
     // use cache if suitable, full module supersedes keys module because it is superset
-    if (LibraryUtils.WASM_MODULE) return LibraryUtils.WASM_MODULE;
+    if (LibraryUtils.instance.WASM_MODULE) return LibraryUtils.instance.WASM_MODULE;
     
     // load module
-    delete LibraryUtils.WASM_MODULE;
-    LibraryUtils.WASM_MODULE = require("../../../../dist/monero_wallet_keys")();
+    delete LibraryUtils.instance.WASM_MODULE;
+    LibraryUtils.instance.WASM_MODULE = require("../../../../dist/monero_wallet_keys")();
     return new Promise(function(resolve, reject) {
-      LibraryUtils.WASM_MODULE.then(module => {
-        LibraryUtils.WASM_MODULE = module
-        delete LibraryUtils.WASM_MODULE.then;
-        LibraryUtils._initWasmModule(LibraryUtils.WASM_MODULE);
-        resolve(LibraryUtils.WASM_MODULE);
+      LibraryUtils.instance.WASM_MODULE.then(module => {
+        LibraryUtils.instance.WASM_MODULE = module
+        delete LibraryUtils.instance.WASM_MODULE.then;
+        LibraryUtils.instance._initWasmModule(LibraryUtils.instance.WASM_MODULE);
+        resolve(LibraryUtils.instance.WASM_MODULE);
       });
     });
   }
@@ -119,18 +119,18 @@ class LibraryUtils {
   static async loadFullModule() {
     
     // use cache if suitable, full module supersedes keys module because it is superset
-    if (LibraryUtils.WASM_MODULE &amp;&amp; LibraryUtils.FULL_LOADED) return LibraryUtils.WASM_MODULE;
+    if (LibraryUtils.instance.WASM_MODULE &amp;&amp; LibraryUtils.instance.FULL_LOADED) return LibraryUtils.instance.WASM_MODULE;
     
     // load module
-    delete LibraryUtils.WASM_MODULE;
-    LibraryUtils.WASM_MODULE = require("../../../../dist/monero_wallet_full")();
+    delete LibraryUtils.instance.WASM_MODULE;
+    LibraryUtils.instance.WASM_MODULE = require("../../../../dist/monero_wallet_full")();
     return new Promise(function(resolve, reject) {
-      LibraryUtils.WASM_MODULE.then(module => {
-        LibraryUtils.WASM_MODULE = module
-        delete LibraryUtils.WASM_MODULE.then;
-        LibraryUtils.FULL_LOADED = true;
-        LibraryUtils._initWasmModule(LibraryUtils.WASM_MODULE);
-        resolve(LibraryUtils.WASM_MODULE);
+      LibraryUtils.instance.WASM_MODULE.then(module => {
+        LibraryUtils.instance.WASM_MODULE = module
+        delete LibraryUtils.instance.WASM_MODULE.then;
+        LibraryUtils.instance.FULL_LOADED = true;
+        LibraryUtils.instance._initWasmModule(LibraryUtils.instance.WASM_MODULE);
+        resolve(LibraryUtils.instance.WASM_MODULE);
       });
     });
   }
@@ -143,9 +143,9 @@ class LibraryUtils {
    * @param {function} fn - function to inform if unauthorized requests should be rejected
    */
   static setRejectUnauthorizedFn(fnId, fn) {
-    if (!LibraryUtils.REJECT_UNAUTHORIZED_FNS) LibraryUtils.REJECT_UNAUTHORIZED_FNS = [];
-    if (fn === undefined) delete LibraryUtils.REJECT_UNAUTHORIZED_FNS[fnId];
-    else LibraryUtils.REJECT_UNAUTHORIZED_FNS[fnId] = fn;
+    if (!LibraryUtils.instance.REJECT_UNAUTHORIZED_FNS) LibraryUtils.instance.REJECT_UNAUTHORIZED_FNS = [];
+    if (fn === undefined) delete LibraryUtils.instance.REJECT_UNAUTHORIZED_FNS[fnId];
+    else LibraryUtils.instance.REJECT_UNAUTHORIZED_FNS[fnId] = fn;
   }
   
   /**
@@ -154,8 +154,8 @@ class LibraryUtils {
    * @param {string} fnId - uniquely identifies the function
    */
   static isRejectUnauthorized(fnId) {
-    if (!LibraryUtils.REJECT_UNAUTHORIZED_FNS[fnId]) throw new Error("No function registered with id " + fnId + " to inform if unauthorized reqs should be rejected");
-    return LibraryUtils.REJECT_UNAUTHORIZED_FNS[fnId]();
+    if (!LibraryUtils.instance.REJECT_UNAUTHORIZED_FNS[fnId]) throw new Error("No function registered with id " + fnId + " to inform if unauthorized reqs should be rejected");
+    return LibraryUtils.instance.REJECT_UNAUTHORIZED_FNS[fnId]();
   }
   
   /**
@@ -165,9 +165,9 @@ class LibraryUtils {
    * @param {string} workerDistPath - path to load the worker
    */
   static setWorkerDistPath(workerDistPath) {
-    let path = LibraryUtils._prefixWindowsPath(workerDistPath ? workerDistPath : LibraryUtils.WORKER_DIST_PATH_DEFAULT);
-    if (path !== LibraryUtils.WORKER_DIST_PATH) delete LibraryUtils.WORKER;
-    LibraryUtils.WORKER_DIST_PATH = path;
+    let path = LibraryUtils.instance._prefixWindowsPath(workerDistPath ? workerDistPath : LibraryUtils.instance.WORKER_DIST_PATH_DEFAULT);
+    if (path !== LibraryUtils.instance.WORKER_DIST_PATH) delete LibraryUtils.instance.WORKER;
+    LibraryUtils.instance.WORKER_DIST_PATH = path;
   }
 
   /**
@@ -178,26 +178,26 @@ class LibraryUtils {
   static async getWorker() {
     
     // one time initialization
-    if (!LibraryUtils.WORKER) {
-      if (GenUtils.isBrowser()) LibraryUtils.WORKER = new Worker(LibraryUtils.WORKER_DIST_PATH);
+    if (!LibraryUtils.instance.WORKER) {
+      if (GenUtils.isBrowser()) LibraryUtils.instance.WORKER = new Worker(LibraryUtils.instance.WORKER_DIST_PATH);
       else { 
        const Worker = require("web-worker"); // import web worker if nodejs
-       LibraryUtils.WORKER = new Worker(LibraryUtils.WORKER_DIST_PATH);
+       LibraryUtils.instance.WORKER = new Worker(LibraryUtils.instance.WORKER_DIST_PATH);
       }
-      LibraryUtils.WORKER_OBJECTS = {};  // store per object running in the worker
+      LibraryUtils.instance.WORKER_OBJECTS = {};  // store per object running in the worker
       
       // receive worker errors
-      LibraryUtils.WORKER.onerror = function(err) {
+      LibraryUtils.instance.WORKER.onerror = function(err) {
         console.error("Error posting message to MoneroWebWorker.js; is it copied to the app's build directory (e.g. in the root)?");
         console.log(err);
       };
       
       // receive worker messages
-      LibraryUtils.WORKER.onmessage = function(e) {
+      LibraryUtils.instance.WORKER.onmessage = function(e) {
         
         // lookup object id, callback function, and this arg
         let thisArg = null;
-        let callbackFn = LibraryUtils.WORKER_OBJECTS[e.data[0]].callbacks[e.data[1]]; // look up by object id then by function name
+        let callbackFn = LibraryUtils.instance.WORKER_OBJECTS[e.data[0]].callbacks[e.data[1]]; // look up by object id then by function name
         if (callbackFn === undefined) throw new Error("No worker callback function defined for key '" + e.data[1] + "'");
         if (callbackFn instanceof Array) {  // this arg may be stored with callback function
           thisArg = callbackFn[1];
@@ -209,19 +209,19 @@ class LibraryUtils {
       }
       
       // set worker log level
-      await LibraryUtils.setLogLevel(LibraryUtils.getLogLevel());
+      await LibraryUtils.instance.setLogLevel(LibraryUtils.instance.LOG_LEVEL);
     }
-    return LibraryUtils.WORKER;
+    return LibraryUtils.instance.WORKER;
   }
   
   /**
    * Terminate monero-javascript's singleton worker.
    */
   static async terminateWorker() {
-    if (LibraryUtils.WORKER) {
-      LibraryUtils.WORKER.terminate();
-      delete LibraryUtils.WORKER;
-      LibraryUtils.WORKER = undefined;
+    if (LibraryUtils.instance.WORKER) {
+      LibraryUtils.instance.WORKER.terminate();
+      delete LibraryUtils.instance.WORKER;
+      LibraryUtils.instance.WORKER = undefined;
     }
   }
   
@@ -235,13 +235,13 @@ class LibraryUtils {
    */
   static async invokeWorker(objectId, fnName, args) {
     assert(fnName.length >= 2);
-    let worker = await LibraryUtils.getWorker();
-    if (!LibraryUtils.WORKER_OBJECTS[objectId]) LibraryUtils.WORKER_OBJECTS[objectId] = {callbacks: {}};
+    let worker = await LibraryUtils.instance.getWorker();
+    if (!LibraryUtils.instance.WORKER_OBJECTS[objectId]) LibraryUtils.instance.WORKER_OBJECTS[objectId] = {callbacks: {}};
     return await new Promise(function(resolve, reject) {
       let callbackId = GenUtils.getUUID();
-      LibraryUtils.WORKER_OBJECTS[objectId].callbacks[callbackId] = function(resp) {  // TODO: this defines function once per callback
-        resp ? (resp.error ? reject(LibraryUtils.deserializeError(resp.error)) : resolve(resp.result)) : resolve();
-        delete LibraryUtils.WORKER_OBJECTS[objectId].callbacks[callbackId];
+      LibraryUtils.instance.WORKER_OBJECTS[objectId].callbacks[callbackId] = function(resp) {  // TODO: this defines function once per callback
+        resp ? (resp.error ? reject(LibraryUtils.instance.deserializeError(resp.error)) : resolve(resp.result)) : resolve();
+        delete LibraryUtils.instance.WORKER_OBJECTS[objectId].callbacks[callbackId];
       };
       worker.postMessage([objectId, fnName, callbackId].concat(args === undefined ? [] : GenUtils.listify(args)));
     });
@@ -273,12 +273,12 @@ class LibraryUtils {
   }
 }
 
-LibraryUtils.LOG_LEVEL = 0;
-LibraryUtils.WORKER_DIST_PATH_DEFAULT = GenUtils.isBrowser() ? "/monero_web_worker.js" : function() {
+LibraryUtils.instance.LOG_LEVEL = 0;
+LibraryUtils.instance.WORKER_DIST_PATH_DEFAULT = GenUtils.isBrowser() ? "/monero_web_worker.js" : function() {
     const path = require("path");
-    return LibraryUtils._prefixWindowsPath(path.join(__dirname, "./MoneroWebWorker.js"));
+    return LibraryUtils.instance._prefixWindowsPath(path.join(__dirname, "./MoneroWebWorker.js"));
 }();
-LibraryUtils.WORKER_DIST_PATH = LibraryUtils.WORKER_DIST_PATH_DEFAULT;
+LibraryUtils.instance.WORKER_DIST_PATH = LibraryUtils.instance.WORKER_DIST_PATH_DEFAULT;
 
 module.exports = LibraryUtils;</code></pre>
         </article>
@@ -290,7 +290,7 @@ module.exports = LibraryUtils;</code></pre>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ConnectionType.html">ConnectionType</a></li><li><a href="GenUtils.html">GenUtils</a></li><li><a href="HttpClient.html">HttpClient</a></li><li><a href="LibraryUtils.html">LibraryUtils</a></li><li><a href="MoneroAccount.html">MoneroAccount</a></li><li><a href="MoneroAccountTag.html">MoneroAccountTag</a></li><li><a href="MoneroAddressBookEntry.html">MoneroAddressBookEntry</a></li><li><a href="MoneroAltChain.html">MoneroAltChain</a></li><li><a href="MoneroBan.html">MoneroBan</a></li><li><a href="MoneroBlock.html">MoneroBlock</a></li><li><a href="MoneroBlockHeader.html">MoneroBlockHeader</a></li><li><a href="MoneroBlockTemplate.html">MoneroBlockTemplate</a></li><li><a href="MoneroCheck.html">MoneroCheck</a></li><li><a href="MoneroCheckReserve.html">MoneroCheckReserve</a></li><li><a href="MoneroCheckTx.html">MoneroCheckTx</a></li><li><a href="MoneroConnectionManager.html">MoneroConnectionManager</a></li><li><a href="MoneroConnectionManagerListener.html">MoneroConnectionManagerListener</a></li><li><a href="MoneroConnectionSpan.html">MoneroConnectionSpan</a></li><li><a href="MoneroDaemonInfo.html">MoneroDaemonInfo</a></li><li><a href="MoneroDaemonListener.html">MoneroDaemonListener</a></li><li><a href="MoneroDaemonRpc.html">MoneroDaemonRpc</a></li><li><a href="MoneroDaemonSyncInfo.html">MoneroDaemonSyncInfo</a></li><li><a href="MoneroDaemonUpdateCheckResult.html">MoneroDaemonUpdateCheckResult</a></li><li><a href="MoneroDaemonUpdateDownloadResult.html">MoneroDaemonUpdateDownloadResult</a></li><li><a href="MoneroDestination.html">MoneroDestination</a></li><li><a href="MoneroError.html">MoneroError</a></li><li><a href="MoneroFeeEstimate.html">MoneroFeeEstimate</a></li><li><a href="MoneroHardForkInfo.html">MoneroHardForkInfo</a></li><li><a href="MoneroIncomingTransfer.html">MoneroIncomingTransfer</a></li><li><a href="MoneroIntegratedAddress.html">MoneroIntegratedAddress</a></li><li><a href="MoneroKeyImage.html">MoneroKeyImage</a></li><li><a href="MoneroKeyImageImportResult.html">MoneroKeyImageImportResult</a></li><li><a href="MoneroKeyImageSpentStatus.html">MoneroKeyImageSpentStatus</a></li><li><a href="MoneroMessageSignatureResult.html">MoneroMessageSignatureResult</a></li><li><a href="MoneroMessageSignatureType.html">MoneroMessageSignatureType</a></li><li><a href="MoneroMinerTxSum.html">MoneroMinerTxSum</a></li><li><a href="MoneroMiningStatus.html">MoneroMiningStatus</a></li><li><a href="MoneroMultisigInfo.html">MoneroMultisigInfo</a></li><li><a href="MoneroMultisigInitResult.html">MoneroMultisigInitResult</a></li><li><a href="MoneroMultisigSignResult.html">MoneroMultisigSignResult</a></li><li><a href="MoneroNetworkType.html">MoneroNetworkType</a></li><li><a href="MoneroOutgoingTransfer.html">MoneroOutgoingTransfer</a></li><li><a href="MoneroOutput.html">MoneroOutput</a></li><li><a href="MoneroOutputHistogramEntry.html">MoneroOutputHistogramEntry</a></li><li><a href="MoneroOutputQuery.html">MoneroOutputQuery</a></li><li><a href="MoneroOutputWallet.html">MoneroOutputWallet</a></li><li><a href="MoneroPeer.html">MoneroPeer</a></li><li><a href="MoneroPruneResult.html">MoneroPruneResult</a></li><li><a href="MoneroRpcConnection.html">MoneroRpcConnection</a></li><li><a href="MoneroRpcError.html">MoneroRpcError</a></li><li><a href="MoneroSubaddress.html">MoneroSubaddress</a></li><li><a href="MoneroSubmitTxResult.html">MoneroSubmitTxResult</a></li><li><a href="MoneroSyncResult.html">MoneroSyncResult</a></li><li><a href="MoneroTransfer.html">MoneroTransfer</a></li><li><a href="MoneroTransferQuery.html">MoneroTransferQuery</a></li><li><a href="MoneroTx.html">MoneroTx</a></li><li><a href="MoneroTxConfig.html">MoneroTxConfig</a></li><li><a href="MoneroTxPoolStats.html">MoneroTxPoolStats</a></li><li><a href="MoneroTxPriority.html">MoneroTxPriority</a></li><li><a href="MoneroTxQuery.html">MoneroTxQuery</a></li><li><a href="MoneroTxSet.html">MoneroTxSet</a></li><li><a href="MoneroTxWallet.html">MoneroTxWallet</a></li><li><a href="MoneroUtils.html">MoneroUtils</a></li><li><a href="MoneroVersion.html">MoneroVersion</a></li><li><a href="MoneroWalletConfig.html">MoneroWalletConfig</a></li><li><a href="MoneroWalletFull.html">MoneroWalletFull</a></li><li><a href="MoneroWalletKeys.html">MoneroWalletKeys</a></li><li><a href="MoneroWalletListener.html">MoneroWalletListener</a></li><li><a href="MoneroWalletRpc.html">MoneroWalletRpc</a></li><li><a href="SslOptions.html">SslOptions</a></li><li><a href="TaskLooper.html">TaskLooper</a></li><li><a href="ThreadPool.html">ThreadPool</a></li></ul><h3>Interfaces</h3><ul><li><a href="MoneroDaemon.html">MoneroDaemon</a></li><li><a href="MoneroWallet.html">MoneroWallet</a></li></ul><h3>Global</h3><ul><li><a href="global.html#connectToDaemonRpc">connectToDaemonRpc</a></li><li><a href="global.html#connectToWalletRpc">connectToWalletRpc</a></li><li><a href="global.html#createWalletFull">createWalletFull</a></li><li><a href="global.html#createWalletKeys">createWalletKeys</a></li><li><a href="global.html#getVersion">getVersion</a></li><li><a href="global.html#openWalletFull">openWalletFull</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ConnectionType.html">ConnectionType</a></li><li><a href="GenUtils.html">GenUtils</a></li><li><a href="HttpClient.html">HttpClient</a></li><li><a href="LibraryUtils.instance.html">LibraryUtils</a></li><li><a href="MoneroAccount.html">MoneroAccount</a></li><li><a href="MoneroAccountTag.html">MoneroAccountTag</a></li><li><a href="MoneroAddressBookEntry.html">MoneroAddressBookEntry</a></li><li><a href="MoneroAltChain.html">MoneroAltChain</a></li><li><a href="MoneroBan.html">MoneroBan</a></li><li><a href="MoneroBlock.html">MoneroBlock</a></li><li><a href="MoneroBlockHeader.html">MoneroBlockHeader</a></li><li><a href="MoneroBlockTemplate.html">MoneroBlockTemplate</a></li><li><a href="MoneroCheck.html">MoneroCheck</a></li><li><a href="MoneroCheckReserve.html">MoneroCheckReserve</a></li><li><a href="MoneroCheckTx.html">MoneroCheckTx</a></li><li><a href="MoneroConnectionManager.html">MoneroConnectionManager</a></li><li><a href="MoneroConnectionManagerListener.html">MoneroConnectionManagerListener</a></li><li><a href="MoneroConnectionSpan.html">MoneroConnectionSpan</a></li><li><a href="MoneroDaemonInfo.html">MoneroDaemonInfo</a></li><li><a href="MoneroDaemonListener.html">MoneroDaemonListener</a></li><li><a href="MoneroDaemonRpc.html">MoneroDaemonRpc</a></li><li><a href="MoneroDaemonSyncInfo.html">MoneroDaemonSyncInfo</a></li><li><a href="MoneroDaemonUpdateCheckResult.html">MoneroDaemonUpdateCheckResult</a></li><li><a href="MoneroDaemonUpdateDownloadResult.html">MoneroDaemonUpdateDownloadResult</a></li><li><a href="MoneroDestination.html">MoneroDestination</a></li><li><a href="MoneroError.html">MoneroError</a></li><li><a href="MoneroFeeEstimate.html">MoneroFeeEstimate</a></li><li><a href="MoneroHardForkInfo.html">MoneroHardForkInfo</a></li><li><a href="MoneroIncomingTransfer.html">MoneroIncomingTransfer</a></li><li><a href="MoneroIntegratedAddress.html">MoneroIntegratedAddress</a></li><li><a href="MoneroKeyImage.html">MoneroKeyImage</a></li><li><a href="MoneroKeyImageImportResult.html">MoneroKeyImageImportResult</a></li><li><a href="MoneroKeyImageSpentStatus.html">MoneroKeyImageSpentStatus</a></li><li><a href="MoneroMessageSignatureResult.html">MoneroMessageSignatureResult</a></li><li><a href="MoneroMessageSignatureType.html">MoneroMessageSignatureType</a></li><li><a href="MoneroMinerTxSum.html">MoneroMinerTxSum</a></li><li><a href="MoneroMiningStatus.html">MoneroMiningStatus</a></li><li><a href="MoneroMultisigInfo.html">MoneroMultisigInfo</a></li><li><a href="MoneroMultisigInitResult.html">MoneroMultisigInitResult</a></li><li><a href="MoneroMultisigSignResult.html">MoneroMultisigSignResult</a></li><li><a href="MoneroNetworkType.html">MoneroNetworkType</a></li><li><a href="MoneroOutgoingTransfer.html">MoneroOutgoingTransfer</a></li><li><a href="MoneroOutput.html">MoneroOutput</a></li><li><a href="MoneroOutputHistogramEntry.html">MoneroOutputHistogramEntry</a></li><li><a href="MoneroOutputQuery.html">MoneroOutputQuery</a></li><li><a href="MoneroOutputWallet.html">MoneroOutputWallet</a></li><li><a href="MoneroPeer.html">MoneroPeer</a></li><li><a href="MoneroPruneResult.html">MoneroPruneResult</a></li><li><a href="MoneroRpcConnection.html">MoneroRpcConnection</a></li><li><a href="MoneroRpcError.html">MoneroRpcError</a></li><li><a href="MoneroSubaddress.html">MoneroSubaddress</a></li><li><a href="MoneroSubmitTxResult.html">MoneroSubmitTxResult</a></li><li><a href="MoneroSyncResult.html">MoneroSyncResult</a></li><li><a href="MoneroTransfer.html">MoneroTransfer</a></li><li><a href="MoneroTransferQuery.html">MoneroTransferQuery</a></li><li><a href="MoneroTx.html">MoneroTx</a></li><li><a href="MoneroTxConfig.html">MoneroTxConfig</a></li><li><a href="MoneroTxPoolStats.html">MoneroTxPoolStats</a></li><li><a href="MoneroTxPriority.html">MoneroTxPriority</a></li><li><a href="MoneroTxQuery.html">MoneroTxQuery</a></li><li><a href="MoneroTxSet.html">MoneroTxSet</a></li><li><a href="MoneroTxWallet.html">MoneroTxWallet</a></li><li><a href="MoneroUtils.html">MoneroUtils</a></li><li><a href="MoneroVersion.html">MoneroVersion</a></li><li><a href="MoneroWalletConfig.html">MoneroWalletConfig</a></li><li><a href="MoneroWalletFull.html">MoneroWalletFull</a></li><li><a href="MoneroWalletKeys.html">MoneroWalletKeys</a></li><li><a href="MoneroWalletListener.html">MoneroWalletListener</a></li><li><a href="MoneroWalletRpc.html">MoneroWalletRpc</a></li><li><a href="SslOptions.html">SslOptions</a></li><li><a href="TaskLooper.html">TaskLooper</a></li><li><a href="ThreadPool.html">ThreadPool</a></li></ul><h3>Interfaces</h3><ul><li><a href="MoneroDaemon.html">MoneroDaemon</a></li><li><a href="MoneroWallet.html">MoneroWallet</a></li></ul><h3>Global</h3><ul><li><a href="global.html#connectToDaemonRpc">connectToDaemonRpc</a></li><li><a href="global.html#connectToWalletRpc">connectToWalletRpc</a></li><li><a href="global.html#createWalletFull">createWalletFull</a></li><li><a href="global.html#createWalletKeys">createWalletKeys</a></li><li><a href="global.html#getVersion">getVersion</a></li><li><a href="global.html#openWalletFull">openWalletFull</a></li></ul>
 </nav>
 
 <br class="clear">

@@ -167,15 +167,6 @@ export { MoneroWalletFull };
 // ---------------------------- GLOBAL FUNCTIONS ------------------------------
 
 /**
- * <p>Get the version of the monero-javascript library.<p>
- *
- * @return {string} the version of this monero-javascript library
- */
-export function getVersion() {
-  return MoneroUtils.getVersion();
-}
-
-/**
  * <p>Create a client connected to monerod.<p>
  *
  * <p>Examples:<p>
@@ -205,7 +196,7 @@ export function getVersion() {
  * @return {Promise<MoneroDaemonRpc>} the daemon RPC client
  */
 export function connectToDaemonRpc(...args) {
-  return MoneroDaemonRpc._connectToDaemonRpc(args);
+  return MoneroDaemonRpc._connectToDaemonRpc(...args);
 }
 
 /**

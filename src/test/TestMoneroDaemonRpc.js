@@ -190,14 +190,14 @@ class TestMoneroDaemonRpc {
         let block = await that.daemon.getBlockByHash(hash);
         testBlock(block, testBlockCtx);
         assert.deepEqual(block, await that.daemon.getBlockByHeight(block.getHeight()));
-        assert(block.getTxs() === undefined);
+        assert(block.txs === undefined);
         
         // retrieve by hash of previous to last block
         hash = await that.daemon.getBlockHash(lastHeader.getHeight() - 1);
         block = await that.daemon.getBlockByHash(hash);
         testBlock(block, testBlockCtx);
         assert.deepEqual(block, await that.daemon.getBlockByHeight(lastHeader.getHeight() - 1));
-        assert(block.getTxs() === undefined);
+        assert(block.txs === undefined);
       });
       
       if (testConfig.testNonRelays)
@@ -245,7 +245,7 @@ class TestMoneroDaemonRpc {
         assert.equal(blocks.length, numBlocks);
         for (let i = 0; i < heights.length; i++) {
           let block = blocks[i];
-          if (block.getTxs().length) txFound = true;
+          if (block.txs.length) txFound = true;
           testBlock(block, BINARY_BLOCK_CTX);
           assert.equal(block.getHeight(), heights[i]);      
         }
@@ -661,7 +661,7 @@ class TestMoneroDaemonRpc {
         let keyImages = [];
         let txHashes = txs.map(tx => tx.getHash());
         for (let tx of await that.daemon.getTxs(txHashes)) {
-          for (let input of tx.getInputs()) keyImages.push(input.getKeyImage().getHex());
+          for (let input of tx.getInputs()) keyImages.push(input.getKeyImage().hex);
         }
         await that.daemon.flushTxPool(txHashes);
         
@@ -678,7 +678,7 @@ class TestMoneroDaemonRpc {
         keyImages = [];
         txs = await getConfirmedTxs(that.daemon, 10);
         for (let tx of txs) {
-          for (let input of tx.getInputs()) keyImages.push(input.getKeyImage().getHex());
+          for (let input of tx.getInputs()) keyImages.push(input.getKeyImage().hex);
         }
         
         // key images are all spent
@@ -1272,28 +1272,28 @@ function testBlock(block, ctx) {
   
   // test required fields
   assert(block);
-  assert(Array.isArray(block.getTxHashes()));
-  assert(block.getTxHashes().length >= 0);
-  testMinerTx(block.getMinerTx());   // TODO: miner tx doesn't have as much stuff, can't call testTx?
+  assert(Array.isArray(block.txHashes));
+  assert(block.txHashes.length >= 0);
+  testMinerTx(block.minerTx);   // TODO: miner tx doesn't have as much stuff, can't call testTx?
   testBlockHeader(block, ctx.headerIsFull);
   
   if (ctx.hasHex) {
-    assert(block.getHex());
-    assert(block.getHex().length > 1);
+    assert(block.hex);
+    assert(block.hex.length > 1);
   } else {
-    assert(block.getHex() === undefined)
+    assert(block.hex === undefined)
   }
   
   if (ctx.hasTxs) {
     assert(typeof ctx.ctx === "object");
-    assert(block.getTxs() instanceof Array);
-    for (let tx of block.getTxs()) {
+    assert(block.txs instanceof Array);
+    for (let tx of block.txs) {
       assert(block === tx.getBlock());
       testTx(tx, ctx.ctx);
     }
   } else {
     assert(ctx.ctx === undefined);
-    assert(block.getTxs() === undefined);
+    assert(block.txs === undefined);
   }
 }
 
@@ -1358,7 +1358,7 @@ function testTx(tx, ctx) {
   // test confirmed
   if (tx.isConfirmed()) {
     assert(tx.getBlock());
-    assert(tx.getBlock().getTxs().includes(tx));
+    assert(tx.getBlock().txs.includes(tx));
     assert(tx.getBlock().getHeight() > 0);
     assert(tx.getBlock().getTimestamp() > 0);
     assert.equal(tx.isRelayed(), true);
@@ -1707,7 +1707,7 @@ function testVin(input, ctx) {
 
 function testKeyImage(image, ctx) {
   assert(image instanceof MoneroKeyImage);
-  assert(image.getHex());
+  assert(image.hex);
   if (image.getSignature() !== undefined) {
     assert.equal(typeof image.getSignature(), "string");
     assert(image.getSignature().length > 0);
@@ -1730,8 +1730,8 @@ async function getConfirmedTxs(daemon, numTxs) {
   for (let startIdx = await daemon.getHeight() - numBlocksPerReq - 1; startIdx >= 0; startIdx -= numBlocksPerReq) {
     let blocks = await daemon.getBlocksByRange(startIdx, startIdx + numBlocksPerReq);
     for (let block of blocks) {
-      if (!block.getTxs()) continue;
-      for (let tx of block.getTxs()) {
+      if (!block.txs) continue;
+      for (let tx of block.txs) {
         txs.push(tx);
         if (txs.length === numTxs) return txs;
       }
@@ -1820,7 +1820,7 @@ async function getConfirmedTxHashes(daemon) {
   let height = await daemon.getHeight();
   while (txHashes.length < numTxs && height > 0) {
     let block = await daemon.getBlockByHeight(--height);
-    for (let txHash of block.getTxHashes()) txHashes.push(txHash);
+    for (let txHash of block.txHashes) txHashes.push(txHash);
   }
   return txHashes;
 }

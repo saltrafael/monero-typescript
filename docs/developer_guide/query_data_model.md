@@ -4,7 +4,7 @@ Wallet [transactions, transfers, and outputs](data_model.md) can be queried by t
 
 ## Getting transactions with queries
 
-See [MoneroWallet.getTxs()](https://moneroecosystem.org/monero-javascript/MoneroWallet.html#getTxs) for all query options.
+See [MoneroWallet.txs](https://moneroecosystem.org/monero-javascript/MoneroWallet.html#getTxs) for all query options.
 
 ```javascript
 // get a transaction by hash
@@ -115,7 +115,7 @@ let outputs = await wallet.getOutputs({
 
 ```javascript
 // get outputs by their key image hex
-let keyImage = outputs[0].getKeyImage().getHex();
+let keyImage = outputs[0].getKeyImage().hex;
 outputs = await wallet.getOutputs({
   keyImage: keyImage
 });

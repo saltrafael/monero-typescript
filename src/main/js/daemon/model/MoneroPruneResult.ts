@@ -10,7 +10,7 @@ class MoneroPruneResult {
   }
 
   toJson() {
-    let json = Object.assign({}, this.state);
+    const json = Object.assign({}, this.state);
     if (this.isPruned()) json.isPruned = this.isPruned();
     if (this.getPruningSeed()) json.pruningSeed = this.getPruningSeed();
     return json;
@@ -35,4 +35,4 @@ class MoneroPruneResult {
   }
 }
 
-module.exports = MoneroPruneResult;
+export default MoneroPruneResult;

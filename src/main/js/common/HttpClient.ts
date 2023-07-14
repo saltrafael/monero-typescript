@@ -7,6 +7,20 @@ import CryptoJS from "crypto-js";
 import http from "http";
 import https from "https";
 
+export interface RequestOpts {
+  method: string;
+  uri: string;
+  body: string | object | Uint8Array;
+  username?: string;
+  password?: string;
+  headers?: object;
+  requestApi?: string;
+  resolveWithFullResponse?: boolean;
+  rejectUnauthorized?: boolean;
+  timeout?: number;
+  proxyToWorker?: number;
+}
+
 /**
  * Handle HTTP requests with a uniform interface.
  *
@@ -48,19 +62,7 @@ class HttpClient {
    * @returns {String} response.statusText - the response message
    * @returns {object} response.headers - the response headers
    */
-  static async request(request: {
-    method: string;
-    uri: string;
-    body: string | object | Uint8Array;
-    username?: string;
-    password?: string;
-    headers?: object;
-    requestApi?: string;
-    resolveWithFullResponse?: boolean;
-    rejectUnauthorized?: boolean;
-    timeout?: number;
-    proxyToWorker?: number;
-  }): Promise<{
+  static async request(request: RequestOpts): Promise<{
     body: string | object | Uint8Array;
     statusCode: number;
     statusText: string;

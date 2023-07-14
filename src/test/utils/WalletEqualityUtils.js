@@ -156,8 +156,8 @@ class WalletEqualityUtils {
           found = true;
           
           // test block equality except txs to ignore order
-          let blockTxs1 = tx1.getBlock().getTxs();
-          let blockTxs2 = tx2.getBlock().getTxs();
+          let blockTxs1 = tx1.getBlock().txs;
+          let blockTxs2 = tx2.getBlock().txs;
           tx1.getBlock().setTxs();
           tx2.getBlock().setTxs();
           assert(GenUtils.equals(tx2.getBlock().toJson(), tx1.getBlock().toJson()), "Tx blocks are not equal");

@@ -1,12 +1,13 @@
+import * as nodejsfs from "fs";
 import GenUtils from "../../common/GenUtils";
 import MoneroError from "../../common/MoneroError";
 import MoneroNetworkType from "../../daemon/model/MoneroNetworkType";
 import MoneroRpcConnection from "../../common/MoneroRpcConnection";
 
-interface Config {
+export interface MoneroWalletConfigOpts {
   path: string;
   password: string;
-  networkType: string | number;
+  networkType?: string | number;
   serverUri?: string;
   serverUsername?: string;
   serverPassword?: string;
@@ -15,7 +16,7 @@ interface Config {
   keysData?: Uint8Array;
   cacheData?: Uint8Array;
   proxyToWorker?: boolean;
-  fs?: FileSystem;
+  fs?: typeof nodejsfs;
   saveCurrent?: boolean;
   accountLookahead?: number;
   subaddressLookahead?: number;
@@ -33,7 +34,7 @@ interface Config {
  * Configuration to create a Monero wallet.
  */
 class MoneroWalletConfig {
-  config: Config;
+  config: MoneroWalletConfigOpts;
 
   static SUPPORTED_FIELDS = [
     "path",
@@ -74,12 +75,12 @@ class MoneroWalletConfig {
    * @param {Uint8Array} [config.keysData] - wallet keys data to open (optional)
    * @param {Uint8Array} [config.cacheData] - wallet cache data to open (optional)
    * @param {boolean} [config.proxyToWorker] - proxies wallet operations to a worker in order to not block the main thread (default true)
-   * @param {FileSystem} [config.fs] - Node.js compatible file system to use (defaults to disk or in-memory FS if browser)
+   * @param {typeof nodejsfs} [config.fs] - Node.js compatible file system to use (defaults to disk or in-memory FS if browser)
    * @param {boolean} config.saveCurrent - specifies if the current RPC wallet should be saved before being closed (optional)
    * @param {number} config.accountLookahead - number of accounts to scan (optional)
    * @param {number} config.subaddressLookahead - number of subaddresses to scan per account (optional)
    */
-  constructor(config?: Config | MoneroWalletConfig) {
+  constructor(config?: MoneroWalletConfigOpts | MoneroWalletConfig) {
     // initialize internal config
     if (config instanceof MoneroWalletConfig) config = config.toJson();
     else if (typeof config === "object") config = Object.assign({}, config);
@@ -272,7 +273,7 @@ class MoneroWalletConfig {
     return this.config.fs;
   }
 
-  public set fs(fs: undefined | FileSystem) {
+  public set fs(fs: undefined | typeof nodejsfs) {
     Object.assign(this.config, { fs });
   }
 

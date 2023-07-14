@@ -20,7 +20,7 @@ class MoneroBlock extends MoneroBlockHeader {
    * @param {MoneroBlock.DeserializationType} txType informs the tx deserialization type (MoneroTx, MoneroTxWallet, MoneroTxQuery)
    */
   constructor(
-    state: MoneroBlock | MoneroBlockHeader | object,
+    state?: MoneroBlock | MoneroBlockHeader | object,
     txType?: (typeof MoneroBlock.DeserializationType)[keyof typeof MoneroBlock.DeserializationType]
   ) {
     super(state);
@@ -28,6 +28,7 @@ class MoneroBlock extends MoneroBlockHeader {
 
     // deserialize miner tx
     if (
+      state &&
       "minerTx" in state &&
       state.minerTx &&
       !(state.minerTx instanceof MoneroTx)
@@ -35,7 +36,7 @@ class MoneroBlock extends MoneroBlockHeader {
       state.minerTx = new MoneroTx(state.minerTx).setBlock(this);
 
     // deserialize non-miner txs
-    if ("txs" in state && state.txs) {
+    if (state && "txs" in state && state.txs) {
       for (let i = 0; i < state.txs.length; i++) {
         if (
           txType === MoneroBlock.DeserializationType.TX ||

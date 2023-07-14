@@ -56,8 +56,8 @@ class TestMoneroWalletRpc extends TestMoneroWalletCommon {
 
         // assign defaults
         config = new MoneroWalletConfig(config);
-        if (config.getPassword() === undefined) config.setPassword(TestUtils.WALLET_PASSWORD);
-        if (!config.getServer()) config.setServer(await this.daemon.getRpcConnection());
+        if (config.password === undefined) config.setPassword(TestUtils.WALLET_PASSWORD);
+        if (!config.server) config.setServer(await this.daemon.getRpcConnection());
 
         // create client connected to internal monero-wallet-rpc executable
         let offline = TestUtils.OFFLINE_SERVER_URI === config.getServerUri();
@@ -66,7 +66,7 @@ class TestMoneroWalletRpc extends TestMoneroWalletCommon {
         // open wallet
         try {
             await wallet.openWallet(config);
-            await wallet.setDaemonConnection(config.getServer(), true, undefined); // set daemon as trusted
+            await wallet.setDaemonConnection(config.server, true, undefined); // set daemon as trusted
             if (await wallet.isConnectedToDaemon()) await wallet.startSyncing(TestUtils.SYNC_PERIOD_IN_MS);
             return wallet;
         } catch (err) {
@@ -79,11 +79,11 @@ class TestMoneroWalletRpc extends TestMoneroWalletCommon {
 
         // assign defaults
         config = new MoneroWalletConfig(config);
-        let random = !config.getMnemonic() && !config.getPrimaryAddress();
-        if (!config.getPath()) config.setPath(GenUtils.getUUID());
-        if (config.getPassword() === undefined) config.setPassword(TestUtils.WALLET_PASSWORD);
-        if (!config.getRestoreHeight() && !random) config.setRestoreHeight(0);
-        if (!config.getServer()) config.setServer(await this.daemon.getRpcConnection());
+        let random = !config.mnemonic && !config.primaryAddress;
+        if (!config.path) config.setPath(GenUtils.getUUID());
+        if (config.password === undefined) config.setPassword(TestUtils.WALLET_PASSWORD);
+        if (!config.restoreHeight && !random) config.setRestoreHeight(0);
+        if (!config.server) config.setServer(await this.daemon.getRpcConnection());
 
         // create client connected to internal monero-wallet-rpc executable
         let offline = TestUtils.OFFLINE_SERVER_URI === config.getServerUri();
@@ -92,7 +92,7 @@ class TestMoneroWalletRpc extends TestMoneroWalletCommon {
         // create wallet
         try {
             await wallet.createWallet(config);
-            await wallet.setDaemonConnection(config.getServer(), true, undefined); // set daemon as trusted
+            await wallet.setDaemonConnection(config.server, true, undefined); // set daemon as trusted
             if (await wallet.isConnectedToDaemon()) await wallet.startSyncing(TestUtils.SYNC_PERIOD_IN_MS);
             return wallet;
         } catch (err) {
@@ -226,7 +226,7 @@ class TestMoneroWalletRpc extends TestMoneroWalletCommon {
                     assert.equal(await wallet.getPrimaryAddress(), TestUtils.ADDRESS);
                     await wallet.sync();
                     assert.equal(await wallet.getHeight(), await that.daemon.getHeight());
-                    let txs = await wallet.getTxs();
+                    let txs = await wallet.txs;
                     assert(txs.length > 0); // wallet is used
                     assert.equal(txs[0].getHeight(), TestUtils.FIRST_RECEIVE_HEIGHT);
                     await that.closeWallet(wallet);

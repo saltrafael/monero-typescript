@@ -10,9 +10,9 @@ class MoneroTxConfig {
 
   /**
    * <p>Generic request to transfer funds from a wallet.</p>
-   * 
+   *
    * <p>Examples:</p>
-   * 
+   *
    * <code>
    * let config1 = new MoneroTxConfig({<br>
    * &nbsp;&nbsp; accountIndex: 0,<br>
@@ -22,7 +22,7 @@ class MoneroTxConfig {
    * &nbsp;&nbsp; relay: true<br>
    * });<br><br>
    * </code>
-   * 
+   *
    * @param {MoneroTxConfig|object} [config] - configures the transaction to create (optional)
    * @param {string} config.address - single destination address
    * @param {BigInt} config.amount - single destination amount
@@ -37,40 +37,61 @@ class MoneroTxConfig {
    * @param {string} config.note - transaction note saved locally with the wallet
    * @param {string} config.recipientName - recipient name saved locally with the wallet
    * @param {boolean} config.canSplit - allow funds to be transferred using multiple transactions
-   * @param {BigInt} config.belowAmount - for sweep requests, include outputs below this amount when sweeping wallet, account, subaddress, or all unlocked funds 
+   * @param {BigInt} config.belowAmount - for sweep requests, include outputs below this amount when sweeping wallet, account, subaddress, or all unlocked funds
    * @param {boolean} config.sweepEachSubaddress - for sweep requests, sweep each subaddress individually instead of together if true
    * @param {string} config.keyImage - key image to sweep (ignored except in sweepOutput() requests)
    */
-  constructor(config: any, relaxValidation: any) {  // relax validation for internal use to process json from rpc or cpp
+  constructor(config: any, relaxValidation?: boolean) {
+    // relax validation for internal use to process json from rpc or cpp
     // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
-    if (arguments.length > 2) throw new MoneroError("MoneroTxConfig can be constructed with only two parameters but was given " + arguments.length)
-    
+    if (arguments.length > 2)
+      throw new MoneroError(
+        "MoneroTxConfig can be constructed with only two parameters but was given " +
+          arguments.length
+      );
+
     // initialize internal state
     if (!config) this.state = {};
     else if (config instanceof MoneroTxConfig) this.state = config.toJson();
     else if (typeof config === "object") {
       this.state = Object.assign({}, config);
-      if (relaxValidation && typeof this.state.amount === "number") this.state.amount = BigInt(this.state.amount);
+      if (relaxValidation && typeof this.state.amount === "number")
+        this.state.amount = BigInt(this.state.amount);
     }
     // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
-    else throw new MoneroError("Invalid argument given to MoneroTxConfig: " + typeof config);
-    
+    else
+      throw new MoneroError(
+        "Invalid argument given to MoneroTxConfig: " + typeof config
+      );
+
     // deserialize if necessary
     if (this.state.destinations) {
-      assert(this.state.address === undefined && this.state.amount === undefined, "Tx configuration may specify destinations or an address/amount but not both");
+      assert(
+        this.state.address === undefined && this.state.amount === undefined,
+        "Tx configuration may specify destinations or an address/amount but not both"
+      );
       // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
-      this.setDestinations(this.state.destinations.map((destination: any) => destination instanceof MoneroDestination ? destination : new MoneroDestination(destination)));
+      this.setDestinations(
+        this.state.destinations.map((destination: any) =>
+          destination instanceof MoneroDestination
+            ? destination
+            : new MoneroDestination(destination)
+        )
+      );
     }
-    
+
     // alias 'address' and 'amount' to single destination to support e.g. createTx({address: "..."})
     if (this.state.address || this.state.amount) {
-      assert(!this.state.destinations, "Tx configuration may specify destinations or an address/amount but not both");
+      assert(
+        !this.state.destinations,
+        "Tx configuration may specify destinations or an address/amount but not both"
+      );
       this.setAddress(this.state.address);
       this.setAmount(this.state.amount);
       delete this.state.address;
       delete this.state.amount;
     }
-    
+
     // alias 'subaddressIndex' to subaddress indices
     if (this.state.subaddressIndex !== undefined) {
       this.setSubaddressIndices([this.state.subaddressIndex]);
@@ -87,76 +108,117 @@ class MoneroTxConfig {
     let json = Object.assign({}, this.state); // copy state
     if (this.getDestinations() !== undefined) {
       json.destinations = [];
-      for (let destination of this.getDestinations()) json.destinations.push(destination.toJson());
+      for (let destination of this.getDestinations())
+        json.destinations.push(destination.toJson());
     }
     if (this.getFee() !== undefined) json.fee = this.getFee().toString();
-    if (this.getBelowAmount() !== undefined) json.belowAmount = this.getBelowAmount().toString();
+    if (this.getBelowAmount() !== undefined)
+      json.belowAmount = this.getBelowAmount().toString();
     return json;
   }
 
   /**
    * Set the address of a single-destination configuration.
-   * 
+   *
    * @param {string} address - the address to set for the single destination
    * @return {MoneroTxConfig} this configuration for chaining
    */
   setAddress(address: any) {
     // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
-    if (this.state.destinations !== undefined && this.state.destinations.length > 1) throw new MoneroError("Cannot set address because MoneroTxConfig already has multiple destinations");
+    if (
+      this.state.destinations !== undefined &&
+      this.state.destinations.length > 1
+    )
+      throw new MoneroError(
+        "Cannot set address because MoneroTxConfig already has multiple destinations"
+      );
     // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
-    if (this.state.destinations === undefined || this.state.destinations.length === 0) this.addDestination(new MoneroDestination(address));
+    if (
+      this.state.destinations === undefined ||
+      this.state.destinations.length === 0
+    )
+      this.addDestination(new MoneroDestination(address));
     else this.state.destinations[0].setAddress(address);
     return this;
   }
 
   /**
    * Get the address of a single-destination configuration.
-   * 
+   *
    * @return {string} the address of the single destination
    */
   getAddress() {
     // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
-    if (this.state.destinations === undefined || this.state.destinations.length !== 1) throw new MoneroError("Cannot get address because MoneroTxConfig does not have exactly one destination");
+    if (
+      this.state.destinations === undefined ||
+      this.state.destinations.length !== 1
+    )
+      throw new MoneroError(
+        "Cannot get address because MoneroTxConfig does not have exactly one destination"
+      );
     return this.state.destinations[0].getAddress();
   }
 
   /**
    * Set the amount of a single-destination configuration.
-   * 
+   *
    * @param {BigInt|string} amount - the amount to set for the single destination
    * @return {MoneroTxConfig} this configuration for chaining
    */
   setAmount(amount: any) {
     if (amount !== undefined && !(this.state.amount instanceof BigInt)) {
       // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
-      if (typeof amount === "number") throw new MoneroError("Destination amount must be BigInt or string");
-      try { amount = BigInt(amount); }
-      // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
-      catch (err) { throw new MoneroError("Invalid destination amount: " + amount); }
+      if (typeof amount === "number")
+        throw new MoneroError("Destination amount must be BigInt or string");
+      try {
+        amount = BigInt(amount);
+      } catch (err) {
+        // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
+        throw new MoneroError("Invalid destination amount: " + amount);
+      }
     }
     // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
-    if (this.state.destinations !== undefined && this.state.destinations.length > 1) throw new MoneroError("Cannot set amount because MoneroTxConfig already has multiple destinations");
+    if (
+      this.state.destinations !== undefined &&
+      this.state.destinations.length > 1
+    )
+      throw new MoneroError(
+        "Cannot set amount because MoneroTxConfig already has multiple destinations"
+      );
     // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
-    if (this.state.destinations === undefined || this.state.destinations.length === 0) this.addDestination(new MoneroDestination(undefined, amount));
+    if (
+      this.state.destinations === undefined ||
+      this.state.destinations.length === 0
+    )
+      this.addDestination(new MoneroDestination(undefined, amount));
     else this.state.destinations[0].setAmount(amount);
     return this;
   }
 
   /**
    * Get the amount of a single-destination configuration.
-   * 
+   *
    * @return {BigInt} the amount of the single destination
    */
   getAmount() {
     // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
-    if (this.state.destinations === undefined || this.state.destinations.length !== 1) throw new MoneroError("Cannot get amount because MoneroTxConfig does not have exactly one destination");
+    if (
+      this.state.destinations === undefined ||
+      this.state.destinations.length !== 1
+    )
+      throw new MoneroError(
+        "Cannot get amount because MoneroTxConfig does not have exactly one destination"
+      );
     return this.state.destinations[0].getAmount();
   }
 
   // @ts-expect-error TS(7023): 'addDestination' implicitly has return type 'any' ... Remove this comment to see the full error message
   addDestination(destinationOrAddress: any, amount: any) {
     // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
-    if (typeof destinationOrAddress === "string") return this.addDestination(new MoneroDestination(destinationOrAddress, amount));
+    if (typeof destinationOrAddress === "string")
+      return this.addDestination(
+        new MoneroDestination(destinationOrAddress, amount)
+      );
     assert(destinationOrAddress instanceof MoneroDestination);
     if (this.state.destinations === undefined) this.state.destinations = [];
     this.state.destinations.push(destinationOrAddress);
@@ -295,7 +357,7 @@ class MoneroTxConfig {
 
   /**
    * Get the key image hex of the output to sweep.
-   * 
+   *
    * return {string} is the key image hex of the output to sweep
    */
   getKeyImage() {
@@ -304,7 +366,7 @@ class MoneroTxConfig {
 
   /**
    * Set the key image hex of the output to sweep.
-   * 
+   *
    * @param {string} keyImage is the key image hex of the output to sweep
    */
   setKeyImage(keyImage: any) {
@@ -313,4 +375,4 @@ class MoneroTxConfig {
   }
 }
 
-export default MoneroTxConfig
+export default MoneroTxConfig;

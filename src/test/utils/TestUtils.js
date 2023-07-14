@@ -25,8 +25,8 @@ class TestUtils {
    * @return nodejs-compatible file system
    */
   static getDefaultFs() {
-    if (!LibraryUtils.FS) LibraryUtils.FS = GenUtils.isBrowser() ? require('memfs') : require('fs');
-    return LibraryUtils.FS;
+    if (!LibraryUtils.instance.FS) LibraryUtils.instance.FS = GenUtils.isBrowser() ? require('memfs') : require('fs');
+    return LibraryUtils.instance.FS;
   }
   
   /**

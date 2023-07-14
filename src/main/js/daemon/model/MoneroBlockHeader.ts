@@ -255,7 +255,7 @@ class MoneroBlockHeader {
     return this;
   }
 
-  toString(indent = 0) {
+  toString(indent = 0): string {
     let str = "";
     str += GenUtils.kvLine("Hash", this.getHash(), indent);
     str += GenUtils.kvLine("Height", this.getHeight(), indent);

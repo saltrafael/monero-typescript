@@ -47,7 +47,7 @@ let walletRpc = await monerojs.connectToWalletRpc("http://localhost:38084", "rpc
 await walletRpc.openWallet("sample_wallet_rpc", "supersecretpassword123");
 let primaryAddress = await walletRpc.getPrimaryAddress(); // 555zgduFhmKd2o8rPUz...
 let balance = await walletRpc.getBalance();               // 533648366742
-let txs = await walletRpc.getTxs();                       // get transactions containing transfers to/from the wallet
+let txs = await walletRpc.txs;                       // get transactions containing transfers to/from the wallet
 
 // create wallet from mnemonic phrase using WebAssembly bindings to monero-project
 let walletFull = await monerojs.createWalletFull({

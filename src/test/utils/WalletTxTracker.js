@@ -47,7 +47,7 @@ class WalletTxTracker {
     for (let wallet of wallets) {
       if (!this.clearedWallets.has(wallet)) {
         await wallet.sync();
-        for (let tx of await wallet.getTxs()) {
+        for (let tx of await wallet.txs) {
           txHashesWallet.add(tx.getHash());
         }
       }
