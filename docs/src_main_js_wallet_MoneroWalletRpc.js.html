@@ -282,13 +282,13 @@ class MoneroWalletRpc extends MoneroWallet {
     // TODO: ensure other fields are uninitialized?
     
     // open wallet on rpc server
-    if (!config.getPath()) throw new MoneroError("Must provide name of wallet to open");
-    await this.rpc.sendJsonRequest("open_wallet", {filename: config.getPath(), password: config.getPassword()});
+    if (!config.path) throw new MoneroError("Must provide name of wallet to open");
+    await this.rpc.sendJsonRequest("open_wallet", {filename: config.path, password: config.password});
     await this._clear();
-    this.path = config.getPath();
+    this.path = config.path;
     
     // set daemon if provided
-    if (config.getServer()) return this.setDaemonConnection(config.getServer());
+    if (config.server) return this.setDaemonConnection(config.server);
     return this;
   }
   
@@ -333,28 +333,28 @@ class MoneroWalletRpc extends MoneroWallet {
     // normalize and validate config
     if (config === undefined) throw new MoneroError("Must provide config to create wallet");
     config = config instanceof MoneroWalletConfig ? config : new MoneroWalletConfig(config);
-    if (config.getMnemonic() !== undefined &amp;&amp; (config.getPrimaryAddress() !== undefined || config.getPrivateViewKey() !== undefined || config.getPrivateSpendKey() !== undefined)) {
+    if (config.mnemonic !== undefined &amp;&amp; (config.primaryAddress !== undefined || config.privateViewKey !== undefined || config.privateSpendKey !== undefined)) {
       throw new MoneroError("Wallet may be initialized with a mnemonic or keys but not both");
     }
-    if (config.getNetworkType() !== undefined) throw new MoneroError("Cannot provide networkType when creating RPC wallet because server's network type is already set");
-    if (config.getAccountLookahead() !== undefined || config.getSubaddressLookahead() !== undefined) throw new MoneroError("monero-wallet-rpc does not support creating wallets with subaddress lookahead over rpc");
-    if (config.getPassword() === undefined) config.setPassword("");
+    if (config.networkType !== undefined) throw new MoneroError("Cannot provide networkType when creating RPC wallet because server's network type is already set");
+    if (config.accountLookahead !== undefined || config.subaddressLookahead !== undefined) throw new MoneroError("monero-wallet-rpc does not support creating wallets with subaddress lookahead over rpc");
+    if (config.password === undefined) config.setPassword("");
     
     // create wallet
-    if (config.getMnemonic() !== undefined) {
-      await this._createWalletFromMnemonic(config.getPath(), config.getPassword(), config.getMnemonic(), config.getRestoreHeight(), config.getLanguage(), config.getSeedOffset(), config.getSaveCurrent());
-    } else if (config.getPrivateSpendKey() !== undefined || config.getPrimaryAddress() !== undefined) {
-      if (config.getSeedOffset() !== undefined) throw new MoneroError("Cannot provide seedOffset when creating wallet from keys");
-      await this._createWalletFromKeys(config.getPath(), config.getPassword(), config.getPrimaryAddress(), config.getPrivateViewKey(), config.getPrivateSpendKey(), config.getRestoreHeight(), config.getLanguage(), config.getSaveCurrent());
+    if (config.mnemonic !== undefined) {
+      await this._createWalletFromMnemonic(config.path, config.password, config.mnemonic, config.restoreHeight, config.language, config.seedOffset, config.saveCurrent);
+    } else if (config.privateSpendKey !== undefined || config.primaryAddress !== undefined) {
+      if (config.seedOffset !== undefined) throw new MoneroError("Cannot provide seedOffset when creating wallet from keys");
+      await this._createWalletFromKeys(config.path, config.password, config.primaryAddress, config.privateViewKey, config.privateSpendKey, config.restoreHeight, config.language, config.saveCurrent);
     } else {
-      if (config.getSeedOffset() !== undefined) throw new MoneroError("Cannot provide seedOffset when creating random wallet");
-      if (config.getRestoreHeight() !== undefined) throw new MoneroError("Cannot provide restoreHeight when creating random wallet");
-      if (config.getSaveCurrent() === false) throw new MoneroError("Current wallet is saved automatically when creating random wallet");
-      await this._createWalletRandom(config.getPath(), config.getPassword(), config.getLanguage());
+      if (config.seedOffset !== undefined) throw new MoneroError("Cannot provide seedOffset when creating random wallet");
+      if (config.restoreHeight !== undefined) throw new MoneroError("Cannot provide restoreHeight when creating random wallet");
+      if (config.saveCurrent === false) throw new MoneroError("Current wallet is saved automatically when creating random wallet");
+      await this._createWalletRandom(config.path, config.password, config.language);
     }
     
     // set daemon if provided
-    if (config.getServer()) return this.setDaemonConnection(config.getServer());
+    if (config.server) return this.setDaemonConnection(config.server);
     return this;
   }
   

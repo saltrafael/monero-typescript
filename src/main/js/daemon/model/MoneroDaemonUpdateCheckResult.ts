@@ -2,15 +2,17 @@
  * Models the result of checking for a daemon update.
  */
 class MoneroDaemonUpdateCheckResult {
-  
+  state: any;
+
   /**
    * Deep copy constructor.
    * 
    * @param {MoneroDaemonUpdateCheckResult} is an existing result to deep copy from
    */
-  constructor(result) {
+  constructor(result: any) {
     this.state = {};
     if (result !== undefined) {
+      // @ts-expect-error TS(2304): Cannot find name 'assert'.
       assert(result instanceof MoneroDaemonUpdateCheckResult);
       this.setIsUpdateAvailable(result.isUpdateAvailable());
       this.setVersion(result.getVersion());
@@ -19,7 +21,7 @@ class MoneroDaemonUpdateCheckResult {
       this.setUserUri(result.getUserUri());
     }
   }
-  
+
   /**
    * Indicates if an update is available.
    * 
@@ -28,12 +30,12 @@ class MoneroDaemonUpdateCheckResult {
   isUpdateAvailable() {
     return this.state.isUpdateAvailable;
   }
-  
-  setIsUpdateAvailable(isUpdateAvailable) {
+
+  setIsUpdateAvailable(isUpdateAvailable: any) {
     this.state.isUpdateAvailable = isUpdateAvailable;
     return this;
   }
-  
+
   /**
    * Get the update's version.
    * 
@@ -42,12 +44,12 @@ class MoneroDaemonUpdateCheckResult {
   getVersion() {
     return this.state.version;
   }
-  
-  setVersion(version) {
+
+  setVersion(version: any) {
     this.state.version = version;
     return this;
   }
-  
+
   /**
    * Get the update's hash.
    * 
@@ -56,12 +58,12 @@ class MoneroDaemonUpdateCheckResult {
   getHash() {
     return this.state.hash;
   }
-  
-  setHash(hash) {
+
+  setHash(hash: any) {
     this.state.hash = hash;
     return this;
   }
-  
+
   /**
    * Get the uri to automatically download the update.
    * 
@@ -70,12 +72,12 @@ class MoneroDaemonUpdateCheckResult {
   getAutoUri() {
     return this.state.autoUri;
   }
-  
-  setAutoUri(autoUri) {
+
+  setAutoUri(autoUri: any) {
     this.state.autoUri = autoUri;
     return this;
   }
-  
+
   /**
    * Get the uri to manually download the update.
    * 
@@ -84,8 +86,8 @@ class MoneroDaemonUpdateCheckResult {
   getUserUri() {
     return this.state.userUri;
   }
-  
-  setUserUri(userUri) {
+
+  setUserUri(userUri: any) {
     this.state.userUri = userUri;
     return this;
   }

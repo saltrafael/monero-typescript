@@ -101,7 +101,7 @@ self.setLogLevel = async function(objectId, level) {
 }
 
 self.getWasmMemoryUsed = async function(objectId) {
-  return LibraryUtils.getWasmModule() &amp;&amp; LibraryUtils.getWasmModule().HEAP8 ? LibraryUtils.getWasmModule().HEAP8.length : undefined;
+  return LibraryUtils.WASM_MODULE &amp;&amp; LibraryUtils.WASM_MODULE.HEAP8 ? LibraryUtils.WASM_MODULE.HEAP8.length : undefined;
 }
 
 // ----------------------------- MONERO UTILS ---------------------------------
@@ -449,7 +449,7 @@ self.openWalletData = async function(walletId, path, password, networkType, keys
 
 self._createWallet = async function(walletId, configJson) {
   let config = new MoneroWalletConfig(configJson);
-  let path = config.getPath();
+  let path = config.path;
   config.setPath("");
   config.setProxyToWorker(false);
   self.WORKER_OBJECTS[walletId] = await MoneroWalletFull.createWallet(config);

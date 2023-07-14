@@ -5,8 +5,9 @@ import MoneroSubaddress from "./MoneroSubaddress";
  * Monero account model.
  */
 class MoneroAccount {
-  
-  constructor(stateOrIndex, primaryAddress, balance, unlockedBalance, subaddresses) {
+  state: any;
+
+  constructor(stateOrIndex: any, primaryAddress: any, balance: any, unlockedBalance: any, subaddresses: any) {
     
     // construct from json
     if (typeof stateOrIndex === "object") {
@@ -20,6 +21,7 @@ class MoneroAccount {
       if (this.state.subaddresses) {
         for (let i = 0; i < this.state.subaddresses.length; i++) {
           if (!(this.state.subaddresses[i] instanceof MoneroSubaddress)) {
+            // @ts-expect-error TS(2554): Expected 3 arguments, but got 1.
             this.state.subaddresses[i] = new MoneroSubaddress(this.state.subaddresses[i]);
           }
         }
@@ -36,7 +38,7 @@ class MoneroAccount {
       this.setSubaddresses(subaddresses);
     }
   }
-  
+
   toJson() {
     let json = Object.assign({}, this.state);
     if (json.balance !== undefined) json.balance = json.balance.toString();
@@ -48,57 +50,57 @@ class MoneroAccount {
     }
     return json;
   }
-  
+
   getIndex() {
     return this.state.index;
   }
-  
-  setIndex(index) {
+
+  setIndex(index: any) {
     this.state.index = index;
     return this;
   }
-  
+
   getPrimaryAddress() {
     return this.state.primaryAddress;
   }
 
-  setPrimaryAddress(primaryAddress) {
+  setPrimaryAddress(primaryAddress: any) {
     this.state.primaryAddress = primaryAddress;
     return this;
   }
-  
+
   getBalance() {
     return this.state.balance;
   }
-  
-  setBalance(balance) {
+
+  setBalance(balance: any) {
     this.state.balance = balance;
     return this;
   }
-  
+
   getUnlockedBalance() {
     return this.state.unlockedBalance;
   }
-  
-  setUnlockedBalance(unlockedBalance) {
+
+  setUnlockedBalance(unlockedBalance: any) {
     this.state.unlockedBalance = unlockedBalance;
     return this;
   }
-  
+
   getTag() {
     return this.state.tag;
   }
-  
-  setTag(tag) {
+
+  setTag(tag: any) {
     this.state.tag = tag;
     return this;
   }
-  
+
   getSubaddresses() {
     return this.state.subaddresses;
   }
-  
-  setSubaddresses(subaddresses) {
+
+  setSubaddresses(subaddresses: any) {
     assert(subaddresses === undefined || Array.isArray(subaddresses), "Given subaddresses must be undefined or an array of subaddresses");
     this.state.subaddresses = subaddresses;
     if (subaddresses) {
@@ -108,7 +110,7 @@ class MoneroAccount {
     }
     return this;
   }
-  
+
   toString(indent = 0) {
     let str = "";
     str += GenUtils.kvLine("Index", this.getIndex(), indent);
@@ -117,6 +119,7 @@ class MoneroAccount {
     str += GenUtils.kvLine("Unlocked balance", this.getUnlockedBalance(), indent);
     str += GenUtils.kvLine("Tag", this.getTag(), indent);
     if (this.getSubaddresses() != null) {
+      // @ts-expect-error TS(2304): Cannot find name 'sb'.
       sb += GenUtils.kvLine("Subaddresses", "", indent)
       for (let i = 0; i < this.getSubaddresses().size(); i++) {
         str += GenUtils.kvLine(i + 1, "", indent + 1);

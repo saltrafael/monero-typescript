@@ -3,14 +3,65 @@ import MoneroError from "../../common/MoneroError";
 import MoneroNetworkType from "../../daemon/model/MoneroNetworkType";
 import MoneroRpcConnection from "../../common/MoneroRpcConnection";
 
+interface Config {
+  path: string;
+  password: string;
+  networkType: string | number;
+  serverUri?: string;
+  serverUsername?: string;
+  serverPassword?: string;
+  rejectUnauthorized?: boolean;
+  server?: MoneroRpcConnection;
+  keysData?: Uint8Array;
+  cacheData?: Uint8Array;
+  proxyToWorker?: boolean;
+  fs?: FileSystem;
+  saveCurrent?: boolean;
+  accountLookahead?: number;
+  subaddressLookahead?: number;
+
+  _mnemonic?: string;
+  _seedOffset?: string;
+  _primaryAddress?: string;
+  _privateViewKey?: string;
+  _privateSpendKey?: string;
+  _restoreHeight?: number;
+  _language?: string;
+}
+
 /**
  * Configuration to create a Monero wallet.
  */
 class MoneroWalletConfig {
-  
+  config: Config;
+
+  static SUPPORTED_FIELDS = [
+    "path",
+    "password",
+    "networkType",
+    "serverUri",
+    "serverUsername",
+    "serverPassword",
+    "rejectUnauthorized",
+    "mnemonic",
+    "seedOffset",
+    "primaryAddress",
+    "privateViewKey",
+    "privateSpendKey",
+    "restoreHeight",
+    "language",
+    "saveCurrent",
+    "proxyToWorker",
+    "fs",
+    "keysData",
+    "cacheData",
+    "accountLookahead",
+    "subaddressLookahead",
+  ];
+
   /**
    * Construct a configuration to open or create a wallet.
-   * 
+   *
    * @param {object|MoneroWalletConfig} config - MoneroWalletConfig or equivalent config object
    * @param {string} config.path - path of the wallet to open or create
    * @param {string} config.password - password of the wallet to open
@@ -23,242 +74,239 @@ class MoneroWalletConfig {
    * @param {Uint8Array} [config.keysData] - wallet keys data to open (optional)
    * @param {Uint8Array} [config.cacheData] - wallet cache data to open (optional)
    * @param {boolean} [config.proxyToWorker] - proxies wallet operations to a worker in order to not block the main thread (default true)
-   * @param {fs} [config.fs] - Node.js compatible file system to use (defaults to disk or in-memory FS if browser)
-   * @param {boolean} config.saveCurrent - specifies if the current RPC wallet should be saved before being closed
+   * @param {FileSystem} [config.fs] - Node.js compatible file system to use (defaults to disk or in-memory FS if browser)
+   * @param {boolean} config.saveCurrent - specifies if the current RPC wallet should be saved before being closed (optional)
    * @param {number} config.accountLookahead - number of accounts to scan (optional)
    * @param {number} config.subaddressLookahead - number of subaddresses to scan per account (optional)
    */
-  constructor(config) {
-    
+  constructor(config?: Config | MoneroWalletConfig) {
     // initialize internal config
-    if (!config) config = {};
-    else if (config instanceof MoneroWalletConfig) config = config.toJson();
+    if (config instanceof MoneroWalletConfig) config = config.toJson();
     else if (typeof config === "object") config = Object.assign({}, config);
-    else throw new MoneroError("config must be a MoneroWalletConfig or JavaScript object");
+    else
+      throw new MoneroError(
+        "config must be a MoneroWalletConfig or Config object"
+      );
+
     this.config = config;
-    
+
     // normalize config
-    this.setNetworkType(config.networkType);
-    if (config.server) this.setServer(config.server);
-    delete this.config.server;
-    
+    this.networkType = "networkType" in config ? config.networkType : undefined;
+    this.server = config.server;
+    this.config.server = undefined;
+
     // check for unsupported fields
-    for (let key of Object.keys(this.config)) {
+    for (const key of Object.keys(this.config)) {
       if (!GenUtils.arrayContains(MoneroWalletConfig.SUPPORTED_FIELDS, key)) {
-        throw new MoneroError("Wallet config includes unsupported field: '" + key + "'");
+        throw new MoneroError(
+          "Wallet config includes unsupported field: '" + key + "'"
+        );
       }
     }
   }
-  
+
   toJson() {
-    let json = Object.assign({}, this.config);
+    const json = Object.assign({}, this.config);
     json.fs = undefined; // remove filesystem
     return json;
   }
-  
-  getPath() {
+
+  public get path() {
     return this.config.path;
   }
-  
-  setPath(path) {
-    this.config.path = path;
-    return this;
+
+  public set path(path: string) {
+    Object.assign(this.config, { path });
   }
-  
-  getPassword() {
+
+  public get password() {
     return this.config.password;
   }
-  
-  setPassword(password) {
-    this.config.password = password;
-    return this;
+
+  public set password(password: string) {
+    Object.assign(this.config, { password });
   }
-  
-  getNetworkType() {
+
+  public get networkType() {
     return this.config.networkType;
   }
-  
-  setNetworkType(networkTypeOrStr) {
-    this.config.networkType = typeof networkTypeOrStr === "string" ? MoneroNetworkType.parse(networkTypeOrStr) : networkTypeOrStr;
-    return this;
+
+  public set networkType(networkTypeOrStr: undefined | string | number) {
+    Object.assign(this.config, {
+      networkType:
+        typeof networkTypeOrStr === "string"
+          ? MoneroNetworkType.parse(networkTypeOrStr)
+          : networkTypeOrStr,
+    });
   }
-  
-  getServer() {
-    return !this.config.serverUri ? undefined : new MoneroRpcConnection({uri: this.config.serverUri, username: this.config.serverUsername, password: this.config.serverPassword, rejectUnauthorized: this.config.rejectUnauthorized})
+
+  public get server() {
+    return !this.config.serverUri
+      ? undefined
+      : new MoneroRpcConnection({
+          uri: this.config.serverUri,
+          username: this.config.serverUsername,
+          password: this.config.serverPassword,
+          rejectUnauthorized: this.config.rejectUnauthorized,
+        });
   }
-  
-  setServer(server) {
-    if (server && !(server instanceof MoneroRpcConnection)) server = new MoneroRpcConnection(server);
-    this.config.serverUri = server === undefined ? undefined : server.getUri();
-    this.config.serverUsername = server === undefined ? undefined : server.getUsername();
-    this.config.serverPassword = server === undefined ? undefined : server.getPassword();
-    this.config.rejectUnauthorized = server === undefined ? undefined : server.getRejectUnauthorized();
-    return this;
+
+  public set server(server: undefined | MoneroRpcConnection) {
+    if (server && !(server instanceof MoneroRpcConnection))
+      server = new MoneroRpcConnection(server);
+
+    this.config.serverUri = server === undefined ? undefined : server.uri;
+    this.config.serverUsername =
+      server === undefined ? undefined : server.username;
+    this.config.serverPassword =
+      server === undefined ? undefined : server.password;
+    this.config.rejectUnauthorized =
+      server === undefined ? undefined : server.rejectUnauthorized;
   }
-  
-  getServerUri() {
+
+  public get serverUri() {
     return this.config.serverUri;
   }
-  
-  setServerUri(serverUri) {
-    this.config.serverUri = serverUri;
-    return this;
+
+  public set serverUri(serverUri: undefined | string) {
+    Object.assign(this.config, { serverUri });
   }
-  
-  getServerUsername() {
+
+  public get serverUsername() {
     return this.config.serverUsername;
   }
-  
-  setServerUsername(serverUsername) {
-    this.config.serverUsername = serverUsername;
-    return this;
+
+  public set serverUsername(serverUsername: undefined | string) {
+    Object.assign(this.config, { serverUsername });
   }
-  
-  getServerPassword() {
+
+  public get serverPassword() {
     return this.config.serverPassword;
   }
-  
-  setServerPassword(serverPassword) {
-    this.config.serverPassword = serverPassword;
-    return this;
+
+  public set serverPassword(serverPassword: undefined | string) {
+    Object.assign(this.config, { serverPassword });
   }
-  
-  getRejectUnauthorized() {
+
+  public get rejectUnauthorized() {
     return this.config.rejectUnauthorized;
   }
-  
-  setRejectUnauthorized(rejectUnauthorized) {
-    this.config.rejectUnauthorized = rejectUnauthorized;
-    return this;
+
+  public set rejectUnauthorized(rejectUnauthorized: undefined | boolean) {
+    Object.assign(this.config, { rejectUnauthorized });
   }
-  
-  getMnemonic() {
-    return this.config.mnemonic;
+
+  public get mnemonic() {
+    return this.config._mnemonic;
   }
-  
-  setMnemonic(mnemonic) {
-    this.config.mnemonic = mnemonic;
-    return this;
+
+  public set mnemonic(mnemonic: undefined | string) {
+    Object.assign(this.config, { mnemonic });
   }
-  
-  getSeedOffset() {
-    return this.config.seedOffset;
+
+  public get seedOffset() {
+    return this.config._seedOffset;
   }
-  
-  setSeedOffset(seedOffset) {
-    this.config.seedOffset = seedOffset;
-    return this;
+
+  public set seedOffset(seedOffset: undefined | string) {
+    Object.assign(this.config, { seedOffset });
   }
-  
-  getPrimaryAddress() {
-    return this.config.primaryAddress;
+
+  public get primaryAddress() {
+    return this.config._primaryAddress;
   }
-  
-  setPrimaryAddress(primaryAddress) {
-    this.config.primaryAddress = primaryAddress;
-    return this;
+
+  public set primaryAddress(primaryAddress: undefined | string) {
+    Object.assign(this.config, { primaryAddress });
   }
-  
-  getPrivateViewKey() {
-    return this.config.privateViewKey;
+
+  public get privateViewKey() {
+    return this.config._privateViewKey;
   }
-  
-  setPrivateViewKey(privateViewKey) {
-    this.config.privateViewKey = privateViewKey;
-    return this;
+
+  public set privateViewKey(privateViewKey: undefined | string) {
+    Object.assign(this.config, { privateViewKey });
   }
-  
-  getPrivateSpendKey() {
-    return this.config.privateSpendKey;
+
+  public get privateSpendKey() {
+    return this.config._privateSpendKey;
   }
-  
-  setPrivateSpendKey(privateSpendKey) {
-    this.config.privateSpendKey = privateSpendKey;
-    return this;
+
+  public set privateSpendKey(privateSpendKey: undefined | string) {
+    Object.assign(this.config, { privateSpendKey });
   }
-  
-  getRestoreHeight() {
-    return this.config.restoreHeight;
+
+  public get restoreHeight() {
+    return this.config._restoreHeight;
   }
-  
-  setRestoreHeight(restoreHeight) {
-    this.config.restoreHeight = restoreHeight;
-    return this;
+
+  public set restoreHeight(restoreHeight: undefined | number) {
+    Object.assign(this.config, { restoreHeight });
   }
-  
-  getLanguage() {
-    return this.config.language;
+
+  public get language() {
+    return this.config._language;
   }
-  
-  setLanguage(language) {
-    this.config.language = language;
-    return this;
+
+  public set language(language: undefined | string) {
+    Object.assign(this.config, { language });
   }
-  
-  getSaveCurrent() {
+
+  public get saveCurrent() {
     return this.config.saveCurrent;
   }
-  
-  setSaveCurrent(saveCurrent) {
-    this.config.saveCurrent = saveCurrent;
-    return this;
+
+  public set saveCurrent(saveCurrent: undefined | boolean) {
+    Object.assign(this.config, { saveCurrent });
   }
-  
-  getProxyToWorker() {
+
+  public get proxyToWorker() {
     return this.config.proxyToWorker;
   }
-  
-  setProxyToWorker(proxyToWorker) {
-    this.config.proxyToWorker = proxyToWorker;
-    return this;
+
+  public set proxyToWorker(proxyToWorker: undefined | boolean) {
+    Object.assign(this.config, { proxyToWorker });
   }
-  
-  getFs() {
+
+  public get fs() {
     return this.config.fs;
   }
-  
-  setFs(fs) {
-    this.config.fs = fs;
-    return this;
+
+  public set fs(fs: undefined | FileSystem) {
+    Object.assign(this.config, { fs });
   }
-  
-  getKeysData() {
+
+  public get keysData() {
     return this.config.keysData;
   }
-  
-  setKeysData(keysData) {
-    this.config.keysData = keysData;
-    return this;
+
+  public set keysData(keysData: undefined | Uint8Array) {
+    Object.assign(this.config, { keysData });
   }
-  
-  getCacheData() {
+
+  public get cacheData() {
     return this.config.cacheData;
   }
-  
-  setCacheData(cacheData) {
-    this.config.cacheData = cacheData;
-    return this;
+
+  public set cacheData(cacheData: undefined | Uint8Array) {
+    Object.assign(this.config, { cacheData });
   }
-  
-  getAccountLookahead() {
+
+  public get accountLookahead() {
     return this.config.accountLookahead;
   }
-  
-  setAccountLookahead(accountLookahead) {
-    this.config.accountLookahead = accountLookahead;
-    return this;
+
+  public set accountLookahead(accountLookahead: undefined | number) {
+    Object.assign(this.config, { accountLookahead });
   }
-  
-  getSubaddressLookahead() {
+
+  public get subaddressLookahead() {
     return this.config.subaddressLookahead;
   }
-  
-  setSubaddressLookahead(subaddressLookahead) {
-    this.config.subaddressLookahead = subaddressLookahead;
-    return this;
+
+  public set subaddressLookahead(subaddressLookahead: undefined | number) {
+    Object.assign(this.config, { subaddressLookahead });
   }
 }
-
-MoneroWalletConfig.SUPPORTED_FIELDS = ["path", "password", "networkType", "serverUri", "serverUsername", "serverPassword", "rejectUnauthorized", "mnemonic", "seedOffset", "primaryAddress", "privateViewKey", "privateSpendKey", "restoreHeight", "language", "saveCurrent", "proxyToWorker", "fs", "keysData", "cacheData", "accountLookahead", "subaddressLookahead"];
 
 export default MoneroWalletConfig;

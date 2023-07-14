@@ -7,7 +7,7 @@ import MoneroCheck from "./MoneroCheck";
  */
 class MoneroCheckTx extends MoneroCheck {
   
-  constructor(state) {
+  constructor(state: any) {
     super(state);
     if (this.state.receivedAmount !== undefined && !(this.state.receivedAmount instanceof BigInt)) this.state.receivedAmount = BigInt(this.state.receivedAmount);
   }
@@ -22,7 +22,7 @@ class MoneroCheckTx extends MoneroCheck {
     return this.state.inTxPool;
   }
   
-  setInTxPool(inTxPool) {
+  setInTxPool(inTxPool: any) {
     this.state.inTxPool = inTxPool;
     return this;
   }
@@ -31,7 +31,7 @@ class MoneroCheckTx extends MoneroCheck {
     return this.state.numConfirmations;
   }
   
-  setNumConfirmations(numConfirmations) {
+  setNumConfirmations(numConfirmations: any) {
     this.state.numConfirmations = numConfirmations;
     return this;
   }
@@ -40,7 +40,7 @@ class MoneroCheckTx extends MoneroCheck {
     return this.state.receivedAmount;
   }
   
-  setReceivedAmount(receivedAmount) {
+  setReceivedAmount(receivedAmount: any) {
     this.state.receivedAmount = receivedAmount;
     return this;
   }

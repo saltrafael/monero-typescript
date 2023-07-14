@@ -41,7 +41,7 @@ class MoneroWallet {
    * 
    * @param {MoneroWalletListener} listener - listener to receive wallet notifications
    */
-  async addListener(listener) {
+  async addListener(listener: any) {
     throw new Error("Not supported");
   }
   
@@ -50,7 +50,7 @@ class MoneroWallet {
    * 
    * @param {MoneroWalletListener} listener - listener to unregister
    */
-  async removeListener(listener) {
+  async removeListener(listener: any) {
     throw new Error("Not supported");
   }
   
@@ -70,6 +70,7 @@ class MoneroWallet {
    * @return {bool} true if the wallet is view-only, false otherwise
    */
   async isViewOnly() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -80,7 +81,8 @@ class MoneroWallet {
    * @param {string} [username] - username to authenticate with the daemon (optional)
    * @param {string} [password] - password to authenticate with the daemon (optional)
    */
-  async setDaemonConnection(uriOrConnection, username, password) {
+  async setDaemonConnection(uriOrConnection: any, username: any, password: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -90,6 +92,7 @@ class MoneroWallet {
    * @return {MoneroRpcConnection} the wallet's daemon connection
    */
   async getDaemonConnection() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -99,6 +102,7 @@ class MoneroWallet {
    * @return {boolean} true if the wallet is connected to a daemon, false otherwise
    */
   async isConnectedToDaemon() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -108,6 +112,7 @@ class MoneroWallet {
    * @return {MoneroVersion} the version of the wallet
    */
   async getVersion() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -117,6 +122,7 @@ class MoneroWallet {
    * @return {string} the path the wallet can be opened with
    */
   async getPath() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -126,6 +132,7 @@ class MoneroWallet {
    * @return {string} the wallet's mnemonic phrase
    */
   async getMnemonic() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -135,6 +142,7 @@ class MoneroWallet {
    * @return {string} the language of the wallet's mnemonic phrase
    */
   async getMnemonicLanguage() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -144,6 +152,7 @@ class MoneroWallet {
    * @return {string} the wallet's private view key
    */
   async getPrivateViewKey() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -153,6 +162,7 @@ class MoneroWallet {
    * @return {string} the wallet's private spend key
    */
   async getPrivateSpendKey() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -162,6 +172,7 @@ class MoneroWallet {
    * @return {string} the wallet's public view key
    */
   async getPublicViewKey() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -171,6 +182,7 @@ class MoneroWallet {
    * @return {string} the wallet's public spend key
    */
   async getPublicSpendKey() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
     
@@ -190,7 +202,8 @@ class MoneroWallet {
    * @param {number} subaddressIdx - the subaddress index within the account
    * @return {string} the receive address of the specified subaddress
    */
-  async getAddress(accountIdx, subaddressIdx) {
+  async getAddress(accountIdx: any, subaddressIdx: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -200,7 +213,8 @@ class MoneroWallet {
    * @param {string} address - address to get the account and subaddress index from
    * @return {MoneroSubaddress} the account and subaddress indices
    */
-  async getAddressIndex(address) {
+  async getAddressIndex(address: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -213,7 +227,8 @@ class MoneroWallet {
    * @param {string} paymentId is the payment ID to generate an integrated address from (randomly generated if undefined)
    * @return {MoneroIntegratedAddress} the integrated address
    */
-  async getIntegratedAddress(standardAddress, paymentId) {
+  async getIntegratedAddress(standardAddress: any, paymentId: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -223,7 +238,8 @@ class MoneroWallet {
    * @param {string} integratedAddress - integrated address to decode
    * @return {MoneroIntegratedAddress} the decoded integrated address including standard address and payment id
    */
-  async decodeIntegratedAddress(integratedAddress) {
+  async decodeIntegratedAddress(integratedAddress: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -233,6 +249,7 @@ class MoneroWallet {
    * @return {int} the block height that the wallet is synced to
    */
   async getHeight() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -242,6 +259,7 @@ class MoneroWallet {
    * @return {int} the blockchain's height
    */
   async getDaemonHeight() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -253,7 +271,8 @@ class MoneroWallet {
    * @param {number} day - day of the height to get as a number between 1 and 31
    * @return the blockchain's approximate height at the given date
    */
-  async getHeightByDate(year, month, day) {
+  async getHeightByDate(year: any, month: any, day: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -263,7 +282,8 @@ class MoneroWallet {
    * @param {MoneroWalletListener|number} [listenerOrStartHeight] - listener xor start height (defaults to no sync listener, the last synced block)
    * @param {number} [startHeight] - startHeight if not given in first arg (defaults to last synced block)
    */
-  async sync(listenerOrStartHeight, startHeight) {
+  async sync(listenerOrStartHeight: any, startHeight: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -272,7 +292,8 @@ class MoneroWallet {
    * 
    * @param {number} [syncPeriodInMs] - maximum period between syncs in milliseconds (default is wallet-specific)
    */
-  async startSyncing(syncPeriodInMs) {
+  async startSyncing(syncPeriodInMs: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -280,6 +301,7 @@ class MoneroWallet {
    * Stop synchronizing the wallet with the daemon.
    */
   async stopSyncing() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -288,7 +310,8 @@ class MoneroWallet {
    * 
    * @param {string[]} txHashes - tx hashes to scan
    */
-  async scanTxs(txHashes) {
+  async scanTxs(txHashes: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -302,6 +325,7 @@ class MoneroWallet {
    * daemon.  This method should be manually invoked to rescan outputs.</p>
    */
   async rescanSpent() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -313,6 +337,7 @@ class MoneroWallet {
    * tx notes, etc.</p>
    */
   async rescanBlockchain() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -323,7 +348,8 @@ class MoneroWallet {
    * @param {number} [subaddressIdx] - index of the subaddress to get the balance of (default all subaddresses)
    * @return {BigInt} the balance of the wallet, account, or subaddress
    */
-  async getBalance(accountIdx, subaddressIdx) {
+  async getBalance(accountIdx: any, subaddressIdx: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -334,7 +360,8 @@ class MoneroWallet {
    * @param {number} [subaddressIdx] - index of the subaddress to get the unlocked balance of (optional)
    * @return {BigInt} the unlocked balance of the wallet, account, or subaddress
    */
-  async getUnlockedBalance(accountIdx, subaddressIdx) {
+  async getUnlockedBalance(accountIdx: any, subaddressIdx: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -346,8 +373,10 @@ class MoneroWallet {
   async getNumBlocksToUnlock() {
     
     // get balances
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 0.
     let balance = await this.getBalance();
     if (GenUtils.compareBigInt(balance, BigInt(0)) === 0) return [undefined, undefined]; // skip if no balance
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 0.
     let unlockedBalance = await this.getUnlockedBalance();
     
     // compute number of blocks until next funds available
@@ -356,9 +385,12 @@ class MoneroWallet {
     let numBlocksToNextUnlock = undefined;
     if (GenUtils.compareBigInt(unlockedBalance, BigInt(0)) > 0) numBlocksToNextUnlock = 0;
     else {
+      // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
       txs = await this.getTxs({isLocked: true}); // get locked txs
       height = await this.getHeight(); // get most recent height
+      // @ts-expect-error TS(2488): Type 'void' must have a '[Symbol.iterator]()' meth... Remove this comment to see the full error message
       for (let tx of txs) {
+        // @ts-expect-error TS(2363): The right-hand side of an arithmetic operation mus... Remove this comment to see the full error message
         let numBlocksToUnlock = Math.max((tx.isConfirmed() ? tx.getHeight() : height) + 10, tx.getUnlockHeight()) - height;
         numBlocksToNextUnlock = numBlocksToNextUnlock === undefined ? numBlocksToUnlock : Math.min(numBlocksToNextUnlock, numBlocksToUnlock);
       }
@@ -369,11 +401,15 @@ class MoneroWallet {
     if (GenUtils.compareBigInt(balance, unlockedBalance) === 0) {
       if (GenUtils.compareBigInt(unlockedBalance, BigInt(0)) > 0) numBlocksToLastUnlock = 0;
     } else {
+      // @ts-expect-error TS(1345): An expression of type 'void' cannot be tested for ... Remove this comment to see the full error message
       if (!txs) {
+        // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
         txs = await this.getTxs({isLocked: true}); // get locked txs
         height = await this.getHeight(); // get most recent height
       }
+      // @ts-expect-error TS(2488): Type 'void' must have a '[Symbol.iterator]()' meth... Remove this comment to see the full error message
       for (let tx of txs) {
+        // @ts-expect-error TS(2363): The right-hand side of an arithmetic operation mus... Remove this comment to see the full error message
         let numBlocksToUnlock = Math.max((tx.isConfirmed() ? tx.getHeight() : height) + 10, tx.getUnlockHeight()) - height;
         numBlocksToLastUnlock = numBlocksToLastUnlock === undefined ? numBlocksToUnlock : Math.max(numBlocksToLastUnlock, numBlocksToUnlock);
       }
@@ -389,7 +425,8 @@ class MoneroWallet {
    * @param {string} tag - tag for filtering accounts, all accounts if undefined
    * @return {MoneroAccount[]} all accounts with the given tag
    */
-  async getAccounts(includeSubaddresses, tag) {
+  async getAccounts(includeSubaddresses: any, tag: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -400,7 +437,8 @@ class MoneroWallet {
    * @param {boolean} includeSubaddresses - include subaddresses if true
    * @return {MoneroAccount} the retrieved account
    */
-  async getAccount(accountIdx, includeSubaddresses) {
+  async getAccount(accountIdx: any, includeSubaddresses: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -410,7 +448,8 @@ class MoneroWallet {
    * @param {string} [label] - label for account's first subaddress (optional)
    * @return {MoneroAccount} the created account
    */
-  async createAccount(label) {
+  async createAccount(label: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
 
@@ -420,7 +459,7 @@ class MoneroWallet {
    * @param {number} accountIdx - index of the account to set the label for
    * @param {string} label - the label to set
    */
-  async setAccountLabel(accountIdx, label) {
+  async setAccountLabel(accountIdx: any, label: any) {
     await this.setSubaddressLabel(accountIdx, 0, label);
   }
   
@@ -431,7 +470,8 @@ class MoneroWallet {
    * @param {int[]} [subaddressIndices] - indices of subaddresses to get (optional)
    * @return {MoneroSubaddress[]} the retrieved subaddresses
    */
-  async getSubaddresses(accountIdx, subaddressIndices) {
+  async getSubaddresses(accountIdx: any, subaddressIndices: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -442,9 +482,10 @@ class MoneroWallet {
    * @param {number} subaddressIdx - index of the subaddress within the account
    * @return {MoneroSubaddress} the retrieved subaddress
    */
-  async getSubaddress(accountIdx, subaddressIdx) {
+  async getSubaddress(accountIdx: any, subaddressIdx: any) {
     assert(accountIdx >= 0);
     assert(subaddressIdx >= 0);
+    // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     return (await this.getSubaddresses(accountIdx, subaddressIdx))[0];
   }
   
@@ -455,7 +496,8 @@ class MoneroWallet {
    * @param {string} [label] - the label for the subaddress (optional)
    * @return {MoneroSubaddress} the created subaddress
    */
-  async createSubaddress(accountIdx, label) {
+  async createSubaddress(accountIdx: any, label: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
 
@@ -466,7 +508,8 @@ class MoneroWallet {
    * @param {number} subaddressIdx - index of the subaddress to set the label for
    * @param {string} label - the label to set
    */
-  async setSubaddressLabel(accountIdx, subaddressIdx, label) {
+  async setSubaddressLabel(accountIdx: any, subaddressIdx: any, label: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -477,8 +520,10 @@ class MoneroWallet {
    * @return {MoneroTxWallet} the identified transactions
    * @throws {MoneroError} if the transaction is not found
    */
-  async getTx(txHash) {
+  async getTx(txHash: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     let txs = await this.getTxs([txHash]);
+    // @ts-expect-error TS(2339): Property 'length' does not exist on type 'void'.
     return txs.length === 0 ? undefined : txs[0]; 
   }
   
@@ -510,7 +555,8 @@ class MoneroWallet {
    * @param {string[]} missingTxHashes - populated with hashes of unfound or unmet transactions that were queried by hash (throws error if undefined and queried transaction hashes are unfound or unmet) 
    * @return {MoneroTxWallet[]} wallet transactions per the configuration
    */
-  async getTxs(query, missingTxHashes) {
+  async getTxs(query: any, missingTxHashes: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
 
@@ -539,7 +585,8 @@ class MoneroWallet {
    * @param {MoneroTxQuery} [query.txQuery] - get transfers whose transaction meets this query (optional)
    * @return {MoneroTransfer[]} wallet transfers that meet the query
    */
-  async getTransfers(query) {
+  async getTransfers(query: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -555,8 +602,9 @@ class MoneroWallet {
    * @param {MoneroTxQuery} [query.txQuery] - get transfers whose transaction meets this query (optional)
    * @return {MoneroIncomingTransfer[]} incoming transfers that meet the query
    */
-  async getIncomingTransfers(query) {
+  async getIncomingTransfers(query: any) {
     query = MoneroWallet._normalizeTransferQuery(query);
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (query.isIncoming() === false) throw new MoneroError("Transfer query contradicts getting incoming transfers");
     query.setIsIncoming(true);
     return this.getTransfers(query);
@@ -576,8 +624,9 @@ class MoneroWallet {
    * @param {MoneroTxQuery} [query.txQuery] - get transfers whose transaction meets this query (optional)
    * @return {MoneroOutgoingTransfer[]} outgoing transfers that meet the query
    */
-  async getOutgoingTransfers(query) {
+  async getOutgoingTransfers(query: any) {
     query = MoneroWallet._normalizeTransferQuery(query);
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (query.isOutgoing() === false) throw new MoneroError("Transfer query contradicts getting outgoing transfers");
     query.setIsOutgoing(true);
     return this.getTransfers(query);
@@ -604,7 +653,8 @@ class MoneroWallet {
    * @param {MoneroTxQuery} [query.txQuery] - get outputs whose transaction meets this filter (optional)
    * @return {MoneroOutputWallet[]} the queried outputs
    */
-  async getOutputs(query) {
+  async getOutputs(query: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -614,7 +664,8 @@ class MoneroWallet {
    * @param {boolean} all - export all outputs if true, else export the outputs since the last export
    * @return {string} outputs in hex format
    */
-  async exportOutputs(all) {
+  async exportOutputs(all: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -624,7 +675,8 @@ class MoneroWallet {
    * @param {string} outputsHex - outputs in hex format
    * @return {int} the number of outputs imported
    */
-  async importOutputs(outputsHex) {
+  async importOutputs(outputsHex: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -634,7 +686,8 @@ class MoneroWallet {
    * @param {boolean} all - export all key images if true, else export the key images since the last export
    * @return {MoneroKeyImage[]} the wallet's signed key images
    */
-  async exportKeyImages(all) {
+  async exportKeyImages(all: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -644,7 +697,8 @@ class MoneroWallet {
    * @param {MoneroKeyImage[]} keyImages - images to import and verify (requires hex and signature)
    * @return {MoneroKeyImageImportResult} results of the import
    */
-  async importKeyImages(keyImages) {
+  async importKeyImages(keyImages: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -654,6 +708,7 @@ class MoneroWallet {
    * @return {MoneroKeyImage[]} the key images from the last imported outputs
    */
   async getNewKeyImagesFromLastImport() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -662,7 +717,8 @@ class MoneroWallet {
    * 
    * @param {string} keyImage - key image of the output to freeze
    */
-  async freezeOutput(keyImage) {
+  async freezeOutput(keyImage: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -671,7 +727,8 @@ class MoneroWallet {
    * 
    * @param {string} keyImage - key image of the output to thaw
    */
-  async thawOutput(keyImage) {
+  async thawOutput(keyImage: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -681,7 +738,8 @@ class MoneroWallet {
    * @param {string} keyImage - key image of the output to check if frozen
    * @return {boolean} true if the output is frozen, false otherwise
    */
-  async isOutputFrozen(keyImage) {
+  async isOutputFrozen(keyImage: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -701,10 +759,11 @@ class MoneroWallet {
    * @param {number} [config.unlockHeight] - minimum height for the transaction to unlock (default 0)
    * @return {MoneroTxWallet} the created transaction
    */
-  async createTx(config) {
+  async createTx(config: any) {
     config = MoneroWallet._normalizeCreateTxsConfig(config);
     if (config.getCanSplit() !== undefined) assert.equal(config.getCanSplit(), false, "Cannot split transactions using createTx(); use createTxs()");
     config.setCanSplit(false);
+    // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     return (await this.createTxs(config))[0];
   }
   
@@ -725,7 +784,8 @@ class MoneroWallet {
    * @param {boolean} [config.canSplit] - allow funds to be transferred using multiple transactions (default true)
    * @return {MoneroTxWallet[]} the created transactions
    */
-  async createTxs(config) {
+  async createTxs(config: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -740,7 +800,8 @@ class MoneroWallet {
    * @param {MoneroTxPriority} [config.priority] - transaction priority (default MoneroTxPriority.NORMAL)
    * @return {MoneroTxWallet} the created transaction
    */
-  async sweepOutput(config) {
+  async sweepOutput(config: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
 
@@ -758,7 +819,8 @@ class MoneroWallet {
    * @param {boolean} [config.sweepEachSubaddress] - sweep each subaddress individually if true (default false)
    * @return {MoneroTxWallet[]} the created transactions
    */
-  async sweepUnlocked(config) {
+  async sweepUnlocked(config: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -770,7 +832,8 @@ class MoneroWallet {
    * @param {boolean} [relay] - specifies if the resulting transaction should be relayed (default false)
    * @return {MoneroTxWallet[]} the created transactions
    */
-  async sweepDust(relay) {
+  async sweepDust(relay: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -780,7 +843,8 @@ class MoneroWallet {
    * @param {(MoneroTxWallet|string)} txOrMetadata - transaction or its metadata to relay
    * @return {string} the hash of the relayed tx
    */
-  async relayTx(txOrMetadata) {
+  async relayTx(txOrMetadata: any) {
+    // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     return (await this.relayTxs([txOrMetadata]))[0];
   }
   
@@ -790,7 +854,8 @@ class MoneroWallet {
    * @param {(MoneroTxWallet[]|string[])} txsOrMetadatas - transactions or their metadata to relay
    * @return {string[]} the hashes of the relayed txs
    */
-  async relayTxs(txsOrMetadatas) {
+  async relayTxs(txsOrMetadatas: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -800,7 +865,8 @@ class MoneroWallet {
    * @param {string} unsignedTxHex - unsigned tx hex
    * @return {MoneroTxSet} the tx set containing structured transactions
    */
-  async describeUnsignedTxSet(unsignedTxHex) {
+  async describeUnsignedTxSet(unsignedTxHex: any) {
+    // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
     return this.describeTxSet(new MoneroTxSet().setUnsignedTxHex(unsignedTxHex));
   }
   
@@ -810,7 +876,8 @@ class MoneroWallet {
    * @param {string} multisigTxHex - multisig tx hex
    * @return {MoneroTxSet} the tx set containing structured transactions
    */
-  async describeMultisigTxSet(multisigTxHex) {
+  async describeMultisigTxSet(multisigTxHex: any) {
+    // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
     return this.describeTxSet(new MoneroTxSet().setMultisigTxHex(multisigTxHex));
   }
   
@@ -820,7 +887,8 @@ class MoneroWallet {
    * @param {MoneroTxSet} txSet - a tx set containing unsigned or multisig tx hex
    * @return {MoneroTxSet} txSet - the tx set containing structured transactions
    */
-  async describeTxSet(txSet) {
+  async describeTxSet(txSet: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -830,7 +898,8 @@ class MoneroWallet {
    * @param {string} unsignedTxHex - unsigned transaction hex from when the transactions were created
    * @return {string} the signed transaction hex
    */
-  async signTxs(unsignedTxHex) {
+  async signTxs(unsignedTxHex: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -840,7 +909,8 @@ class MoneroWallet {
    * @param {string} signedTxHex - signed transaction hex from signTxs()
    * @return {string[]} the resulting transaction hashes
    */
-  async submitTxs(signedTxHex) {
+  async submitTxs(signedTxHex: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -853,7 +923,8 @@ class MoneroWallet {
    * @param {number} [subaddressIdx] - the subaddress index of the message signature (default 0)
    * @return {string} the signature
    */
-  async signMessage(message, signatureType, accountIdx, subaddressIdx) {
+  async signMessage(message: any, signatureType: any, accountIdx: any, subaddressIdx: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -865,7 +936,8 @@ class MoneroWallet {
    * @param {string} signature - signature
    * @return {MoneroMessageSignatureResult} true if the signature is good, false otherwise
    */
-  async verifyMessage(message, address, signature) {
+  async verifyMessage(message: any, address: any, signature: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -875,7 +947,8 @@ class MoneroWallet {
    * @param {string} txHash - transaction's hash
    * @return {string} - transaction's secret key
    */
-  async getTxKey(txHash) {
+  async getTxKey(txHash: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -887,7 +960,8 @@ class MoneroWallet {
    * @param {string} address - destination public address of the transaction
    * @return {MoneroCheckTx} the result of the check
    */
-  async checkTxKey(txHash, txKey, address) {
+  async checkTxKey(txHash: any, txKey: any, address: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -899,7 +973,8 @@ class MoneroWallet {
    * @param {string} [message] - message to include with the signature to further authenticate the proof (optional)
    * @return {string} the transaction signature
    */
-  async getTxProof(txHash, address, message) {
+  async getTxProof(txHash: any, address: any, message: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -912,7 +987,8 @@ class MoneroWallet {
    * @param {string} signature - transaction signature to confirm
    * @return {MoneroCheckTx} the result of the check
    */
-  async checkTxProof(txHash, address, message, signature) {
+  async checkTxProof(txHash: any, address: any, message: any, signature: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -923,7 +999,8 @@ class MoneroWallet {
    * @param {string} [message] - message to include with the signature to further authenticate the proof (optional)
    * @return {string} the transaction signature
    */
-  async getSpendProof(txHash, message) {
+  async getSpendProof(txHash: any, message: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -935,7 +1012,8 @@ class MoneroWallet {
    * @param {string} signature - transaction signature to confirm
    * @return {boolean} true if the signature is good, false otherwise
    */
-  async checkSpendProof(txHash, message, signature) {
+  async checkSpendProof(txHash: any, message: any, signature: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -945,7 +1023,8 @@ class MoneroWallet {
    * @param message - message included with the signature to further authenticate the proof (optional)
    * @return the reserve proof signature
    */
-  async getReserveProofWallet(message) {
+  async getReserveProofWallet(message: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -957,7 +1036,8 @@ class MoneroWallet {
    * @param {string} [message] - message to include with the signature to further authenticate the proof (optional)
    * @return {string} the reserve proof signature
    */
-  async getReserveProofAccount(accountIdx, amount, message) {
+  async getReserveProofAccount(accountIdx: any, amount: any, message: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
 
@@ -969,7 +1049,8 @@ class MoneroWallet {
    * @param {string} signature - reserve proof signature to check
    * @return {MoneroCheckReserve} the result of checking the signature proof
    */
-  async checkReserveProof(address, message, signature) {
+  async checkReserveProof(address: any, message: any, signature: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -979,7 +1060,8 @@ class MoneroWallet {
    * @param {string} txHash - transaction to get the note of
    * @return {string} the tx note
    */
-  async getTxNote(txHash) {
+  async getTxNote(txHash: any) {
+    // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     return (await this.getTxNotes([txHash]))[0];
   }
   
@@ -989,7 +1071,8 @@ class MoneroWallet {
    * @param {string[]} txHashes - hashes of the transactions to get notes for
    * @return {string[]} notes for the transactions
    */
-  async getTxNotes(txHashes) {
+  async getTxNotes(txHashes: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -999,7 +1082,7 @@ class MoneroWallet {
    * @param {string} txHash - hash of the transaction to set a note for
    * @param {string} note - the transaction note
    */
-  async setTxNote(txHash, note) {
+  async setTxNote(txHash: any, note: any) {
     await this.setTxNotes([txHash], [note]);
   }
   
@@ -1009,7 +1092,8 @@ class MoneroWallet {
    * @param {string[]} txHashes - transactions to set notes for
    * @param {string[]} notes - notes to set for the transactions
    */
-  async setTxNotes(txHashes, notes) {
+  async setTxNotes(txHashes: any, notes: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -1019,7 +1103,8 @@ class MoneroWallet {
    * @param {int[]} entryIndices - indices of the entries to get
    * @return {MoneroAddressBookEntry[]} the address book entries
    */
-  async getAddressBookEntries(entryIndices) {
+  async getAddressBookEntries(entryIndices: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -1030,7 +1115,8 @@ class MoneroWallet {
    * @param {string} [description] - entry description (optional)
    * @return {int} the index of the added entry
    */
-  async addAddressBookEntry(address, description) {
+  async addAddressBookEntry(address: any, description: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -1043,7 +1129,8 @@ class MoneroWallet {
    * @param {boolean} setDescription - specifies if the description should be updated
    * @param {string} description - updated description
    */
-  async editAddressBookEntry(index, setAddress, address, setDescription, description) {
+  async editAddressBookEntry(index: any, setAddress: any, address: any, setDescription: any, description: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -1052,7 +1139,8 @@ class MoneroWallet {
    * 
    * @param {number} entryIdx - index of the entry to delete
    */
-  async deleteAddressBookEntry(entryIdx) {
+  async deleteAddressBookEntry(entryIdx: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -1062,7 +1150,8 @@ class MoneroWallet {
    * @param {string} tag - tag to apply to the specified accounts
    * @param {int[]} accountIndices - indices of the accounts to tag
    */
-  async tagAccounts(tag, accountIndices) {
+  async tagAccounts(tag: any, accountIndices: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
 
@@ -1071,7 +1160,8 @@ class MoneroWallet {
    * 
    * @param {int[]} accountIndices - indices of the accounts to untag
    */
-  async untagAccounts(accountIndices) {
+  async untagAccounts(accountIndices: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -1081,6 +1171,7 @@ class MoneroWallet {
    * @return {MoneroAccountTag[]} the wallet's account tags
    */
   async getAccountTags() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
 
@@ -1090,7 +1181,8 @@ class MoneroWallet {
    * @param {string} tag - tag to set a description for
    * @param {string} label - label to set for the tag
    */
-  async setAccountTagLabel(tag, label) {
+  async setAccountTagLabel(tag: any, label: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -1100,7 +1192,8 @@ class MoneroWallet {
    * @param {MoneroTxConfig} config - specifies configuration for a potential tx
    * @return {string} the payment uri
    */
-  async getPaymentUri(config) {
+  async getPaymentUri(config: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -1110,7 +1203,8 @@ class MoneroWallet {
    * @param {string} uri - payment uri to parse
    * @return {MoneroTxConfig} the send configuration parsed from the uri
    */
-  async parsePaymentUri(uri) {
+  async parsePaymentUri(uri: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -1120,7 +1214,8 @@ class MoneroWallet {
    * @param {string} key - attribute to get the value of
    * @return {string} the attribute's value
    */
-  async getAttribute(key) {
+  async getAttribute(key: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -1130,7 +1225,8 @@ class MoneroWallet {
    * @param {string} key - attribute key
    * @param {string} val - attribute value
    */
-  async setAttribute(key, val) {
+  async setAttribute(key: any, val: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -1141,7 +1237,8 @@ class MoneroWallet {
    * @param {boolean} [backgroundMining] - specifies if mining should occur in the background (optional)
    * @param {boolean} [ignoreBattery] - specifies if the battery should be ignored for mining (optional)
    */
-  async startMining(numThreads, backgroundMining, ignoreBattery) {
+  async startMining(numThreads: any, backgroundMining: any, ignoreBattery: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -1149,6 +1246,7 @@ class MoneroWallet {
    * Stop mining.
    */
   async stopMining() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -1158,6 +1256,7 @@ class MoneroWallet {
    * @return {boolean} true if importing multisig data is needed for returning a correct balance, false otherwise
    */
   async isMultisigImportNeeded() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -1167,6 +1266,7 @@ class MoneroWallet {
    * @return {boolean} true if this is a multisig wallet, false otherwise
    */
   async isMultisig() {
+    // @ts-expect-error TS(2339): Property 'isMultisig' does not exist on type 'void... Remove this comment to see the full error message
     return (await this.getMultisigInfo()).isMultisig();
   }
   
@@ -1176,6 +1276,7 @@ class MoneroWallet {
    * @return {MoneroMultisigInfo} multisig info about this wallet
    */
   async getMultisigInfo() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -1186,6 +1287,7 @@ class MoneroWallet {
    * @return {string} this wallet's multisig hex to share with participants
    */
   async prepareMultisig() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -1197,7 +1299,8 @@ class MoneroWallet {
    * @param {string} password - wallet password
    * @return {string} this wallet's multisig hex to share with participants
    */
-  async makeMultisig(multisigHexes, threshold, password) {
+  async makeMultisig(multisigHexes: any, threshold: any, password: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -1210,7 +1313,8 @@ class MoneroWallet {
    * @param {string} password - wallet's password // TODO monero-project: redundant? wallet is created with password
    * @return {MoneroMultisigInitResult} the result which has the multisig's address xor this wallet's multisig hex to share with participants iff not done
    */
-  async exchangeMultisigKeys(multisigHexes, password) {
+  async exchangeMultisigKeys(multisigHexes: any, password: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -1220,6 +1324,7 @@ class MoneroWallet {
    * @return {string} this wallet's multisig info as hex for other participants
    */
   async exportMultisigHex() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported?");
   }
   
@@ -1229,7 +1334,8 @@ class MoneroWallet {
    * @param {string[]} multisigHexes - multisig hex from each participant
    * @return {int} the number of outputs signed with the given multisig hex
    */
-  async importMultisigHex(multisigHexes) {
+  async importMultisigHex(multisigHexes: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -1239,7 +1345,8 @@ class MoneroWallet {
    * @param {string} multisigTxHex - unsigned multisig transactions as hex
    * @return {MoneroMultisigSignResult} the result of signing the multisig transactions
    */
-  async signMultisigTxHex(multisigTxHex) {
+  async signMultisigTxHex(multisigTxHex: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -1249,7 +1356,8 @@ class MoneroWallet {
    * @param {string} signedMultisigTxHex - signed multisig hex returned from signMultisigTxHex()
    * @return {string[]} the resulting transaction hashes
    */
-  async submitMultisigTxHex(signedMultisigTxHex) {
+  async submitMultisigTxHex(signedMultisigTxHex: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -1259,7 +1367,8 @@ class MoneroWallet {
    * @param {string} oldPassword - the wallet's old password
    * @param {string} newPassword - the wallet's new password
    */
-  async changePassword(oldPassword, newPassword) {
+  async changePassword(oldPassword: any, newPassword: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -1267,6 +1376,7 @@ class MoneroWallet {
    * Save the wallet at its current path.
    */
   save() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -1275,7 +1385,8 @@ class MoneroWallet {
    *
    * @param {boolean} [save] - specifies if the wallet should be saved before being closed (default false)
    */
-  async close(save) {
+  async close(save: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
@@ -1285,25 +1396,29 @@ class MoneroWallet {
    * @return {boolean} true if the wallet is closed, false otherwise
    */
   async isClosed() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Not supported");
   }
   
   // -------------------------------- PRIVATE ---------------------------------
   
-  static _normalizeTxQuery(query) {
+  static _normalizeTxQuery(query: any) {
     if (query instanceof MoneroTxQuery) query = query.copy();
+    // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
     else if (Array.isArray(query)) query = new MoneroTxQuery().setHashes(query);
     else {
       query = Object.assign({}, query);
       query = new MoneroTxQuery(query);
     }
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 0.
     if (query.getBlock() === undefined) query.setBlock(new MoneroBlock().setTxs([query]));
     if (query.getInputQuery()) query.getInputQuery().setTxQuery(query);
     if (query.getOutputQuery()) query.getOutputQuery().setTxQuery(query);
     return query;
   }
   
-  static _normalizeTransferQuery(query) {
+  static _normalizeTransferQuery(query: any) {
+    // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
     if (query === undefined) query = new MoneroTransferQuery();
     else if (query instanceof MoneroTransferQuery) {
       if (query.getTxQuery() === undefined) query = query.copy();
@@ -1320,13 +1435,16 @@ class MoneroWallet {
       query = Object.assign({}, query);
       query = new MoneroTransferQuery(query);
     }
+    // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
     if (query.getTxQuery() === undefined) query.setTxQuery(new MoneroTxQuery());
     query.getTxQuery().setTransferQuery(query);
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 0.
     if (query.getTxQuery().getBlock() === undefined) query.getTxQuery().setBlock(new MoneroBlock().setTxs([query.getTxQuery()]));
     return query;
   }
   
-  static _normalizeOutputQuery(query) {
+  static _normalizeOutputQuery(query: any) {
+    // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
     if (query === undefined) query = new MoneroOutputQuery();
     else if (query instanceof MoneroOutputQuery) {
       if (query.getTxQuery() === undefined) query = query.copy();
@@ -1343,14 +1461,18 @@ class MoneroWallet {
       query = Object.assign({}, query);
       query = new MoneroOutputQuery(query);
     }
+    // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
     if (query.getTxQuery() === undefined) query.setTxQuery(new MoneroTxQuery());
     query.getTxQuery().setOutputQuery(query);
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 0.
     if (query.getTxQuery().getBlock() === undefined) query.getTxQuery().setBlock(new MoneroBlock().setTxs([query.getTxQuery()]));
     return query;
   }
   
-  static _normalizeCreateTxsConfig(config) {
+  static _normalizeCreateTxsConfig(config: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (config === undefined || !(config instanceof Object)) throw new MoneroError("Must provide MoneroTxConfig or equivalent JS object");
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     config = new MoneroTxConfig(config);
     assert(config.getDestinations() && config.getDestinations().length > 0, "Must provide destinations");
     assert.equal(config.getSweepEachSubaddress(), undefined);
@@ -1358,29 +1480,40 @@ class MoneroWallet {
     return config;
   }
   
-  static _normalizeSweepOutputConfig(config) {
+  static _normalizeSweepOutputConfig(config: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (config === undefined || !(config instanceof Object)) throw new MoneroError("Must provide MoneroTxConfig or equivalent JS object");
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     config = new MoneroTxConfig(config);
     assert.equal(config.getSweepEachSubaddress(), undefined);
     assert.equal(config.getBelowAmount(), undefined);
     assert.equal(config.getCanSplit(), undefined, "Cannot split transactions when sweeping an output");
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (!config.getDestinations() || config.getDestinations().length !== 1 || !config.getDestinations()[0].getAddress()) throw new MoneroError("Must provide exactly one destination address to sweep output to");
     return config;
   }
   
-  static _normalizeSweepUnlockedConfig(config) {
+  static _normalizeSweepUnlockedConfig(config: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (config === undefined || !(config instanceof Object)) throw new MoneroError("Must provide MoneroTxConfig or equivalent JS object");
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     config = new MoneroTxConfig(config);
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (config.getDestinations() === undefined || config.getDestinations().length != 1) throw new MoneroError("Must provide exactly one destination to sweep to");
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (config.getDestinations()[0].getAddress() === undefined) throw new MoneroError("Must provide destination address to sweep to");
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (config.getDestinations()[0].getAmount() !== undefined) throw new MoneroError("Cannot provide amount in sweep config");
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (config.getKeyImage() !== undefined) throw new MoneroError("Key image defined; use sweepOutput() to sweep an output by its key image");
     if (config.getSubaddressIndices() !== undefined && config.getSubaddressIndices().length === 0) config.setSubaddressIndices(undefined);
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (config.getAccountIndex() === undefined && config.getSubaddressIndices() !== undefined) throw new MoneroError("Must provide account index if subaddress indices are provided");
     return config;
   }
 }
 
+// @ts-expect-error TS(2339): Property 'DEFAULT_LANGUAGE' does not exist on type... Remove this comment to see the full error message
 MoneroWallet.DEFAULT_LANGUAGE = "English";
 
 export default MoneroWallet;

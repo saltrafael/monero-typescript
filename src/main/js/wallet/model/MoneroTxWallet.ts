@@ -19,7 +19,7 @@ class MoneroTxWallet extends MoneroTx {
    * 
    * @param {MoneroTxWallet|object} [state] is existing state to initialize from (optional)
    */
-  constructor(state) {
+  constructor(state: any) {
     super(state);
     if (state instanceof MoneroTxWallet && state.getTxSet()) this.setTxSet(state.getTxSet()); // preserve reference to tx set
     state = this.state;
@@ -91,7 +91,7 @@ class MoneroTxWallet extends MoneroTx {
    * @param {MoneroTxSet} txSet - tx set containing txs
    * @return {MoneroTxWallet} this tx for chaining
    */
-  setTxSet(txSet) {
+  setTxSet(txSet: any) {
     this.state.txSet = txSet;
     return this;
   }
@@ -107,7 +107,7 @@ class MoneroTxWallet extends MoneroTx {
    * @param {boolean} isIncoming - true if the tx has incoming funds, false otherwise
    * @return {MoneroTxWallet} this tx for chaining
    */
-  setIsIncoming(isIncoming) {
+  setIsIncoming(isIncoming: any) {
     this.state.isIncoming = isIncoming;
     return this;
   }
@@ -123,7 +123,7 @@ class MoneroTxWallet extends MoneroTx {
    * @param {boolean} isOutgoing - true if the tx has outgoing funds, false otherwise
    * @return {MoneroTxWallet} this tx for chaining
    */
-  setIsOutgoing(isOutgoing) {
+  setIsOutgoing(isOutgoing: any) {
     this.state.isOutgoing = isOutgoing;
     return this;
   }
@@ -149,7 +149,7 @@ class MoneroTxWallet extends MoneroTx {
    * @param {MoneroTransferQuery} [transferQuery] - query to get specific transfers
    * @return {MoneroTransfer[]} transfers matching the query
    */
-  getTransfers(transferQuery) {
+  getTransfers(transferQuery: any) {
     let transfers = [];
     if (this.getOutgoingTransfer() && (!transferQuery || transferQuery.meetsCriteria(this.getOutgoingTransfer()))) transfers.push(this.getOutgoingTransfer());
     if (this.getIncomingTransfers() !== undefined) {
@@ -164,7 +164,7 @@ class MoneroTxWallet extends MoneroTx {
    * @param {MoneroTransferQuery} transferQuery - query to keep only specific transfers
    * @return {MoneroTransfer[]} remaining transfers matching the query
    */
-  filterTransfers(transferQuery) {
+  filterTransfers(transferQuery: any) {
     let transfers = [];
     
     // collect outgoing transfer or erase if filtered
@@ -173,12 +173,12 @@ class MoneroTxWallet extends MoneroTx {
     
     // collect incoming transfers or erase if filtered
     if (this.getIncomingTransfers() !== undefined) {
-      let toRemoves = [];
+      let toRemoves: any = [];
       for (let transfer of this.getIncomingTransfers()) {
         if (transferQuery.meetsCriteria(transfer)) transfers.push(transfer);
         else toRemoves.push(transfer);
       }
-      this.setIncomingTransfers(this.getIncomingTransfers().filter(function(transfer) {
+      this.setIncomingTransfers(this.getIncomingTransfers().filter(function(transfer: any) {
         return !toRemoves.includes(transfer);
       }));
       if (this.getIncomingTransfers().length === 0) this.setIncomingTransfers(undefined);
@@ -198,7 +198,7 @@ class MoneroTxWallet extends MoneroTx {
    * @param {MoneroIncomingTransfer[]} incomingTransfers - incoming transfers
    * @return {MoneroTxWallet} this tx for chaining
    */
-  setIncomingTransfers(incomingTransfers) {
+  setIncomingTransfers(incomingTransfers: any) {
     this.state.incomingTransfers = incomingTransfers;
     return this;
   }
@@ -214,7 +214,7 @@ class MoneroTxWallet extends MoneroTx {
    * @param {MoneroOutgoingTransfer[]} outgoingTransfer - outgoing transfers
    * @return {MoneroTxWallet} this tx for chaining
    */
-  setOutgoingTransfer(outgoingTransfer) {
+  setOutgoingTransfer(outgoingTransfer: any) {
     this.state.outgoingTransfer = outgoingTransfer;
     return this;
   }
@@ -223,7 +223,8 @@ class MoneroTxWallet extends MoneroTx {
    * @param {MoneroOutputWallet[]} outputQuery - query to get specific inputs
    * @return {MoneroOutputWallet[]} inputs matching the query
    */
-  getInputs(outputQuery) {
+  // @ts-expect-error TS(2416): Property 'getInputs' in type 'MoneroTxWallet' is n... Remove this comment to see the full error message
+  getInputs(outputQuery: any) {
     if (!outputQuery || !super.getInputs()) return super.getInputs();
     let inputs = [];
     for (let output of super.getInputs()) if (!outputQuery || outputQuery.meetsCriteria(output)) inputs.push(output);
@@ -234,11 +235,12 @@ class MoneroTxWallet extends MoneroTx {
    * @param {MoneroOutputWallet[]} inputs - tx inputs
    * @return {MoneroTxWallet} this tx for chaining
    */
-  setInputs(inputs) {
+  setInputs(inputs: any) {
     
     // validate that all inputs are wallet inputs
     if (inputs) {
       for (let output of inputs) {
+        // @ts-expect-error TS(2304): Cannot find name 'MoneroError'.
         if (!(output instanceof MoneroOutputWallet)) throw new MoneroError("Wallet transaction inputs must be of type MoneroOutputWallet");
       }
     }
@@ -250,7 +252,8 @@ class MoneroTxWallet extends MoneroTx {
    * @param {MoneroOutputQuery} [outputQuery] - query to get specific outputs
    * @return {MoneroOutputWallet[]} outputs matching the query
    */
-  getOutputs(outputQuery) {
+  // @ts-expect-error TS(2416): Property 'getOutputs' in type 'MoneroTxWallet' is ... Remove this comment to see the full error message
+  getOutputs(outputQuery: any) {
     if (!outputQuery || !super.getOutputs()) return super.getOutputs();
     let outputs = [];
     for (let output of super.getOutputs()) if (!outputQuery || outputQuery.meetsCriteria(output)) outputs.push(output);
@@ -261,11 +264,12 @@ class MoneroTxWallet extends MoneroTx {
    * @param {MoneroOutputWallet[]} outputs - tx outputs
    * @return {MoneroTxWallet} this tx for chaining
    */
-  setOutputs(outputs) {
+  setOutputs(outputs: any) {
     
     // validate that all outputs are wallet outputs
     if (outputs) {
       for (let output of outputs) {
+        // @ts-expect-error TS(2304): Cannot find name 'MoneroError'.
         if (!(output instanceof MoneroOutputWallet)) throw new MoneroError("Wallet transaction outputs must be of type MoneroOutputWallet");
       }
     }
@@ -277,17 +281,18 @@ class MoneroTxWallet extends MoneroTx {
    * @param {MoneroOutputQuery} outputQuery - query to keep only specific outputs
    * @return {MoneroTransfer[]} remaining outputs matching the query
    */
-  filterOutputs(outputQuery) {
+  filterOutputs(outputQuery: any) {
     let outputs = [];
     if (super.getOutputs()) {
-      let toRemoves = [];
+      let toRemoves: any = [];
       for (let output of super.getOutputs()) {
         if (!outputQuery || outputQuery.meetsCriteria(output)) outputs.push(output);
         else toRemoves.push(output);
       }
-      this.setOutputs(super.getOutputs().filter(function(output) {
+      this.setOutputs(super.getOutputs().filter(function(output: any) {
         return !toRemoves.includes(output);
       }));
+      // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
       if (this.getOutputs().length === 0) this.setOutputs(undefined);
     }
     return outputs;
@@ -304,7 +309,7 @@ class MoneroTxWallet extends MoneroTx {
    * @param {string} note - tx note
    * @return {MoneroTxWallet} this tx for chaining
    */
-  setNote(note) {
+  setNote(note: any) {
     this.state.note = note;
     return this;
   }
@@ -320,7 +325,7 @@ class MoneroTxWallet extends MoneroTx {
    * @param {boolean} isLocked - true if the tx is locked, false otherwise
    * @return {MoneroTxWallet} this tx for chaining
    */
-  setIsLocked(isLocked) {
+  setIsLocked(isLocked: any) {
     this.state.isLocked = isLocked;
     return this;
   }
@@ -336,7 +341,7 @@ class MoneroTxWallet extends MoneroTx {
    * @param {BigInt} inputSum - sum of tx inputs
    * @return {MoneroTxWallet} this tx for chaining
    */
-  setInputSum(inputSum) {
+  setInputSum(inputSum: any) {
     this.state.inputSum = inputSum;
     return this;
   }
@@ -352,7 +357,7 @@ class MoneroTxWallet extends MoneroTx {
    * @param {BigInt} outputSum - sum of tx outputs
    * @return {MoneroTxWallet} this tx for chaining
    */
-  setOutputSum(outputSum) {
+  setOutputSum(outputSum: any) {
     this.state.outputSum = outputSum;
     return this;
   }
@@ -368,7 +373,7 @@ class MoneroTxWallet extends MoneroTx {
    * @param {string} changeAddress - change address
    * @return {MoneroTxWallet} this tx for chaining
    */
-  setChangeAddress(changeAddress) {
+  setChangeAddress(changeAddress: any) {
     this.state.changeAddress = changeAddress;
     return this;
   }
@@ -384,7 +389,7 @@ class MoneroTxWallet extends MoneroTx {
    * @param {BigInt} changeAmount - change amount
    * @return {MoneroTxWallet} this tx for chaining
    */
-  setChangeAmount(changeAmount) {
+  setChangeAmount(changeAmount: any) {
     this.state.changeAmount = changeAmount;
     return this;
   }
@@ -400,7 +405,7 @@ class MoneroTxWallet extends MoneroTx {
    * @param {number} numDummyOutputs - number of dummy outputs
    * @return {MoneroTxWallet} this tx for chaining
    */
-  setNumDummyOutputs(numDummyOutputs) {
+  setNumDummyOutputs(numDummyOutputs: any) {
     this.state.numDummyOutputs = numDummyOutputs;
     return this;
   }
@@ -416,7 +421,7 @@ class MoneroTxWallet extends MoneroTx {
    * @param {string} extraHex - tx extra as hex
    * @return {MoneroTxWallet} this tx for chaining
    */
-  setExtraHex(extraHex) {
+  setExtraHex(extraHex: any) {
     this.state.extraHex = extraHex;
     return this;
   }
@@ -424,6 +429,7 @@ class MoneroTxWallet extends MoneroTx {
   /**
    * @return {MoneroTxWallet} a copy of this tx
    */
+  // @ts-expect-error TS(2416): Property 'copy' in type 'MoneroTxWallet' is not as... Remove this comment to see the full error message
   copy() {
     return new MoneroTxWallet(this);
   }
@@ -437,7 +443,7 @@ class MoneroTxWallet extends MoneroTx {
    * 
    * @param {MoneroTxWallet} tx - the transaction to merge into this transaction
    */
-  merge(tx) {
+  merge(tx: any) {
     assert(tx instanceof MoneroTxWallet);
     if (this === tx) return this;
     
@@ -448,9 +454,11 @@ class MoneroTxWallet extends MoneroTx {
     //import MoneroTxSet from "./MoneroTxSet";
     if (this.getTxSet() !== tx.getTxSet()) {
       if (this.getTxSet() == undefined) {
+        // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
         this.setTxSet(new MoneroTxSet().setTxs([this]));
       }
       if (tx.getTxSet() === undefined) {
+        // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
         tx.setTxSet(new MoneroTxSet().setTxs([tx]));
       }
       this.getTxSet().merge(tx.getTxSet());
@@ -474,15 +482,25 @@ class MoneroTxWallet extends MoneroTx {
     }
     
     // merge simple extensions
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setIsIncoming(GenUtils.reconcile(this.isIncoming(), tx.isIncoming()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setIsOutgoing(GenUtils.reconcile(this.isOutgoing(), tx.isOutgoing()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setNote(GenUtils.reconcile(this.getNote(), tx.getNote()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 3.
     this.setIsLocked(GenUtils.reconcile(this.isLocked(), tx.isLocked(), {resolveTrue: false})); // tx can become unlocked
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setInputSum(GenUtils.reconcile(this.getInputSum(), tx.getInputSum()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setOutputSum(GenUtils.reconcile(this.getOutputSum(), tx.getOutputSum()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setChangeAddress(GenUtils.reconcile(this.getChangeAddress(), tx.getChangeAddress()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setChangeAmount(GenUtils.reconcile(this.getChangeAmount(), tx.getChangeAmount()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setNumDummyOutputs(GenUtils.reconcile(this.getNumDummyOutputs(), tx.getNumDummyOutputs()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setExtraHex(GenUtils.reconcile(this.getExtraHex(), tx.getExtraHex()));
     
     return this;  // for chaining
@@ -503,6 +521,7 @@ class MoneroTxWallet extends MoneroTx {
       str += (this.isConfirmed() ? this.getBlock().getTimestamp() : this.getReceivedTimestamp()) + ", ";
       str += this.isConfirmed() + ", ";
       str += (this.getOutgoingAmount() ? this.getOutgoingAmount().toString() : "") + ", ";
+      // @ts-expect-error TS(2532): Object is possibly 'undefined'.
       str += this.getIncomingAmount() ? this.getIncomingAmount().toString() : "";
       return str;
     }
@@ -536,7 +555,7 @@ class MoneroTxWallet extends MoneroTx {
   }
   
   // private helper to merge transfers
-  static _mergeIncomingTransfer(transfers, transfer) {
+  static _mergeIncomingTransfer(transfers: any, transfer: any) {
     for (let aTransfer of transfers) {
       if (aTransfer.getAccountIndex() === transfer.getAccountIndex() && aTransfer.getSubaddressIndex() === transfer.getSubaddressIndex()) {
         aTransfer.merge(transfer);

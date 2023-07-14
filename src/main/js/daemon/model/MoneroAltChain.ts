@@ -3,60 +3,61 @@
  * Models an alternative chain seen by the node.
  */
 class MoneroAltChain {
-  
-  constructor(state) {
+  state: any;
+
+  constructor(state: any) {
     state = Object.assign({}, state);
     if (state.difficulty !== undefined && !(state.difficulty instanceof BigInt)) state.difficulty = BigInt(state.difficulty);
     this.state = state;
   }
-  
+
   toJson() {
     let json = Object.assign({}, this.state);
     if (this.getDifficulty() !== undefined) json.difficulty = this.getDifficulty().toString();
     return json;
   }
-  
-  getBlockHashes(blockHashes) {
+
+  getBlockHashes(blockHashes: any) {
     return this.state.blockHashes;
   }
-  
-  setBlockHashes(blockHashes) {
+
+  setBlockHashes(blockHashes: any) {
     this.state.blockHashes = blockHashes;
     return this;
   }
-  
+
   getDifficulty() {
     return this.state.difficulty;
   }
-  
-  setDifficulty(difficulty) {
+
+  setDifficulty(difficulty: any) {
     this.state.difficulty = difficulty;
     return this;
   }
-  
+
   getHeight() {
     return this.state.height;
   }
-  
-  setHeight(height) {
+
+  setHeight(height: any) {
     this.state.height = height;
     return this;
   }
-  
+
   getLength() {
     return this.state.length;
   }
-  
-  setLength(length) {
+
+  setLength(length: any) {
     this.state.length = length;
     return this;
   }
-  
+
   getMainChainParentBlockHash() {
     return this.state.mainChainParentBlockHash;
   }
-  
-  setMainChainParentBlockHash(mainChainParentBlockHash) {
+
+  setMainChainParentBlockHash(mainChainParentBlockHash: any) {
     this.state.mainChainParentBlockHash = mainChainParentBlockHash;
     return this;
   }

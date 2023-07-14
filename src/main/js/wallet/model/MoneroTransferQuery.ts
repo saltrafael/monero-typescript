@@ -37,7 +37,7 @@ class MoneroTransferQuery extends MoneroTransfer {
    * @param {boolean} config.hasDestinations - get transfers with known destinations if true (destinations are only stored locally with the wallet)
    * @param {object|MoneroTxQuery} config.txQuery - get transfers whose tx match this tx query
    */
-  constructor(config) {
+  constructor(config: any) {
     super(config);
     
     // deserialize if necessary
@@ -52,6 +52,7 @@ class MoneroTransferQuery extends MoneroTransfer {
     this._validate();
   }
   
+  // @ts-expect-error TS(2416): Property 'copy' in type 'MoneroTransferQuery' is n... Remove this comment to see the full error message
   copy() {
     return new MoneroTransferQuery(this);
   }
@@ -66,7 +67,7 @@ class MoneroTransferQuery extends MoneroTransfer {
     return this.state.txQuery;
   }
   
-  setTxQuery(txQuery) {
+  setTxQuery(txQuery: any) {
     this.state.txQuery = txQuery;
     if (txQuery) txQuery.state.transferQuery = this;
     return this;
@@ -76,16 +77,17 @@ class MoneroTransferQuery extends MoneroTransfer {
     return this.state.isIncoming;
   }
 
-  setIsIncoming(isIncoming) {
+  setIsIncoming(isIncoming: any) {
     this.state.isIncoming = isIncoming;
     return this;
   }
   
+  // @ts-expect-error TS(2416): Property 'isOutgoing' in type 'MoneroTransferQuery... Remove this comment to see the full error message
   isOutgoing() {
     return this.state.isIncoming === undefined ? undefined : !this.state.isIncoming;
   }
   
-  setIsOutgoing(isOutgoing) {
+  setIsOutgoing(isOutgoing: any) {
     this.state.isIncoming = isOutgoing === undefined ? undefined : !isOutgoing;
     return this;
   }
@@ -94,7 +96,7 @@ class MoneroTransferQuery extends MoneroTransfer {
     return this.state.address;
   }
 
-  setAddress(address) {
+  setAddress(address: any) {
     this.state.address = address;
     return this;
   }
@@ -103,7 +105,7 @@ class MoneroTransferQuery extends MoneroTransfer {
     return this.state.addresses;
   }
 
-  setAddresses(addresses) {
+  setAddresses(addresses: any) {
     this.state.addresses = addresses;
     return this;
   }
@@ -112,7 +114,7 @@ class MoneroTransferQuery extends MoneroTransfer {
     return this.state.subaddressIndex;
   }
   
-  setSubaddressIndex(subaddressIndex) {
+  setSubaddressIndex(subaddressIndex: any) {
     this.state.subaddressIndex = subaddressIndex;
     this._validate();
     return this;
@@ -122,7 +124,7 @@ class MoneroTransferQuery extends MoneroTransfer {
     return this.state.subaddressIndices;
   }
   
-  setSubaddressIndices(subaddressIndices) {
+  setSubaddressIndices(subaddressIndices: any) {
     this.state.subaddressIndices = subaddressIndices;
     this._validate();
     return this;
@@ -132,7 +134,7 @@ class MoneroTransferQuery extends MoneroTransfer {
     return this.state.destinations;
   }
   
-  setDestinations(destinations) {
+  setDestinations(destinations: any) {
     this.state.destinations = destinations;
     return this;
   }
@@ -141,7 +143,7 @@ class MoneroTransferQuery extends MoneroTransfer {
     return this.state.hasDestinations;
   }
   
-  setHasDestinations(hasDestinations) {
+  setHasDestinations(hasDestinations: any) {
     this.state.hasDestinations = hasDestinations;
     return this;
   }
@@ -152,13 +154,14 @@ class MoneroTransferQuery extends MoneroTransfer {
    * @param isLocked specifies if the output's tx must be locked or unlocked (optional)
    * @return {MoneroOutputQuery} this query for chaining
    */
-  setIsLocked(isLocked) {
+  setIsLocked(isLocked: any) {
+    // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
     if (this.state.txQuery === undefined) this.state.txQuery = new MoneroTxQuery();
     this.state.txQuery.setIsLocked(isLocked);
     return this;
   }
   
-  meetsCriteria(transfer, queryParent) {
+  meetsCriteria(transfer: any, queryParent: any) {
     if (!(transfer instanceof MoneroTransfer)) throw new Error("Transfer not given to MoneroTransferQuery.meetsCriteria(transfer)");
     if (queryParent === undefined) queryParent = true;
     
@@ -184,14 +187,14 @@ class MoneroTransferQuery extends MoneroTransfer {
       if (this.getAddress() !== undefined && (transfer.getAddresses() === undefined || !transfer.getAddresses().includes(this.getAddress()))) return false;   // TODO: will filter all transfers that don't contain addresses (outgoing txs might not have this field initialized)
       if (this.getAddresses() !== undefined) {
         if (!transfer.getAddresses()) return false;
-        if (!this.getAddresses().some(address => transfer.getAddresses().includes(address))) return false;
+        if (!this.getAddresses().some((address: any) => transfer.getAddresses().includes(address))) return false;
       }
       
       // filter on subaddress indices
       if (this.getSubaddressIndex() !== undefined && (transfer.getSubaddressIndices() === undefined || !transfer.getSubaddressIndices().includes(this.getSubaddressIndex()))) return false;
       if (this.getSubaddressIndices() !== undefined) {
         if (!transfer.getSubaddressIndices()) return false;
-        if (!this.getSubaddressIndices().some(subaddressIdx => transfer.getSubaddressIndices().includes(subaddressIdx))) return false;
+        if (!this.getSubaddressIndices().some((subaddressIdx: any) => transfer.getSubaddressIndices().includes(subaddressIdx))) return false;
       }
       
       // filter on having destinations
@@ -213,7 +216,9 @@ class MoneroTransferQuery extends MoneroTransfer {
   }
   
   _validate() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (this.getSubaddressIndex() !== undefined && this.getSubaddressIndex() < 0) throw new MoneroError("Subaddress index must be >= 0");
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (this.getSubaddressIndices() !== undefined) for (let subaddressIdx of this.getSubaddressIndices()) if (subaddressIdx < 0) throw new MoneroError("Subaddress indices must be >= 0");
   }
 }

@@ -2,20 +2,21 @@
  * Models the result of signing multisig tx hex.
  */
 class MoneroMultisigSignResult {
-  
-  constructor(state) {
+  state: any;
+
+  constructor(state: any) {
     this.state = Object.assign({}, state);
   }
-  
+
   toJson() {
     return Object.assign({}, this.state);
   }
-  
+
   getSignedMultisigTxHex() {
     return this.state.signedMultisigTxHex;
   }
 
-  setSignedMultisigTxHex(signedTxMultisigHex) {
+  setSignedMultisigTxHex(signedTxMultisigHex: any) {
     this.state.signedMultisigTxHex = signedTxMultisigHex;
   }
 
@@ -23,7 +24,7 @@ class MoneroMultisigSignResult {
     return this.state.txHashes;
   }
 
-  setTxHashes(txHashes) {
+  setTxHashes(txHashes: any) {
     this.state.txHashes = txHashes;
   }
 }

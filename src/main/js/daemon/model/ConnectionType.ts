@@ -2,51 +2,42 @@ import assert from "assert";
 
 /**
  * Enumerates connection types.
- * 
+ *
  * Based on enums.h in monero-project.
- * 
+ *
  * @hideconstructor
  */
 class ConnectionType {
-    
+  static INVALID: number = 0;
+  static IPV4: number = 1;
+  static IPV6: number = 2;
+  static TOR: number = 3;
+  static I2P: number = 4;
+
   /**
    * Asserts that the given connection type is valid.
    */
-  static validate(type) {
-    assert(type === 0 || type === 1 || type === 2 || type === 3, "Connection type is invalid: " + type);
+  static validate(type: number) {
+    assert(
+      type === ConnectionType.INVALID ||
+        type === ConnectionType.IPV4 ||
+        type === ConnectionType.IPV6 ||
+        type === ConnectionType.TOR,
+      "Connection type is invalid: " + type
+    );
   }
-  
+
   /**
    * Indicates if the given connection type is valid or not.
    */
-  static isValid(type) {
-    return type === 0 || type === 1 || type === 2 || 3;
+  static isValid(type: number) {
+    return (
+      type === ConnectionType.INVALID ||
+      type === ConnectionType.IPV4 ||
+      type === ConnectionType.IPV6 ||
+      type === ConnectionType.TOR
+    );
   }
 }
-
-/**
- * Invalid connection type (value=0).
- */
-ConnectionType.INVALID = 0;
-
-/**
- * IPV4 connection type (value=1).
- */
-ConnectionType.IPV4 = 1;
-
-/**
- * IPV6 connection type (value=2).
- */
-ConnectionType.IPV6 = 2;
-
-/**
- * TOR connection type (value=3).
- */
-ConnectionType.TOR = 3;
-
-/**
- * I2P connection type (value=4).
- */
-ConnectionType.I2P = 4;
 
 export default ConnectionType;

@@ -6,18 +6,20 @@ import GenUtils from "../../common/GenUtils";
  * @class
  */
 class MoneroTransfer {
-  
+  state: any;
+
   /**
    * Construct the model.
    * 
    * @param {MoneroTransfer|object} state is existing state to initialize from (optional)
    */
-  constructor(state) {
+  constructor(state: any) {
     
     // initialize internal state
     if (!state) state = {};
     else if (state instanceof MoneroTransfer) state = state.toJson();
     else if (typeof state === "object") state = Object.assign({}, state);
+    // @ts-expect-error TS(2304): Cannot find name 'MoneroError'.
     else throw new MoneroError("state must be a MoneroTransfer or JavaScript object");
     this.state = state;
     
@@ -27,33 +29,33 @@ class MoneroTransfer {
     // validate state
     this._validate();
   }
-  
+
   copy() {
     return new MoneroTransfer(this);
   }
-  
+
   toJson() {
     let json = Object.assign({}, this.state);
     if (this.getAmount() !== undefined) json.amount = this.getAmount().toString()
     delete json.tx; // parent tx is not serialized
     return json;
   }
-  
+
   getTx() {
     return this.state.tx;
   }
-  
-  setTx(tx) {
+
+  setTx(tx: any) {
     this.state.tx = tx;
     return this;
   }
-  
+
   isOutgoing() {
     let isIncoming = this.isIncoming();
     assert(typeof isIncoming === "boolean");
     return !isIncoming;
   }
-  
+
   isIncoming() {
     throw new Error("Subclass must implement");
   }
@@ -62,7 +64,7 @@ class MoneroTransfer {
     return this.state.accountIndex;
   }
 
-  setAccountIndex(accountIndex) {
+  setAccountIndex(accountIndex: any) {
     this.state.accountIndex = accountIndex;
     this._validate();
     return this;
@@ -72,11 +74,11 @@ class MoneroTransfer {
     return this.state.amount;
   }
 
-  setAmount(amount) {
+  setAmount(amount: any) {
     this.state.amount = amount;
     return this;
   }
-  
+
   /**
    * Updates this transaction by merging the latest information from the given
    * transaction.
@@ -87,7 +89,7 @@ class MoneroTransfer {
    * @param transfer is the transfer to merge into this one
    * @return {MoneroTransfer} the merged transfer
    */
-  merge(transfer) {
+  merge(transfer: any) {
     assert(transfer instanceof MoneroTransfer);
     if (this === transfer) return this;
     
@@ -98,18 +100,20 @@ class MoneroTransfer {
     }
     
     // otherwise merge transfer fields
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setAccountIndex(GenUtils.reconcile(this.getAccountIndex(), transfer.getAccountIndex()));
     
     // TODO monero-project: failed tx in pool (after testUpdateLockedDifferentAccounts()) causes non-originating saved wallets to return duplicate incoming transfers but one has amount of 0
         if (this.getAmount() !== undefined && transfer.getAmount() !== undefined && GenUtils.compareBigInt(this.getAmount(), transfer.getAmount()) !== 0 && (GenUtils.compareBigInt(this.getAmount(), BigInt("0")) === 0 || GenUtils.compareBigInt(transfer.getAmount(), BigInt("0")) === 0)) {
       console.warn("monero-project returning transfers with 0 amount/numSuggestedConfirmations");
     } else {
+      // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
       this.setAmount(GenUtils.reconcile(this.getAmount(), transfer.getAmount()));
     }
     
     return this;
   }
-  
+
   toString(indent = 0) {
     let str = "";
     str += GenUtils.kvLine("Is incoming", this.isIncoming(), indent);
@@ -117,8 +121,9 @@ class MoneroTransfer {
     str += GenUtils.kvLine("Amount", this.getAmount() ? this.getAmount().toString() : undefined, indent);
     return str === "" ? str :  str.slice(0, str.length - 1);  // strip last newline
   }
-  
+
   _validate() {
+    // @ts-expect-error TS(2304): Cannot find name 'MoneroError'.
     if (this.getAccountIndex() !== undefined && this.getAccountIndex() < 0) throw new MoneroError("Account index must be >= 0");
   }
 }

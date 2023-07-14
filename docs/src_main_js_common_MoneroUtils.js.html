@@ -186,11 +186,11 @@ class MoneroUtils {
     assert(GenUtils.isBase58(standardAddress), "Address is not base 58");
     
     // load keys module by default
-    if (LibraryUtils.getWasmModule() === undefined) await LibraryUtils.loadKeysModule();
+    if (LibraryUtils.WASM_MODULE === undefined) await LibraryUtils.loadKeysModule();
     
     // get integrated address in queue
-    return LibraryUtils.getWasmModule().queueTask(async function() {
-      let integratedAddressJson = LibraryUtils.getWasmModule().get_integrated_address_util(networkType, standardAddress, paymentId ? paymentId : "");
+    return LibraryUtils.WASM_MODULE.queueTask(async function() {
+      let integratedAddressJson = LibraryUtils.WASM_MODULE.get_integrated_address_util(networkType, standardAddress, paymentId ? paymentId : "");
       if (integratedAddressJson.charAt(0) !== '{') throw new MoneroError(integratedAddressJson);
       return new MoneroIntegratedAddress(JSON.parse(integratedAddressJson));
     });
@@ -228,11 +228,11 @@ class MoneroUtils {
     MoneroNetworkType.validate(networkType);
     
     // load keys module by default
-    if (LibraryUtils.getWasmModule() === undefined) await LibraryUtils.loadKeysModule();
+    if (LibraryUtils.WASM_MODULE === undefined) await LibraryUtils.loadKeysModule();
     
     // validate address in queue
-    return LibraryUtils.getWasmModule().queueTask(async function() {
-      let errMsg = LibraryUtils.getWasmModule().validate_address(address, networkType);
+    return LibraryUtils.WASM_MODULE.queueTask(async function() {
+      let errMsg = LibraryUtils.WASM_MODULE.validate_address(address, networkType);
       if (errMsg) throw new MoneroError(errMsg);
     });
   }
@@ -332,13 +332,13 @@ class MoneroUtils {
     if (MoneroUtils.PROXY_TO_WORKER) return LibraryUtils.invokeWorker(undefined, "moneroUtilsJsonToBinary", Array.from(arguments));
     
     // load keys module by default
-    if (LibraryUtils.getWasmModule() === undefined) await LibraryUtils.loadKeysModule();
+    if (LibraryUtils.WASM_MODULE === undefined) await LibraryUtils.loadKeysModule();
     
     // use wasm in queue
-    return LibraryUtils.getWasmModule().queueTask(async function() {
+    return LibraryUtils.WASM_MODULE.queueTask(async function() {
       
       // serialize json to binary which is stored in c++ heap
-      let binMemInfoStr = LibraryUtils.getWasmModule().malloc_binary_from_json(JSON.stringify(json));
+      let binMemInfoStr = LibraryUtils.WASM_MODULE.malloc_binary_from_json(JSON.stringify(json));
       
       // sanitize binary memory address info
       let binMemInfo = JSON.parse(binMemInfoStr);
@@ -348,11 +348,11 @@ class MoneroUtils {
       // read binary data from heap to Uint8Array
       let view = new Uint8Array(binMemInfo.length);
       for (let i = 0; i &lt; binMemInfo.length; i++) {
-        view[i] = LibraryUtils.getWasmModule().HEAPU8[binMemInfo.ptr / Uint8Array.BYTES_PER_ELEMENT + i];
+        view[i] = LibraryUtils.WASM_MODULE.HEAPU8[binMemInfo.ptr / Uint8Array.BYTES_PER_ELEMENT + i];
       }
       
       // free binary on heap
-      LibraryUtils.getWasmModule()._free(binMemInfo.ptr);
+      LibraryUtils.WASM_MODULE._free(binMemInfo.ptr);
       
       // return json from binary data
       return view;
@@ -369,14 +369,14 @@ class MoneroUtils {
     if (MoneroUtils.PROXY_TO_WORKER) return LibraryUtils.invokeWorker(undefined, "moneroUtilsBinaryToJson", Array.from(arguments));
     
     // load keys module by default
-    if (LibraryUtils.getWasmModule() === undefined) await LibraryUtils.loadKeysModule();
+    if (LibraryUtils.WASM_MODULE === undefined) await LibraryUtils.loadKeysModule();
     
     // use wasm in queue
-    return LibraryUtils.getWasmModule().queueTask(async function() {
+    return LibraryUtils.WASM_MODULE.queueTask(async function() {
       
       // allocate space in c++ heap for binary
-      let ptr = LibraryUtils.getWasmModule()._malloc(uint8arr.length * uint8arr.BYTES_PER_ELEMENT);
-      let heap = new Uint8Array(LibraryUtils.getWasmModule().HEAPU8.buffer, ptr, uint8arr.length * uint8arr.BYTES_PER_ELEMENT);
+      let ptr = LibraryUtils.WASM_MODULE._malloc(uint8arr.length * uint8arr.BYTES_PER_ELEMENT);
+      let heap = new Uint8Array(LibraryUtils.WASM_MODULE.HEAPU8.buffer, ptr, uint8arr.length * uint8arr.BYTES_PER_ELEMENT);
       if (ptr !== heap.byteOffset) throw new MoneroError("Memory ptr !== heap.byteOffset"); // should be equal
       
       // write binary to heap
@@ -386,10 +386,10 @@ class MoneroUtils {
       let binMemInfo = { ptr: ptr, length: uint8arr.length };
       
       // convert binary to json str
-      const ret_string = LibraryUtils.getWasmModule().binary_to_json(JSON.stringify(binMemInfo));
+      const ret_string = LibraryUtils.WASM_MODULE.binary_to_json(JSON.stringify(binMemInfo));
       
       // free binary on heap
-      LibraryUtils.getWasmModule()._free(ptr);
+      LibraryUtils.WASM_MODULE._free(ptr);
       
       // parse and return json
       return JSON.parse(ret_string);
@@ -406,14 +406,14 @@ class MoneroUtils {
     if (MoneroUtils.PROXY_TO_WORKER) return LibraryUtils.invokeWorker(undefined, "moneroUtilsBinaryBlocksToJson", Array.from(arguments));
     
     // load keys module by default
-    if (LibraryUtils.getWasmModule() === undefined) await LibraryUtils.loadKeysModule();
+    if (LibraryUtils.WASM_MODULE === undefined) await LibraryUtils.loadKeysModule();
     
     // use wasm in queue
-    return LibraryUtils.getWasmModule().queueTask(async function() {
+    return LibraryUtils.WASM_MODULE.queueTask(async function() {
       
       // allocate space in c++ heap for binary
-      let ptr = LibraryUtils.getWasmModule()._malloc(uint8arr.length * uint8arr.BYTES_PER_ELEMENT);
-      let heap = new Uint8Array(LibraryUtils.getWasmModule().HEAPU8.buffer, ptr, uint8arr.length * uint8arr.BYTES_PER_ELEMENT);
+      let ptr = LibraryUtils.WASM_MODULE._malloc(uint8arr.length * uint8arr.BYTES_PER_ELEMENT);
+      let heap = new Uint8Array(LibraryUtils.WASM_MODULE.HEAPU8.buffer, ptr, uint8arr.length * uint8arr.BYTES_PER_ELEMENT);
       if (ptr !== heap.byteOffset) throw new MoneroError("Memory ptr !== heap.byteOffset"); // should be equal
       
       // write binary to heap
@@ -423,10 +423,10 @@ class MoneroUtils {
       let binMemInfo = { ptr: ptr, length: uint8arr.length  }
 
       // convert binary to json str
-      const json_str = LibraryUtils.getWasmModule().binary_blocks_to_json(JSON.stringify(binMemInfo));
+      const json_str = LibraryUtils.WASM_MODULE.binary_blocks_to_json(JSON.stringify(binMemInfo));
       
       // free memory
-      LibraryUtils.getWasmModule()._free(ptr);
+      LibraryUtils.WASM_MODULE._free(ptr);
       
       // parse result to json
       let json = JSON.parse(json_str);                                          // parsing json gives arrays of block and tx strings

@@ -5,16 +5,18 @@ const GenUtils = require("../../common/GenUtils");
  * Models a Monero fee estimate.
  */
 class MoneroFeeEstimate {
-  
+  state: any;
+
   /**
    * Construct the model.
    * 
    * @param {MoneroFeeEstimate|object} state - MoneroFeeEstimate or JS object
    */
-  constructor(state) {
+  constructor(state: any) {
     if (!state) this.state = {};
     else if (state instanceof MoneroFeeEstimate) this.state = state.toJson();
     else if (typeof state === "object") this.state = Object.assign({}, state);
+    // @ts-expect-error TS(2304): Cannot find name 'MoneroError'.
     else throw new MoneroError("state must be a MoneroFeeEstimate or JavaScript object");
     
     // deserialize
@@ -31,7 +33,7 @@ class MoneroFeeEstimate {
     return this.state.fee;
   }
 
-  setFee(fee) {
+  setFee(fee: any) {
     this.state.fee = fee;
     return this;
   }
@@ -40,24 +42,24 @@ class MoneroFeeEstimate {
     return this.state.fees;
   }
 
-  setFees(fees) {
+  setFees(fees: any) {
     this.state.fees = fees;
     return this;
   }
-  
+
   getQuantizationMask() {
     return this.state.quantizationMask;
   }
 
-  setQuantizationMask(quantizationMask) {
+  setQuantizationMask(quantizationMask: any) {
     this.state.quantizationMask = quantizationMask;
     return this;
   }
-  
+
   copy() {
     return new MoneroFeeEstimate(this);
   }
-  
+
   toJson() {
     let json = Object.assign({}, this.state);
     if (this.getFee()) json.fee = this.getFee().toString();
@@ -65,7 +67,7 @@ class MoneroFeeEstimate {
     if (this.getQuantizationMask()) json.quantizationMask = this.getQuantizationMask().toString();
     return json;
   }
-  
+
   toString(indent = 0) {
     let str = "";
     let json = this.toJson();

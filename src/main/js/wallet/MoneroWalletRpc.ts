@@ -69,7 +69,16 @@ import SslOptions from "../common/SslOptions";
  * @hideconstructor
  */
 class MoneroWalletRpc extends MoneroWallet {
-  
+  addressCache: any;
+  config: any;
+  daemonConnection: any;
+  listeners: any;
+  path: any;
+  process: any;
+  rpc: any;
+  syncPeriodInMs: any;
+  walletPoller: any;
+
   /**
    * <p>Construct a wallet RPC client (for internal use).</p>
    * 
@@ -82,16 +91,19 @@ class MoneroWalletRpc extends MoneroWallet {
    * @param {string} [password] - password to authenticate with monero-wallet-rpc (optional)
    * @param {boolean} [rejectUnauthorized] - rejects self-signed certificates if true (default true)
    */
-  constructor(uriOrConfig, username, password, rejectUnauthorized) {
+  constructor(uriOrConfig: any, username: any, password: any, rejectUnauthorized: any) {
     super();
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (GenUtils.isArray(uriOrConfig)) throw new MoneroError("Array with command parameters is invalid first parameter, use `await connectToWalletRpc(...)`");
     this.config = MoneroWalletRpc._normalizeConfig(uriOrConfig, username, password, rejectUnauthorized);
+    // @ts-expect-error TS(2554): Expected 5 arguments, but got 1.
     this.rpc = new MoneroRpcConnection(this.config);
     this.addressCache = {}; // avoid unecessary requests for addresses
+    // @ts-expect-error TS(2339): Property 'DEFAULT_SYNC_PERIOD_IN_MS' does not exis... Remove this comment to see the full error message
     this.syncPeriodInMs = MoneroWalletRpc.DEFAULT_SYNC_PERIOD_IN_MS;
     this.listeners = [];
   }
-  
+
   /**
    * <p>Create a client connected to monero-wallet-rpc (for internal use).</p>
    * 
@@ -105,27 +117,32 @@ class MoneroWalletRpc extends MoneroWallet {
    * @param {boolean} [rejectUnauthorized] - rejects self-signed certificates if true (default true)
    * @return {MoneroWalletRpc} the wallet RPC client
    */
-  static async _connectToWalletRpc(uriOrConfig, username, password, rejectUnauthorized) {
+  static async _connectToWalletRpc(uriOrConfig: any, username: any, password: any, rejectUnauthorized: any) {
     if (GenUtils.isArray(uriOrConfig)) return MoneroWalletRpc._startWalletRpcProcess(uriOrConfig); // handle array as terminal command
+    // @ts-expect-error TS(2556): A spread argument must either have a tuple type or... Remove this comment to see the full error message
     else return new MoneroWalletRpc(...arguments); // otherwise connect to server
   }
-  
-  static async _startWalletRpcProcess(cmd) {
+
+  static async _startWalletRpcProcess(cmd: any) {
     assert(GenUtils.isArray(cmd), "Must provide string array with command line parameters");
     
     // start process
+    // @ts-expect-error TS(2339): Property 'process' does not exist on type 'typeof ... Remove this comment to see the full error message
     this.process = require('child_process').spawn(cmd[0], cmd.slice(1), {});
+    // @ts-expect-error TS(2339): Property 'process' does not exist on type 'typeof ... Remove this comment to see the full error message
     this.process.stdout.setEncoding('utf8');
+    // @ts-expect-error TS(2339): Property 'process' does not exist on type 'typeof ... Remove this comment to see the full error message
     this.process.stderr.setEncoding('utf8');
     
     // return promise which resolves after starting monero-wallet-rpc
-    let uri;
+    let uri: any;
     let that = this;
     let output = "";
     return new Promise(function(resolve, reject) {
       
       // handle stdout
-      that.process.stdout.on('data', function(data) {
+      // @ts-expect-error TS(2339): Property 'process' does not exist on type 'typeof ... Remove this comment to see the full error message
+      that.process.stdout.on('data', function(this: any, data: any) {
         let line = data.toString();
         LibraryUtils.log(2, line);
         output += line + '\n'; // capture output in case of error
@@ -152,7 +169,9 @@ class MoneroWalletRpc extends MoneroWallet {
           let password = userPass === undefined ? undefined : userPass.substring(userPass.indexOf(':') + 1);
           
           // create client connected to internal process
+          // @ts-expect-error TS(2554): Expected 4 arguments, but got 3.
           let wallet = new MoneroWalletRpc(uri, username, password);
+          // @ts-expect-error TS(2339): Property 'process' does not exist on type 'typeof ... Remove this comment to see the full error message
           wallet.process = that.process;
           
           // resolve promise with client connected to internal process 
@@ -162,32 +181,38 @@ class MoneroWalletRpc extends MoneroWallet {
       });
       
       // handle stderr
-      that.process.stderr.on('data', function(data) {
+      // @ts-expect-error TS(2339): Property 'process' does not exist on type 'typeof ... Remove this comment to see the full error message
+      that.process.stderr.on('data', function(data: any) {
         if (LibraryUtils.getLogLevel() >= 2) console.error(data);
       });
       
       // handle exit
-      that.process.on("exit", function(code) {
+      // @ts-expect-error TS(2339): Property 'process' does not exist on type 'typeof ... Remove this comment to see the full error message
+      that.process.on("exit", function(this: any, code: any) {
+        // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
         if (!this.isResolved) reject(new MoneroError("monero-wallet-rpc process terminated with exit code " + code + (output ? ":\n\n" + output : "")));
       });
       
       // handle error
-      that.process.on("error", function(err) {
+      // @ts-expect-error TS(2339): Property 'process' does not exist on type 'typeof ... Remove this comment to see the full error message
+      that.process.on("error", function(this: any, err: any) {
+        // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
         if (err.message.indexOf("ENOENT") >= 0) reject(new MoneroError("monero-wallet-rpc does not exist at path '" + cmd[0] + "'"));
         if (!this.isResolved) reject(err);
       });
       
       // handle uncaught exception
-      that.process.on("uncaughtException", function(err, origin) {
+      // @ts-expect-error TS(2339): Property 'process' does not exist on type 'typeof ... Remove this comment to see the full error message
+      that.process.on("uncaughtException", function(err: any, origin: any) {
         console.error("Uncaught exception in monero-wallet-rpc process: " + err.message);
         console.error(origin);
         reject(err);
       });
     });
   }
-  
+
   // --------------------------- RPC WALLET METHODS ---------------------------
-  
+
   /**
    * Get the internal process running monero-wallet-rpc.
    * 
@@ -196,20 +221,21 @@ class MoneroWalletRpc extends MoneroWallet {
   getProcess() {
     return this.process;
   }
-  
+
   /**
    * Stop the internal process running monero-wallet-rpc, if applicable.
    * 
    * @param {boolean} force specifies if the process should be destroyed forcibly
    * @return {Promise<number|undefined>} the exit code from stopping the process
    */
-  async stopProcess(force) {
+  async stopProcess(force: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (this.process === undefined) throw new MoneroError("MoneroWalletRpc instance not created from new process");
     let listenersCopy = GenUtils.copyArray(this.getListeners());
     for (let listener of listenersCopy) await this.removeListener(listener);
     return GenUtils.killProcess(this.process, force ? "sigkill" : undefined);
   }
-  
+
   /**
    * Get the wallet's RPC connection.
    * 
@@ -218,7 +244,7 @@ class MoneroWalletRpc extends MoneroWallet {
   getRpcConnection() {
     return this.rpc;
   }
-  
+
   /**
    * <p>Open an existing wallet on the monero-wallet-rpc server.</p>
    * 
@@ -246,23 +272,25 @@ class MoneroWalletRpc extends MoneroWallet {
    * @param {string} password is the wallet's password
    * @return {MoneroWalletRpc} this wallet client
    */
-  async openWallet(pathOrConfig, password) {
+  async openWallet(pathOrConfig: any, password: any) {
     
     // normalize and validate config
     let config = new MoneroWalletConfig(typeof pathOrConfig === "string" ? {path: pathOrConfig, password: password ? password : ""} : pathOrConfig);
     // TODO: ensure other fields are uninitialized?
     
     // open wallet on rpc server
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (!config.getPath()) throw new MoneroError("Must provide name of wallet to open");
     await this.rpc.sendJsonRequest("open_wallet", {filename: config.getPath(), password: config.getPassword()});
     await this._clear();
     this.path = config.getPath();
     
     // set daemon if provided
+    // @ts-expect-error TS(2554): Expected 3 arguments, but got 1.
     if (config.getServer()) return this.setDaemonConnection(config.getServer());
     return this;
   }
-  
+
   /**
    * <p>Create and open a wallet on the monero-wallet-rpc server.<p>
    * 
@@ -299,15 +327,19 @@ class MoneroWalletRpc extends MoneroWallet {
    * @param {boolean} [config.saveCurrent] - specifies if the current RPC wallet should be saved before being closed (default true)
    * @return {MoneroWalletRpc} this wallet client
    */
-  async createWallet(config) {
+  async createWallet(config: any) {
     
     // normalize and validate config
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (config === undefined) throw new MoneroError("Must provide config to create wallet");
     config = config instanceof MoneroWalletConfig ? config : new MoneroWalletConfig(config);
     if (config.getMnemonic() !== undefined && (config.getPrimaryAddress() !== undefined || config.getPrivateViewKey() !== undefined || config.getPrivateSpendKey() !== undefined)) {
+      // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
       throw new MoneroError("Wallet may be initialized with a mnemonic or keys but not both");
     }
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (config.getNetworkType() !== undefined) throw new MoneroError("Cannot provide networkType when creating RPC wallet because server's network type is already set");
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (config.getAccountLookahead() !== undefined || config.getSubaddressLookahead() !== undefined) throw new MoneroError("monero-wallet-rpc does not support creating wallets with subaddress lookahead over rpc");
     if (config.getPassword() === undefined) config.setPassword("");
     
@@ -315,20 +347,25 @@ class MoneroWalletRpc extends MoneroWallet {
     if (config.getMnemonic() !== undefined) {
       await this._createWalletFromMnemonic(config.getPath(), config.getPassword(), config.getMnemonic(), config.getRestoreHeight(), config.getLanguage(), config.getSeedOffset(), config.getSaveCurrent());
     } else if (config.getPrivateSpendKey() !== undefined || config.getPrimaryAddress() !== undefined) {
+      // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
       if (config.getSeedOffset() !== undefined) throw new MoneroError("Cannot provide seedOffset when creating wallet from keys");
       await this._createWalletFromKeys(config.getPath(), config.getPassword(), config.getPrimaryAddress(), config.getPrivateViewKey(), config.getPrivateSpendKey(), config.getRestoreHeight(), config.getLanguage(), config.getSaveCurrent());
     } else {
+      // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
       if (config.getSeedOffset() !== undefined) throw new MoneroError("Cannot provide seedOffset when creating random wallet");
+      // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
       if (config.getRestoreHeight() !== undefined) throw new MoneroError("Cannot provide restoreHeight when creating random wallet");
+      // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
       if (config.getSaveCurrent() === false) throw new MoneroError("Current wallet is saved automatically when creating random wallet");
       await this._createWalletRandom(config.getPath(), config.getPassword(), config.getLanguage());
     }
     
     // set daemon if provided
+    // @ts-expect-error TS(2554): Expected 3 arguments, but got 1.
     if (config.getServer()) return this.setDaemonConnection(config.getServer());
     return this;
   }
-  
+
   /**
    * Create and open a new wallet with a randomly generated seed on the RPC server.
    * 
@@ -337,8 +374,10 @@ class MoneroWalletRpc extends MoneroWallet {
    * @param {string} language - language for the wallet's mnemonic phrase
    * @return {MoneroWalletRpc} this wallet client
    */
-  async _createWalletRandom(name, password, language) {
+  async _createWalletRandom(name: any, password: any, language: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (!name) throw new MoneroError("Name is not initialized");
+    // @ts-expect-error TS(2339): Property 'DEFAULT_LANGUAGE' does not exist on type... Remove this comment to see the full error message
     if (!language) language = MoneroWallet.DEFAULT_LANGUAGE;
     let params = { filename: name, password: password, language: language };
     try {
@@ -350,7 +389,7 @@ class MoneroWalletRpc extends MoneroWallet {
     this.path = name;
     return this;
   }
-  
+
   /**
    * Create and open a wallet from an existing mnemonic phrase on the RPC server,
    * closing the currently open wallet if applicable.
@@ -364,7 +403,7 @@ class MoneroWalletRpc extends MoneroWallet {
    * @param {boolean} saveCurrent - specifies if the current RPC wallet should be saved before being closed
    * @return {MoneroWalletRpc} this wallet client
    */
-  async _createWalletFromMnemonic(name, password, mnemonic, restoreHeight, language, seedOffset, saveCurrent) {
+  async _createWalletFromMnemonic(name: any, password: any, mnemonic: any, restoreHeight: any, language: any, seedOffset: any, saveCurrent: any) {
     try {
       await this.rpc.sendJsonRequest("restore_deterministic_wallet", {
         filename: name,
@@ -382,7 +421,7 @@ class MoneroWalletRpc extends MoneroWallet {
     this.path = name;
     return this;
   }
-  
+
   /**
    * Create a wallet on the RPC server from an address, view key, and (optionally) spend key.
    * 
@@ -396,8 +435,9 @@ class MoneroWalletRpc extends MoneroWallet {
    * @param language - wallet and mnemonic's language (default = "English")
    * @return {MoneroWalletRpc} this wallet client
    */
-  async _createWalletFromKeys(name, password, address, viewKey, spendKey, restoreHeight, language, saveCurrent) {
+  async _createWalletFromKeys(name: any, password: any, address: any, viewKey: any, spendKey: any, restoreHeight: any, language: any, saveCurrent: any) {
     if (restoreHeight === undefined) restoreHeight = 0;
+    // @ts-expect-error TS(2339): Property 'DEFAULT_LANGUAGE' does not exist on type... Remove this comment to see the full error message
     if (language === undefined) language = MoneroWallet.DEFAULT_LANGUAGE;
     try {
       await this.rpc.sendJsonRequest("generate_from_keys", {
@@ -416,24 +456,27 @@ class MoneroWalletRpc extends MoneroWallet {
     this.path = name;
     return this;
   }
-  
-  _handleCreateWalletError(name, err) {
+
+  _handleCreateWalletError(name: any, err: any) {
     if (err.message === "Cannot create wallet. Already exists.") throw new MoneroRpcError("Wallet already exists: " + name, err.getCode(), err.getRpcMethod(), err.getRpcParams());
     if (err.message === "Electrum-style word list failed verification") throw new MoneroRpcError("Invalid mnemonic", err.getCode(), err.getRpcMethod(), err.getRpcParams());
     throw err;
   }
-  
+
+  // @ts-expect-error TS(2416): Property 'isViewOnly' in type 'MoneroWalletRpc' is... Remove this comment to see the full error message
   async isViewOnly() {
     try {
       await this.rpc.sendJsonRequest("query_key", {key_type: "mnemonic"});
       return false; // key retrieval succeeds if not view only
     } catch (e) {
+      // @ts-expect-error TS(2571): Object is of type 'unknown'.
       if (e.getCode() === -29) return true;  // wallet is view only
+      // @ts-expect-error TS(2571): Object is of type 'unknown'.
       if (e.getCode() === -1) return false;  // wallet is offline but not view only
       throw e;
     }
   }
-  
+
   /**
    * Set the wallet's daemon connection.
    * 
@@ -441,77 +484,96 @@ class MoneroWalletRpc extends MoneroWallet {
    * @param {boolean} isTrusted - indicates if the daemon in trusted
    * @param {SslOptions} sslOptions - custom SSL configuration
    */
-  async setDaemonConnection(uriOrRpcConnection, isTrusted, sslOptions) {
+  async setDaemonConnection(uriOrRpcConnection: any, isTrusted: any, sslOptions: any) {
+    // @ts-expect-error TS(2554): Expected 5 arguments, but got 1.
     let connection = !uriOrRpcConnection ? undefined : uriOrRpcConnection instanceof MoneroRpcConnection ? uriOrRpcConnection : new MoneroRpcConnection(uriOrRpcConnection);
+    // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
     if (!sslOptions) sslOptions = new SslOptions();
     let params = {};
+    // @ts-expect-error TS(2339): Property 'address' does not exist on type '{}'.
     params.address = connection ? connection.getUri() : "bad_uri"; // TODO monero-wallet-rpc: bad daemon uri necessary for offline?
+    // @ts-expect-error TS(2339): Property 'username' does not exist on type '{}'.
     params.username = connection ? connection.getUsername() : "";
+    // @ts-expect-error TS(2339): Property 'password' does not exist on type '{}'.
     params.password = connection ? connection.getPassword() : "";
+    // @ts-expect-error TS(2339): Property 'trusted' does not exist on type '{}'.
     params.trusted = isTrusted;
+    // @ts-expect-error TS(2339): Property 'ssl_support' does not exist on type '{}'... Remove this comment to see the full error message
     params.ssl_support = "autodetect";
+    // @ts-expect-error TS(2339): Property 'ssl_private_key_path' does not exist on ... Remove this comment to see the full error message
     params.ssl_private_key_path = sslOptions.getPrivateKeyPath();
+    // @ts-expect-error TS(2339): Property 'ssl_certificate_path' does not exist on ... Remove this comment to see the full error message
     params.ssl_certificate_path  = sslOptions.getCertificatePath();
+    // @ts-expect-error TS(2339): Property 'ssl_ca_file' does not exist on type '{}'... Remove this comment to see the full error message
     params.ssl_ca_file = sslOptions.getCertificateAuthorityFile();
+    // @ts-expect-error TS(2339): Property 'ssl_allowed_fingerprints' does not exist... Remove this comment to see the full error message
     params.ssl_allowed_fingerprints = sslOptions.getAllowedFingerprints();
+    // @ts-expect-error TS(2339): Property 'ssl_allow_any_cert' does not exist on ty... Remove this comment to see the full error message
     params.ssl_allow_any_cert = sslOptions.getAllowAnyCert();
     await this.rpc.sendJsonRequest("set_daemon", params);
     this.daemonConnection = connection;
   }
-  
+
   async getDaemonConnection() {
     return this.daemonConnection;
   }
-  
+
   // -------------------------- COMMON WALLET METHODS -------------------------
-  
-  async addListener(listener) {
+
+  async addListener(listener: any) {
     assert(listener instanceof MoneroWalletListener, "Listener must be instance of MoneroWalletListener");
     this.listeners.push(listener);
     this._refreshListening();
   }
-  
-  async removeListener(listener) {
+
+  async removeListener(listener: any) {
     let idx = this.listeners.indexOf(listener);
     if (idx > -1) this.listeners.splice(idx, 1);
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     else throw new MoneroError("Listener is not registered with wallet");
     this._refreshListening();
   }
-  
+
   getListeners() {
     return this.listeners;
   }
-  
+
+  // @ts-expect-error TS(2416): Property 'isConnectedToDaemon' in type 'MoneroWall... Remove this comment to see the full error message
   async isConnectedToDaemon() {
     try {
       await this.checkReserveProof(await this.getPrimaryAddress(), "", ""); // TODO (monero-project): provide better way to know if wallet rpc is connected to daemon
+      // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
       throw new MoneroError("check reserve expected to fail");
     } catch (e) {
+      // @ts-expect-error TS(2571): Object is of type 'unknown'.
       return e.message.indexOf("Failed to connect to daemon") < 0;
     }
   }
-  
+
+  // @ts-expect-error TS(2416): Property 'getVersion' in type 'MoneroWalletRpc' is... Remove this comment to see the full error message
   async getVersion() {
     let resp = await this.rpc.sendJsonRequest("get_version");
     return new MoneroVersion(resp.result.version, resp.result.release);
   }
-  
+
   async getPath() {
     return this.path;
   }
-  
+
   async getMnemonic() {
     try {
       let resp = await this.rpc.sendJsonRequest("query_key", { key_type: "mnemonic" });
       return resp.result.key;
     } catch (e) {
+      // @ts-expect-error TS(2571): Object is of type 'unknown'.
       if (e.getCode() === -29) return undefined;  // wallet is view-only
       throw e;
     }
   }
-  
+
   async getMnemonicLanguage() {
-    if (await this.getMnemonic() === undefined) return undefined;
+    if ((await this.getMnemonic()) === undefined) return undefined;
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("MoneroWalletRpc.getMnemonicLanguage() not supported");
   }
 
@@ -523,12 +585,12 @@ class MoneroWalletRpc extends MoneroWallet {
   async getMnemonicLanguages() {
     return (await this.rpc.sendJsonRequest("get_languages")).result.languages;
   }
-  
+
   async getPrivateViewKey() {
     let resp = await this.rpc.sendJsonRequest("query_key", { key_type: "view_key" });
     return resp.result.key;
   }
-  
+
   async getPrivateSpendKey() {
     
     // get private spend key which will throw error if wallet is view-only
@@ -536,12 +598,14 @@ class MoneroWalletRpc extends MoneroWallet {
       let resp = await this.rpc.sendJsonRequest("query_key", { key_type: "spend_key" });
       return resp.result.key;
     } catch (e) {
+      // @ts-expect-error TS(2571): Object is of type 'unknown'.
       if (e.getCode() === -29 && e.message.indexOf("watch-only") !== -1) return undefined; // return undefined if wallet is view-only
       throw e;
     }
   }
-  
-  async getAddress(accountIdx, subaddressIdx) {
+
+  // @ts-expect-error TS(7023): 'getAddress' implicitly has return type 'any' beca... Remove this comment to see the full error message
+  async getAddress(accountIdx: any, subaddressIdx: any) {
     let subaddressMap = this.addressCache[accountIdx];
     if (!subaddressMap) {
       await this.getSubaddresses(accountIdx, undefined, true);  // cache's all addresses at this account
@@ -554,68 +618,80 @@ class MoneroWalletRpc extends MoneroWallet {
     }
     return address;
   }
-  
+
   // TODO: use cache
-  async getAddressIndex(address) {
+  // @ts-expect-error TS(2416): Property 'getAddressIndex' in type 'MoneroWalletRp... Remove this comment to see the full error message
+  async getAddressIndex(address: any) {
     
     // fetch result and normalize error if address does not belong to the wallet
     let resp;
     try {
       resp = await this.rpc.sendJsonRequest("get_address_index", {address: address});
     } catch (e) {
+      // @ts-expect-error TS(2571): Object is of type 'unknown'.
       if (e.getCode() === -2) throw new MoneroError(e.message);
       throw e;
     }
     
     // convert rpc response
+    // @ts-expect-error TS(2554): Expected 3 arguments, but got 1.
     let subaddress = new MoneroSubaddress(address);
     subaddress.setAccountIndex(resp.result.index.major);
     subaddress.setIndex(resp.result.index.minor);
     return subaddress;
   }
-  
-  async getIntegratedAddress(standardAddress, paymentId) {
+
+  // @ts-expect-error TS(2416): Property 'getIntegratedAddress' in type 'MoneroWal... Remove this comment to see the full error message
+  async getIntegratedAddress(standardAddress: any, paymentId: any) {
     try {
       let integratedAddressStr = (await this.rpc.sendJsonRequest("make_integrated_address", {standard_address: standardAddress, payment_id: paymentId})).result.integrated_address;
       return await this.decodeIntegratedAddress(integratedAddressStr);
     } catch (e) {
+      // @ts-expect-error TS(2571): Object is of type 'unknown'.
       if (e.message.includes("Invalid payment ID")) throw new MoneroError("Invalid payment ID: " + paymentId);
       throw e;
     }
   }
-  
-  async decodeIntegratedAddress(integratedAddress) {
+
+  // @ts-expect-error TS(2416): Property 'decodeIntegratedAddress' in type 'Monero... Remove this comment to see the full error message
+  async decodeIntegratedAddress(integratedAddress: any) {
     let resp = await this.rpc.sendJsonRequest("split_integrated_address", {integrated_address: integratedAddress});
+    // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
     return new MoneroIntegratedAddress().setStandardAddress(resp.result.standard_address).setPaymentId(resp.result.payment_id).setIntegratedAddress(integratedAddress);
   }
-  
+
   async getHeight() {
     return (await this.rpc.sendJsonRequest("get_height")).result.height;
   }
-  
+
   async getDaemonHeight() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("monero-wallet-rpc does not support getting the chain height");
   }
-  
-  async getHeightByDate(year, month, day) {
+
+  async getHeightByDate(year: any, month: any, day: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("monero-wallet-rpc does not support getting a height by date");
   }
-  
-  async sync(startHeight, onProgress) {
+
+  // @ts-expect-error TS(2416): Property 'sync' in type 'MoneroWalletRpc' is not a... Remove this comment to see the full error message
+  async sync(startHeight: any, onProgress: any) {
     assert(onProgress === undefined, "Monero Wallet RPC does not support reporting sync progress");
     try {
       let resp = await this.rpc.sendJsonRequest("refresh", {start_height: startHeight}, 0);
       await this._poll();
       return new MoneroSyncResult(resp.result.blocks_fetched, resp.result.received_money);
     } catch (err) {
+      // @ts-expect-error TS(2571): Object is of type 'unknown'.
       if (err.message === "no connection to daemon") throw new MoneroError("Wallet is not connected to daemon");
       throw err;
     }
   }
-  
-  async startSyncing(syncPeriodInMs) {
+
+  async startSyncing(syncPeriodInMs: any) {
     
     // convert ms to seconds for rpc parameter
+    // @ts-expect-error TS(2339): Property 'DEFAULT_SYNC_PERIOD_IN_MS' does not exis... Remove this comment to see the full error message
     let syncPeriodInSeconds = Math.round((syncPeriodInMs === undefined ? MoneroWalletRpc.DEFAULT_SYNC_PERIOD_IN_MS : syncPeriodInMs) / 1000);
     
     // send rpc request
@@ -631,34 +707,38 @@ class MoneroWalletRpc extends MoneroWallet {
     // poll if listening
     await this._poll();
   }
-  
+
   async stopSyncing() {
     return this.rpc.sendJsonRequest("auto_refresh", { enable: false });
   }
-  
-  async scanTxs(txHashes) {
+
+  async scanTxs(txHashes: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (!txHashes || !txHashes.length) throw new MoneroError("No tx hashes given to scan");
     await this.rpc.sendJsonRequest("scan_tx", {txids: txHashes});
     await this._poll();
   }
-  
+
   async rescanSpent() {
     await this.rpc.sendJsonRequest("rescan_spent", undefined, 0);
   }
-  
+
   async rescanBlockchain() {
     await this.rpc.sendJsonRequest("rescan_blockchain", undefined, 0);
   }
-  
-  async getBalance(accountIdx, subaddressIdx) {
+
+  // @ts-expect-error TS(2416): Property 'getBalance' in type 'MoneroWalletRpc' is... Remove this comment to see the full error message
+  async getBalance(accountIdx: any, subaddressIdx: any) {
     return (await this._getBalances(accountIdx, subaddressIdx))[0];
   }
-  
-  async getUnlockedBalance(accountIdx, subaddressIdx) {
+
+  // @ts-expect-error TS(2416): Property 'getUnlockedBalance' in type 'MoneroWalle... Remove this comment to see the full error message
+  async getUnlockedBalance(accountIdx: any, subaddressIdx: any) {
     return (await this._getBalances(accountIdx, subaddressIdx))[1];
   }
-  
-  async getAccounts(includeSubaddresses, tag, skipBalances) {
+
+  // @ts-expect-error TS(2416): Property 'getAccounts' in type 'MoneroWalletRpc' i... Remove this comment to see the full error message
+  async getAccounts(includeSubaddresses: any, tag: any, skipBalances: any) {
     
     // fetch accounts from rpc
     let resp = await this.rpc.sendJsonRequest("get_accounts", {tag: tag});
@@ -706,30 +786,38 @@ class MoneroWalletRpc extends MoneroWallet {
     // return accounts
     return accounts;
   }
-  
+
   // TODO: getAccountByIndex(), getAccountByTag()
-  async getAccount(accountIdx, includeSubaddresses, skipBalances) {
+  // @ts-expect-error TS(2416): Property 'getAccount' in type 'MoneroWalletRpc' is... Remove this comment to see the full error message
+  async getAccount(accountIdx: any, includeSubaddresses: any, skipBalances: any) {
     assert(accountIdx >= 0);
+    // @ts-expect-error TS(2554): Expected 3 arguments, but got 0.
     for (let account of await this.getAccounts()) {
       if (account.getIndex() === accountIdx) {
         if (includeSubaddresses) account.setSubaddresses(await this.getSubaddresses(accountIdx, undefined, skipBalances));
         return account;
       }
     }
+    // @ts-expect-error TS(2304): Cannot find name 'Exception'.
     throw new Exception("Account with index " + accountIdx + " does not exist");
   }
 
-  async createAccount(label) {
+  // @ts-expect-error TS(2416): Property 'createAccount' in type 'MoneroWalletRpc'... Remove this comment to see the full error message
+  async createAccount(label: any) {
     label = label ? label : undefined;
     let resp = await this.rpc.sendJsonRequest("create_account", {label: label});
+    // @ts-expect-error TS(2554): Expected 5 arguments, but got 4.
     return new MoneroAccount(resp.result.account_index, resp.result.address, BigInt(0), BigInt(0));
   }
 
-  async getSubaddresses(accountIdx, subaddressIndices, skipBalances) {
+  // @ts-expect-error TS(2416): Property 'getSubaddresses' in type 'MoneroWalletRp... Remove this comment to see the full error message
+  async getSubaddresses(accountIdx: any, subaddressIndices: any, skipBalances: any) {
     
     // fetch subaddresses
     let params = {};
+    // @ts-expect-error TS(2339): Property 'account_index' does not exist on type '{... Remove this comment to see the full error message
     params.account_index = accountIdx;
+    // @ts-expect-error TS(2339): Property 'address_index' does not exist on type '{... Remove this comment to see the full error message
     if (subaddressIndices) params.address_index = GenUtils.listify(subaddressIndices);
     let resp = await this.rpc.sendJsonRequest("get_address", params);
     
@@ -784,18 +872,21 @@ class MoneroWalletRpc extends MoneroWallet {
     return subaddresses;
   }
 
-  async getSubaddress(accountIdx, subaddressIdx, skipBalances) {
+  // @ts-expect-error TS(2416): Property 'getSubaddress' in type 'MoneroWalletRpc'... Remove this comment to see the full error message
+  async getSubaddress(accountIdx: any, subaddressIdx: any, skipBalances: any) {
     assert(accountIdx >= 0);
     assert(subaddressIdx >= 0);
     return (await this.getSubaddresses(accountIdx, subaddressIdx, skipBalances))[0];
   }
 
-  async createSubaddress(accountIdx, label) {
+  // @ts-expect-error TS(2416): Property 'createSubaddress' in type 'MoneroWalletR... Remove this comment to see the full error message
+  async createSubaddress(accountIdx: any, label: any) {
     
     // send request
     let resp = await this.rpc.sendJsonRequest("create_address", {account_index: accountIdx, label: label});
     
     // build subaddress object
+    // @ts-expect-error TS(2554): Expected 3 arguments, but got 0.
     let subaddress = new MoneroSubaddress();
     subaddress.setAccountIndex(accountIdx);
     subaddress.setIndex(resp.result.address_index);
@@ -809,11 +900,12 @@ class MoneroWalletRpc extends MoneroWallet {
     return subaddress;
   }
 
-  async setSubaddressLabel(accountIdx, subaddressIdx, label) {
+  async setSubaddressLabel(accountIdx: any, subaddressIdx: any, label: any) {
     await this.rpc.sendJsonRequest("label_address", {index: {major: accountIdx, minor: subaddressIdx}, label: label});
   }
-  
-  async getTxs(query, missingTxHashes) {
+
+  // @ts-expect-error TS(7023): 'getTxs' implicitly has return type 'any' because ... Remove this comment to see the full error message
+  async getTxs(query: any, missingTxHashes: any) {
     
     // copy query
     query = MoneroWallet._normalizeTxQuery(query);
@@ -827,6 +919,7 @@ class MoneroWalletRpc extends MoneroWallet {
     query.setOutputQuery(undefined);
     
     // fetch all transfers that meet tx query
+    // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
     let transfers = await this._getTransfersAux(new MoneroTransferQuery().setTxQuery(MoneroWalletRpc._decontextualize(query.copy())));
     
     // collect unique txs from transfers while retaining order
@@ -850,11 +943,12 @@ class MoneroWalletRpc extends MoneroWallet {
     if (query.getIncludeOutputs() || outputQuery) {
         
       // fetch outputs
+      // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
       let outputQueryAux = (outputQuery ? outputQuery.copy() : new MoneroOutputQuery()).setTxQuery(MoneroWalletRpc._decontextualize(query.copy()));
       let outputs = await this._getOutputsAux(outputQueryAux);
       
       // merge output txs one time while retaining order
-      let outputTxs = [];
+      let outputTxs: any = [];
       for (let output of outputs) {
         if (!outputTxs.includes(output.getTx())) {
           MoneroWalletRpc._mergeTx(output.getTx(), txMap, blockMap);
@@ -892,6 +986,7 @@ class MoneroWalletRpc extends MoneroWallet {
      
       // if txs not found, collect missing hashes or throw error if no collection given
       if (missingTxHashes) for (let unfoundTxHash of unfoundTxHashes) missingTxHashes.push(unfoundTxHash);
+      // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
       else if (unfoundTxHashes.length > 0) throw new MoneroError("Wallet missing requested tx hashes: " + unfoundTxHashes);
     }
     
@@ -899,6 +994,7 @@ class MoneroWalletRpc extends MoneroWallet {
     for (let tx of txs) {
       if (tx.isConfirmed() && tx.getBlock() === undefined) {
         console.error("Inconsistency detected building txs from multiple rpc calls, re-fetching txs");
+        // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
         return this.getTxs(query);
       }
     }
@@ -913,8 +1009,9 @@ class MoneroWalletRpc extends MoneroWallet {
     }
     return txs;
   }
-  
-  async getTransfers(query) {
+
+  // @ts-expect-error TS(2416): Property 'getTransfers' in type 'MoneroWalletRpc' ... Remove this comment to see the full error message
+  async getTransfers(query: any) {
     
     // copy and normalize query up to block
     query = MoneroWallet._normalizeTransferQuery(query);
@@ -924,6 +1021,7 @@ class MoneroWalletRpc extends MoneroWallet {
     
     // otherwise get txs with full models to fulfill query
     let transfers = [];
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     for (let tx of await this.getTxs(query.getTxQuery())) {
       for (let transfer of tx.filterTransfers(query)) {
         transfers.push(transfer);
@@ -932,8 +1030,9 @@ class MoneroWalletRpc extends MoneroWallet {
     
     return transfers;
   }
-  
-  async getOutputs(query) {
+
+  // @ts-expect-error TS(2416): Property 'getOutputs' in type 'MoneroWalletRpc' is... Remove this comment to see the full error message
+  async getOutputs(query: any) {
     
     // copy and normalize query up to block
     query = MoneroWallet._normalizeOutputQuery(query);
@@ -943,6 +1042,7 @@ class MoneroWalletRpc extends MoneroWallet {
     
     // otherwise get txs with full models to fulfill query
     let outputs = [];
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     for (let tx of await this.getTxs(query.getTxQuery())) {
       for (let output of tx.filterOutputs(query)) {
         outputs.push(output);
@@ -951,83 +1051,103 @@ class MoneroWalletRpc extends MoneroWallet {
     
     return outputs;
   }
-  
-  async exportOutputs(all) {
+
+  async exportOutputs(all: any) {
     return (await this.rpc.sendJsonRequest("export_outputs", {all: all})).result.outputs_data_hex;
   }
-  
-  async importOutputs(outputsHex) {
+
+  async importOutputs(outputsHex: any) {
     let resp = await this.rpc.sendJsonRequest("import_outputs", {outputs_data_hex: outputsHex});
     return resp.result.num_imported;
   }
-  
-  async exportKeyImages(all) {
+
+  async exportKeyImages(all: any) {
     return await this._rpcExportKeyImages(all);
   }
-  
-  async importKeyImages(keyImages) {
+
+  // @ts-expect-error TS(2416): Property 'importKeyImages' in type 'MoneroWalletRp... Remove this comment to see the full error message
+  async importKeyImages(keyImages: any) {
     
     // convert key images to rpc parameter
-    let rpcKeyImages = keyImages.map(keyImage => ({key_image: keyImage.getHex(), signature: keyImage.getSignature()}));
+    let rpcKeyImages = keyImages.map((keyImage: any) => ({
+      key_image: keyImage.getHex(),
+      signature: keyImage.getSignature()
+    }));
     
     // send request
     let resp = await this.rpc.sendJsonRequest("import_key_images", {signed_key_images: rpcKeyImages});
     
     // build and return result
+    // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
     let importResult = new MoneroKeyImageImportResult();
     importResult.setHeight(resp.result.height);
     importResult.setSpentAmount(BigInt(resp.result.spent));
     importResult.setUnspentAmount(BigInt(resp.result.unspent));
     return importResult;
   }
-  
+
   async getNewKeyImagesFromLastImport() {
     return await this._rpcExportKeyImages(false);
   }
-  
-  async freezeOutput(keyImage) {
+
+  async freezeOutput(keyImage: any) {
     return this.rpc.sendJsonRequest("freeze", {key_image: keyImage});
   }
-  
-  async thawOutput(keyImage) {
+
+  async thawOutput(keyImage: any) {
     return this.rpc.sendJsonRequest("thaw", {key_image: keyImage});
   }
-  
-  async isOutputFrozen(keyImage) {
+
+  // @ts-expect-error TS(2416): Property 'isOutputFrozen' in type 'MoneroWalletRpc... Remove this comment to see the full error message
+  async isOutputFrozen(keyImage: any) {
     let resp = await this.rpc.sendJsonRequest("frozen", {key_image: keyImage});
     return resp.result.frozen === true;
   }
-  
-  async createTxs(config) {
+
+  async createTxs(config: any) {
     
     // validate, copy, and normalize config
     config = MoneroWallet._normalizeCreateTxsConfig(config);
     if (config.getCanSplit() === undefined) config.setCanSplit(true);
-    if (config.getRelay() === true && await this.isMultisig()) throw new MoneroError("Cannot relay multisig transaction until co-signed");
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
+    if (config.getRelay() === true && (await this.isMultisig())) throw new MoneroError("Cannot relay multisig transaction until co-signed");
 
     // determine account and subaddresses to send from
     let accountIdx = config.getAccountIndex();
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (accountIdx === undefined) throw new MoneroError("Must provide the account index to send from");
     let subaddressIndices = config.getSubaddressIndices() === undefined ? undefined : config.getSubaddressIndices().slice(0); // fetch all or copy given indices
     
     // build config parameters
     let params = {};
+    // @ts-expect-error TS(2339): Property 'destinations' does not exist on type '{}... Remove this comment to see the full error message
     params.destinations = [];
     for (let destination of config.getDestinations()) {
       assert(destination.getAddress(), "Destination address is not defined");
       assert(destination.getAmount(), "Destination amount is not defined");
+      // @ts-expect-error TS(2339): Property 'destinations' does not exist on type '{}... Remove this comment to see the full error message
       params.destinations.push({ address: destination.getAddress(), amount: destination.getAmount().toString() });
     }
+    // @ts-expect-error TS(2339): Property 'account_index' does not exist on type '{... Remove this comment to see the full error message
     params.account_index = accountIdx;
+    // @ts-expect-error TS(2339): Property 'subaddr_indices' does not exist on type ... Remove this comment to see the full error message
     params.subaddr_indices = subaddressIndices;
+    // @ts-expect-error TS(2339): Property 'payment_id' does not exist on type '{}'.
     params.payment_id = config.getPaymentId();
+    // @ts-expect-error TS(2339): Property 'unlock_time' does not exist on type '{}'... Remove this comment to see the full error message
     params.unlock_time = config.getUnlockHeight();
+    // @ts-expect-error TS(2339): Property 'do_not_relay' does not exist on type '{}... Remove this comment to see the full error message
     params.do_not_relay = config.getRelay() !== true;
     assert(config.getPriority() === undefined || config.getPriority() >= 0 && config.getPriority() <= 3);
+    // @ts-expect-error TS(2339): Property 'priority' does not exist on type '{}'.
     params.priority = config.getPriority();
+    // @ts-expect-error TS(2339): Property 'get_tx_hex' does not exist on type '{}'.
     params.get_tx_hex = true;
+    // @ts-expect-error TS(2339): Property 'get_tx_metadata' does not exist on type ... Remove this comment to see the full error message
     params.get_tx_metadata = true;
+    // @ts-expect-error TS(2339): Property 'get_tx_keys' does not exist on type '{}'... Remove this comment to see the full error message
     if (config.getCanSplit()) params.get_tx_keys = true; // param to get tx key(s) depends if split
+    // @ts-expect-error TS(2339): Property 'get_tx_key' does not exist on type '{}'.
     else params.get_tx_key = true;
     
     // send request
@@ -1036,16 +1156,18 @@ class MoneroWalletRpc extends MoneroWallet {
       let resp = await this.rpc.sendJsonRequest(config.getCanSplit() ? "transfer_split" : "transfer", params);
       result = resp.result;
     } catch (err) {
+      // @ts-expect-error TS(2571): Object is of type 'unknown'.
       if (err.message.indexOf("WALLET_RPC_ERROR_CODE_WRONG_ADDRESS") > -1) throw new MoneroError("Invalid destination address");
       throw err;
     }
     
     // pre-initialize txs iff present. multisig and view-only wallets will have tx set without transactions
-    let txs;
+    let txs: any;
     let numTxs = config.getCanSplit() ? (result.fee_list !== undefined ? result.fee_list.length : 0) : (result.fee !== undefined ? 1 : 0);
     if (numTxs > 0) txs = [];
     let copyDestinations = numTxs === 1;
     for (let i = 0; i < numTxs; i++) {
+      // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
       let tx = new MoneroTxWallet();
       MoneroWalletRpc._initSentTxWallet(config, tx, copyDestinations);
       tx.getOutgoingTransfer().setAccountIndex(accountIdx);
@@ -1060,25 +1182,36 @@ class MoneroWalletRpc extends MoneroWallet {
     if (config.getCanSplit()) return MoneroWalletRpc._convertRpcSentTxsToTxSet(result, txs).getTxs();
     else return MoneroWalletRpc._convertRpcTxToTxSet(result, txs === undefined ? undefined : txs[0], true).getTxs();
   }
-  
-  async sweepOutput(config) {
+
+  async sweepOutput(config: any) {
     
     // normalize and validate config
     config = MoneroWallet._normalizeSweepOutputConfig(config);
     
     // build config parameters
     let params = {};
+    // @ts-expect-error TS(2339): Property 'address' does not exist on type '{}'.
     params.address = config.getDestinations()[0].getAddress();
+    // @ts-expect-error TS(2339): Property 'account_index' does not exist on type '{... Remove this comment to see the full error message
     params.account_index = config.getAccountIndex();
+    // @ts-expect-error TS(2339): Property 'subaddr_indices' does not exist on type ... Remove this comment to see the full error message
     params.subaddr_indices = config.getSubaddressIndices();
+    // @ts-expect-error TS(2339): Property 'key_image' does not exist on type '{}'.
     params.key_image = config.getKeyImage();
+    // @ts-expect-error TS(2339): Property 'unlock_time' does not exist on type '{}'... Remove this comment to see the full error message
     params.unlock_time = config.getUnlockHeight();
+    // @ts-expect-error TS(2339): Property 'do_not_relay' does not exist on type '{}... Remove this comment to see the full error message
     params.do_not_relay = config.getRelay() !== true;
     assert(config.getPriority() === undefined || config.getPriority() >= 0 && config.getPriority() <= 3);
+    // @ts-expect-error TS(2339): Property 'priority' does not exist on type '{}'.
     params.priority = config.getPriority();
+    // @ts-expect-error TS(2339): Property 'payment_id' does not exist on type '{}'.
     params.payment_id = config.getPaymentId();
+    // @ts-expect-error TS(2339): Property 'get_tx_key' does not exist on type '{}'.
     params.get_tx_key = true;
+    // @ts-expect-error TS(2339): Property 'get_tx_hex' does not exist on type '{}'.
     params.get_tx_hex = true;
+    // @ts-expect-error TS(2339): Property 'get_tx_metadata' does not exist on type ... Remove this comment to see the full error message
     params.get_tx_metadata = true;
     
     // send request
@@ -1094,8 +1227,9 @@ class MoneroWalletRpc extends MoneroWallet {
     tx.getOutgoingTransfer().getDestinations()[0].setAmount(tx.getOutgoingTransfer().getAmount()); // initialize destination amount
     return tx;
   }
-  
-  async sweepUnlocked(config) {
+
+  // @ts-expect-error TS(2416): Property 'sweepUnlocked' in type 'MoneroWalletRpc'... Remove this comment to see the full error message
+  async sweepUnlocked(config: any) {
     
     // validate and normalize config
     config = MoneroWallet._normalizeSweepUnlockedConfig(config);
@@ -1106,17 +1240,19 @@ class MoneroWalletRpc extends MoneroWallet {
       if (config.getSubaddressIndices() !== undefined) {
         indices.set(config.getAccountIndex(), config.getSubaddressIndices());
       } else {
-        let subaddressIndices = [];
+        let subaddressIndices: any = [];
         indices.set(config.getAccountIndex(), subaddressIndices);
+        // @ts-expect-error TS(2554): Expected 3 arguments, but got 1.
         for (let subaddress of await this.getSubaddresses(config.getAccountIndex())) {
           if (GenUtils.compareBigInt(subaddress.getUnlockedBalance(), BigInt(0)) > 0) subaddressIndices.push(subaddress.getIndex());
         }
       }
     } else {
+      // @ts-expect-error TS(2554): Expected 3 arguments, but got 1.
       let accounts = await this.getAccounts(true);
       for (let account of accounts) {
         if (GenUtils.compareBigInt(account.getUnlockedBalance(), BigInt(0)) > 0) {
-          let subaddressIndices = [];
+          let subaddressIndices: any = [];
           indices.set(account.getIndex(), subaddressIndices);
           for (let subaddress of account.getSubaddresses()) {
             if (GenUtils.compareBigInt(subaddress.getUnlockedBalance(), BigInt(0)) > 0) subaddressIndices.push(subaddress.getIndex());
@@ -1153,12 +1289,13 @@ class MoneroWalletRpc extends MoneroWallet {
     if (config.getRelay()) await this._poll();
     return txs;
   }
-  
-  async sweepDust(relay) {
+
+  async sweepDust(relay: any) {
     if (relay === undefined) relay = false;
     let resp = await this.rpc.sendJsonRequest("sweep_dust", {do_not_relay: !relay});
     if (relay) await this._poll();
     let result = resp.result;
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     let txSet = MoneroWalletRpc._convertRpcSentTxsToTxSet(result);
     if (txSet.getTxs() === undefined) return [];
     for (let tx of txSet.getTxs()) {
@@ -1167,8 +1304,9 @@ class MoneroWalletRpc extends MoneroWallet {
     }
     return txSet.getTxs();
   }
-  
-  async relayTxs(txsOrMetadatas) {
+
+  // @ts-expect-error TS(2416): Property 'relayTxs' in type 'MoneroWalletRpc' is n... Remove this comment to see the full error message
+  async relayTxs(txsOrMetadatas: any) {
     assert(Array.isArray(txsOrMetadatas), "Must provide an array of txs or their metadata to relay");
     let txHashes = [];
     for (let txOrMetadata of txsOrMetadatas) {
@@ -1179,16 +1317,17 @@ class MoneroWalletRpc extends MoneroWallet {
     await this._poll(); // notify of changes
     return txHashes;
   }
-  
-  async describeTxSet(txSet) {
+
+  // @ts-expect-error TS(2416): Property 'describeTxSet' in type 'MoneroWalletRpc'... Remove this comment to see the full error message
+  async describeTxSet(txSet: any) {
     let resp = await this.rpc.sendJsonRequest("describe_transfer", {
       unsigned_txset: txSet.getUnsignedTxHex(),
       multisig_txset: txSet.getMultisigTxHex()
     });
     return MoneroWalletRpc._convertRpcDescribeTransfer(resp.result);
   }
-  
-  async signTxs(unsignedTxHex) {
+
+  async signTxs(unsignedTxHex: any) {
     let resp = await this.rpc.sendJsonRequest("sign_transfer", {
       unsigned_txset: unsignedTxHex,
       export_raw: false
@@ -1196,41 +1335,45 @@ class MoneroWalletRpc extends MoneroWallet {
     await this._poll();
     return resp.result.signed_txset
   }
-  
-  async submitTxs(signedTxHex) {
+
+  async submitTxs(signedTxHex: any) {
     let resp = await this.rpc.sendJsonRequest("submit_transfer", {
       tx_data_hex: signedTxHex
     });
     await this._poll();
     return resp.result.tx_hash_list;
   }
-  
-  async signMessage(message, signatureType, accountIdx, subaddressIdx) {
+
+  async signMessage(message: any, signatureType: any, accountIdx: any, subaddressIdx: any) {
     let resp = await this.rpc.sendJsonRequest("sign", {
         data: message,
+        // @ts-expect-error TS(2339): Property 'SIGN_WITH_SPEND_KEY' does not exist on t... Remove this comment to see the full error message
         signature_type: signatureType === MoneroMessageSignatureType.SIGN_WITH_SPEND_KEY ? "spend" : "view",
         account_index: accountIdx,
         address_index: subaddressIdx
     });
     return resp.result.signature;
   }
-  
-  async verifyMessage(message, address, signature) {
+
+  // @ts-expect-error TS(2416): Property 'verifyMessage' in type 'MoneroWalletRpc'... Remove this comment to see the full error message
+  async verifyMessage(message: any, address: any, signature: any) {
     try {
       let resp = await this.rpc.sendJsonRequest("verify", {data: message, address: address, signature: signature});
       let result = new MoneroMessageSignatureResult(
         resp.result.good,
         !resp.result.good ? undefined : resp.result.old,
+        // @ts-expect-error TS(2339): Property 'SIGN_WITH_VIEW_KEY' does not exist on ty... Remove this comment to see the full error message
         !resp.result.good ? undefined : !resp.result.signature_type ? undefined : resp.result.signature_type === "view" ? MoneroMessageSignatureType.SIGN_WITH_VIEW_KEY : MoneroMessageSignatureType.SIGN_WITH_SPEND_KEY,
         !resp.result.good ? undefined : resp.result.version);
       return result;
     } catch (e) {
+      // @ts-expect-error TS(2571): Object is of type 'unknown'.
       if (e.getCode() === -2) return new MoneroMessageSignatureResult(false);
       throw e;
     }
   }
-  
-  async getTxKey(txHash) {
+
+  async getTxKey(txHash: any) {
     try {
       return (await this.rpc.sendJsonRequest("get_tx_key", {txid: txHash})).result.tx_key;
     } catch (e) {
@@ -1238,14 +1381,16 @@ class MoneroWalletRpc extends MoneroWallet {
       throw e;
     }
   }
-  
-  async checkTxKey(txHash, txKey, address) {
+
+  // @ts-expect-error TS(2416): Property 'checkTxKey' in type 'MoneroWalletRpc' is... Remove this comment to see the full error message
+  async checkTxKey(txHash: any, txKey: any, address: any) {
     try {
       
       // send request
       let resp = await this.rpc.sendJsonRequest("check_tx_key", {txid: txHash, tx_key: txKey, address: address});
       
       // interpret result
+      // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
       let check = new MoneroCheckTx();
       check.setIsGood(true);
       check.setNumConfirmations(resp.result.confirmations);
@@ -1257,8 +1402,8 @@ class MoneroWalletRpc extends MoneroWallet {
       throw e;
     }
   }
-  
-  async getTxProof(txHash, address, message) {
+
+  async getTxProof(txHash: any, address: any, message: any) {
     try {
       let resp = await this.rpc.sendJsonRequest("get_tx_proof", {txid: txHash, address: address, message: message});
       return resp.result.signature;
@@ -1267,8 +1412,9 @@ class MoneroWalletRpc extends MoneroWallet {
       throw e;
     }
   }
-  
-  async checkTxProof(txHash, address, message, signature) {
+
+  // @ts-expect-error TS(2416): Property 'checkTxProof' in type 'MoneroWalletRpc' ... Remove this comment to see the full error message
+  async checkTxProof(txHash: any, address: any, message: any, signature: any) {
     try {
       
       // send request
@@ -1281,6 +1427,7 @@ class MoneroWalletRpc extends MoneroWallet {
       
       // interpret response
       let isGood = resp.result.good;
+      // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
       let check = new MoneroCheckTx();
       check.setIsGood(isGood);
       if (isGood) {
@@ -1290,13 +1437,14 @@ class MoneroWalletRpc extends MoneroWallet {
       }
       return check;
     } catch (e) {
+      // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
       if (e instanceof MoneroRpcError && e.getCode() === -1 && e.message === "basic_string") e = new MoneroRpcError("Must provide signature to check tx proof", -1);
       if (e instanceof MoneroRpcError && e.getCode() === -8 && e.message.includes("TX ID has invalid format")) e = new MoneroRpcError("TX hash has invalid format", e.getCode(), e.getRpcMethod(), e.getRpcParams());
       throw e;
     }
   }
-  
-  async getSpendProof(txHash, message) {
+
+  async getSpendProof(txHash: any, message: any) {
     try {
       let resp = await this.rpc.sendJsonRequest("get_spend_proof", {txid: txHash, message: message});
       return resp.result.signature;
@@ -1305,8 +1453,8 @@ class MoneroWalletRpc extends MoneroWallet {
       throw e;
     }
   }
-  
-  async checkSpendProof(txHash, message, signature) {
+
+  async checkSpendProof(txHash: any, message: any, signature: any) {
     try {
       let resp = await this.rpc.sendJsonRequest("check_spend_proof", {
         txid: txHash,
@@ -1319,16 +1467,16 @@ class MoneroWalletRpc extends MoneroWallet {
       throw e;
     }
   }
-  
-  async getReserveProofWallet(message) {
+
+  async getReserveProofWallet(message: any) {
     let resp = await this.rpc.sendJsonRequest("get_reserve_proof", {
       all: true,
       message: message
     });
     return resp.result.signature;
   }
-  
-  async getReserveProofAccount(accountIdx, amount, message) {
+
+  async getReserveProofAccount(accountIdx: any, amount: any, message: any) {
     let resp = await this.rpc.sendJsonRequest("get_reserve_proof", {
       account_index: accountIdx,
       amount: amount.toString(),
@@ -1337,7 +1485,8 @@ class MoneroWalletRpc extends MoneroWallet {
     return resp.result.signature;
   }
 
-  async checkReserveProof(address, message, signature) {
+  // @ts-expect-error TS(2416): Property 'checkReserveProof' in type 'MoneroWallet... Remove this comment to see the full error message
+  async checkReserveProof(address: any, message: any, signature: any) {
     
     // send request
     let resp = await this.rpc.sendJsonRequest("check_reserve_proof", {
@@ -1348,6 +1497,7 @@ class MoneroWalletRpc extends MoneroWallet {
     
     // interpret results
     let isGood = resp.result.good;
+    // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
     let check = new MoneroCheckReserve();
     check.setIsGood(isGood);
     if (isGood) {
@@ -1356,31 +1506,33 @@ class MoneroWalletRpc extends MoneroWallet {
     }
     return check;
   }
-  
-  async getTxNotes(txHashes) {
+
+  async getTxNotes(txHashes: any) {
     return (await this.rpc.sendJsonRequest("get_tx_notes", {txids: txHashes})).result.notes;
   }
-  
-  async setTxNotes(txHashes, notes) {
+
+  async setTxNotes(txHashes: any, notes: any) {
     await this.rpc.sendJsonRequest("set_tx_notes", {txids: txHashes, notes: notes});
   }
-  
-  async getAddressBookEntries(entryIndices) {
+
+  // @ts-expect-error TS(2416): Property 'getAddressBookEntries' in type 'MoneroWa... Remove this comment to see the full error message
+  async getAddressBookEntries(entryIndices: any) {
     let resp = await this.rpc.sendJsonRequest("get_address_book", {entries: entryIndices});
     if (!resp.result.entries) return [];
     let entries = [];
     for (let rpcEntry of resp.result.entries) {
+      // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
       entries.push(new MoneroAddressBookEntry().setIndex(rpcEntry.index).setAddress(rpcEntry.address).setDescription(rpcEntry.description).setPaymentId(rpcEntry.payment_id));
     }
     return entries;
   }
-  
-  async addAddressBookEntry(address, description) {
+
+  async addAddressBookEntry(address: any, description: any) {
     let resp = await this.rpc.sendJsonRequest("add_address_book", {address: address, description: description});
     return resp.result.index;
   }
-  
-  async editAddressBookEntry(index, setAddress, address, setDescription, description) {
+
+  async editAddressBookEntry(index: any, setAddress: any, address: any, setDescription: any, description: any) {
     let resp = await this.rpc.sendJsonRequest("edit_address_book", {
       index: index,
       set_address: setAddress,
@@ -1389,19 +1541,20 @@ class MoneroWalletRpc extends MoneroWallet {
       description: description
     });
   }
-  
-  async deleteAddressBookEntry(entryIdx) {
+
+  async deleteAddressBookEntry(entryIdx: any) {
     await this.rpc.sendJsonRequest("delete_address_book", {index: entryIdx});
   }
-  
-  async tagAccounts(tag, accountIndices) {
+
+  async tagAccounts(tag: any, accountIndices: any) {
     await this.rpc.sendJsonRequest("tag_accounts", {tag: tag, accounts: accountIndices});
   }
 
-  async untagAccounts(accountIndices) {
+  async untagAccounts(accountIndices: any) {
     await this.rpc.sendJsonRequest("untag_accounts", {accounts: accountIndices});
   }
 
+  // @ts-expect-error TS(2416): Property 'getAccountTags' in type 'MoneroWalletRpc... Remove this comment to see the full error message
   async getAccountTags() {
     let tags = [];
     let resp = await this.rpc.sendJsonRequest("get_account_tags");
@@ -1413,11 +1566,11 @@ class MoneroWalletRpc extends MoneroWallet {
     return tags;
   }
 
-  async setAccountTagLabel(tag, label) {
+  async setAccountTagLabel(tag: any, label: any) {
     await this.rpc.sendJsonRequest("set_account_tag_description", {tag: tag, description: label});
   }
-  
-  async getPaymentUri(config) {
+
+  async getPaymentUri(config: any) {
     config = MoneroWallet._normalizeCreateTxsConfig(config);
     let resp = await this.rpc.sendJsonRequest("make_uri", {
       address: config.getDestinations()[0].getAddress(),
@@ -1428,10 +1581,12 @@ class MoneroWalletRpc extends MoneroWallet {
     });
     return resp.result.uri;
   }
-  
-  async parsePaymentUri(uri) {
+
+  // @ts-expect-error TS(2416): Property 'parsePaymentUri' in type 'MoneroWalletRp... Remove this comment to see the full error message
+  async parsePaymentUri(uri: any) {
     assert(uri, "Must provide URI to parse");
     let resp = await this.rpc.sendJsonRequest("parse_uri", {uri: uri});
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     let config = new MoneroTxConfig({address: resp.result.uri.address, amount: BigInt(resp.result.uri.amount)});
     config.setPaymentId(resp.result.uri.payment_id);
     config.setRecipientName(resp.result.uri.recipient_name);
@@ -1442,8 +1597,8 @@ class MoneroWalletRpc extends MoneroWallet {
     if ("" === config.getNote()) config.setNote(undefined);
     return config;
   }
-  
-  async getAttribute(key) {
+
+  async getAttribute(key: any) {
     try {
       let resp = await this.rpc.sendJsonRequest("get_attribute", {key: key});
       return resp.result.value === "" ? undefined : resp.result.value;
@@ -1452,31 +1607,34 @@ class MoneroWalletRpc extends MoneroWallet {
       throw e;
     }
   }
-  
-  async setAttribute(key, val) {
+
+  async setAttribute(key: any, val: any) {
     await this.rpc.sendJsonRequest("set_attribute", {key: key, value: val});
   }
-  
-  async startMining(numThreads, backgroundMining, ignoreBattery) {
+
+  async startMining(numThreads: any, backgroundMining: any, ignoreBattery: any) {
     await this.rpc.sendJsonRequest("start_mining", {
       threads_count: numThreads,
       do_background_mining: backgroundMining,
       ignore_battery: ignoreBattery
     });
   }
-  
+
   async stopMining() {
     await this.rpc.sendJsonRequest("stop_mining");
   }
-  
+
+  // @ts-expect-error TS(2416): Property 'isMultisigImportNeeded' in type 'MoneroW... Remove this comment to see the full error message
   async isMultisigImportNeeded() {
     let resp = await this.rpc.sendJsonRequest("get_balance");
     return resp.result.multisig_import_needed === true;
   }
-  
+
+  // @ts-expect-error TS(2416): Property 'getMultisigInfo' in type 'MoneroWalletRp... Remove this comment to see the full error message
   async getMultisigInfo() {
     let resp = await this.rpc.sendJsonRequest("is_multisig");
     let result = resp.result;
+    // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
     let info = new MoneroMultisigInfo();
     info.setIsMultisig(result.multisig);
     info.setIsReady(result.ready);
@@ -1484,15 +1642,15 @@ class MoneroWalletRpc extends MoneroWallet {
     info.setNumParticipants(result.total);
     return info;
   }
-  
+
   async prepareMultisig() {
     let resp = await this.rpc.sendJsonRequest("prepare_multisig", {enable_multisig_experimental: true});
     this.addressCache = {};
     let result = resp.result;
     return result.multisig_info;
   }
-  
-  async makeMultisig(multisigHexes, threshold, password) {
+
+  async makeMultisig(multisigHexes: any, threshold: any, password: any) {
     let resp = await this.rpc.sendJsonRequest("make_multisig", {
       multisig_info: multisigHexes,
       threshold: threshold,
@@ -1501,10 +1659,12 @@ class MoneroWalletRpc extends MoneroWallet {
     this.addressCache = {};
     return resp.result.multisig_info;
   }
-  
-  async exchangeMultisigKeys(multisigHexes, password) {
+
+  // @ts-expect-error TS(2416): Property 'exchangeMultisigKeys' in type 'MoneroWal... Remove this comment to see the full error message
+  async exchangeMultisigKeys(multisigHexes: any, password: any) {
     let resp = await this.rpc.sendJsonRequest("exchange_multisig_keys", {multisig_info: multisigHexes, password: password});
     this.addressCache = {};
+    // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
     let msResult = new MoneroMultisigInitResult();
     msResult.setAddress(resp.result.address);
     msResult.setMultisigHex(resp.result.multisig_info);
@@ -1512,46 +1672,50 @@ class MoneroWalletRpc extends MoneroWallet {
     if (msResult.getMultisigHex().length === 0) msResult.setMultisigHex(undefined);
     return msResult;
   }
-  
+
   async exportMultisigHex() {
     let resp = await this.rpc.sendJsonRequest("export_multisig_info");
     return resp.result.info;
   }
 
-  async importMultisigHex(multisigHexes) {
+  async importMultisigHex(multisigHexes: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (!GenUtils.isArray(multisigHexes)) throw new MoneroError("Must provide string[] to importMultisigHex()")
     let resp = await this.rpc.sendJsonRequest("import_multisig_info", {info: multisigHexes});
     return resp.result.n_outputs;
   }
 
-  async signMultisigTxHex(multisigTxHex) {
+  // @ts-expect-error TS(2416): Property 'signMultisigTxHex' in type 'MoneroWallet... Remove this comment to see the full error message
+  async signMultisigTxHex(multisigTxHex: any) {
     let resp = await this.rpc.sendJsonRequest("sign_multisig", {tx_data_hex: multisigTxHex});
     let result = resp.result;
+    // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
     let signResult = new MoneroMultisigSignResult();
     signResult.setSignedMultisigTxHex(result.tx_data_hex);
     signResult.setTxHashes(result.tx_hash_list);
     return signResult;
   }
 
-  async submitMultisigTxHex(signedMultisigTxHex) {
+  async submitMultisigTxHex(signedMultisigTxHex: any) {
     let resp = await this.rpc.sendJsonRequest("submit_multisig", {tx_data_hex: signedMultisigTxHex});
     return resp.result.tx_hash_list;
   }
-  
-  async changePassword(oldPassword, newPassword) {
+
+  async changePassword(oldPassword: any, newPassword: any) {
     return this.rpc.sendJsonRequest("change_wallet_password", {old_password: oldPassword || "", new_password: newPassword || ""});
   }
-  
+
   async save() {
     await this.rpc.sendJsonRequest("store");
   }
-  
-  async close(save) {
+
+  async close(save: any) {
     if (save === undefined) save = false;
     await this._clear();
     await this.rpc.sendJsonRequest("close_wallet", {autosave_current: save});
   }
-  
+
+  // @ts-expect-error TS(2416): Property 'isClosed' in type 'MoneroWalletRpc' is n... Remove this comment to see the full error message
   async isClosed() {
     try {
       await this.getPrimaryAddress();
@@ -1560,7 +1724,7 @@ class MoneroWalletRpc extends MoneroWallet {
     }
     return false;
   }
-  
+
   /**
    * Save and close the current wallet and stop the RPC server.
    */
@@ -1568,20 +1732,28 @@ class MoneroWalletRpc extends MoneroWallet {
     await this._clear();
     await this.rpc.sendJsonRequest("stop_wallet");
   }
-  
+
   // ----------- ADD JSDOC FOR SUPPORTED DEFAULT IMPLEMENTATIONS --------------
-  
+
+  // @ts-expect-error TS(2556): A spread argument must either have a tuple type or... Remove this comment to see the full error message
   async getNumBlocksToUnlock() { return super.getNumBlocksToUnlock(...arguments); }
+  // @ts-expect-error TS(2556): A spread argument must either have a tuple type or... Remove this comment to see the full error message
   async getTx() { return super.getTx(...arguments); }
+  // @ts-expect-error TS(2556): A spread argument must either have a tuple type or... Remove this comment to see the full error message
   async getIncomingTransfers() { return super.getIncomingTransfers(...arguments); }
+  // @ts-expect-error TS(2556): A spread argument must either have a tuple type or... Remove this comment to see the full error message
   async getOutgoingTransfers() { return super.getOutgoingTransfers(...arguments); }
+  // @ts-expect-error TS(2556): A spread argument must either have a tuple type or... Remove this comment to see the full error message
   async createTx() { return super.createTx(...arguments); }
+  // @ts-expect-error TS(2556): A spread argument must either have a tuple type or... Remove this comment to see the full error message
   async relayTx() { return super.relayTx(...arguments); }
+  // @ts-expect-error TS(2556): A spread argument must either have a tuple type or... Remove this comment to see the full error message
   async getTxNote() { return super.getTxNote(...arguments); }
+  // @ts-expect-error TS(2556): A spread argument must either have a tuple type or... Remove this comment to see the full error message
   async setTxNote() { return super.setTxNote(...arguments); }
-  
+
   // -------------------------------- PRIVATE ---------------------------------
-  
+
   async _clear() {
     this.listeners.splice(0, this.listeners.length);
     this._refreshListening();
@@ -1589,12 +1761,13 @@ class MoneroWalletRpc extends MoneroWallet {
     this.addressCache = {};
     this.path = undefined;
   }
-  
-  async _getBalances(accountIdx, subaddressIdx) {
+
+  async _getBalances(accountIdx: any, subaddressIdx: any) {
     if (accountIdx === undefined) {
       assert.equal(subaddressIdx, undefined, "Must provide account index with subaddress index");
       let balance = BigInt(0);
       let unlockedBalance = BigInt(0);
+      // @ts-expect-error TS(2554): Expected 3 arguments, but got 0.
       for (let account of await this.getAccounts()) {
         balance = balance + account.getBalance();
         unlockedBalance = unlockedBalance + account.getUnlockedBalance();
@@ -1607,23 +1780,24 @@ class MoneroWalletRpc extends MoneroWallet {
       else return [BigInt(resp.result.per_subaddress[0].balance), BigInt(resp.result.per_subaddress[0].unlocked_balance)];
     }
   }
-  
-  async _getAccountIndices(getSubaddressIndices) {
+
+  async _getAccountIndices(getSubaddressIndices: any) {
     let indices = new Map();
+    // @ts-expect-error TS(2554): Expected 3 arguments, but got 0.
     for (let account of await this.getAccounts()) {
       indices.set(account.getIndex(), getSubaddressIndices ? await this._getSubaddressIndices(account.getIndex()) : undefined);
     }
     return indices;
   }
-  
-  async _getSubaddressIndices(accountIdx) {
+
+  async _getSubaddressIndices(accountIdx: any) {
     let subaddressIndices = [];
     let resp = await this.rpc.sendJsonRequest("get_address", {account_index: accountIdx});
     for (let address of resp.result.addresses) subaddressIndices.push(address.address_index);
     return subaddressIndices;
   }
-  
-  async _getTransfersAux(query) {
+
+  async _getTransfersAux(query: any) {
     
     // build params for get_transfers rpc call
     let txQuery = query.getTxQuery();
@@ -1634,31 +1808,44 @@ class MoneroWalletRpc extends MoneroWallet {
 
     // check if fetching pool txs contradicted by configuration
     if (txQuery.inTxPool() === true && !canBeInTxPool) {
+      // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
       throw new MoneroError("Cannot fetch pool transactions because it contradicts configuration");
     }
 
     let params = {};
+    // @ts-expect-error TS(2339): Property 'in' does not exist on type '{}'.
     params.in = canBeIncoming && canBeConfirmed;
+    // @ts-expect-error TS(2339): Property 'out' does not exist on type '{}'.
     params.out = canBeOutgoing && canBeConfirmed;
+    // @ts-expect-error TS(2339): Property 'pool' does not exist on type '{}'.
     params.pool = canBeIncoming && canBeInTxPool;
+    // @ts-expect-error TS(2339): Property 'pending' does not exist on type '{}'.
     params.pending = canBeOutgoing && canBeInTxPool;
+    // @ts-expect-error TS(2339): Property 'failed' does not exist on type '{}'.
     params.failed = txQuery.isFailed() !== false && txQuery.isConfirmed() !== true && txQuery.inTxPool() != true;
     if (txQuery.getMinHeight() !== undefined) {
+      // @ts-expect-error TS(2339): Property 'min_height' does not exist on type '{}'.
       if (txQuery.getMinHeight() > 0) params.min_height = txQuery.getMinHeight() - 1; // TODO monero-project: wallet2::get_payments() min_height is exclusive, so manually offset to match intended range (issues #5751, #5598)
+      // @ts-expect-error TS(2339): Property 'min_height' does not exist on type '{}'.
       else params.min_height = txQuery.getMinHeight();
     }
+    // @ts-expect-error TS(2339): Property 'max_height' does not exist on type '{}'.
     if (txQuery.getMaxHeight() !== undefined) params.max_height = txQuery.getMaxHeight();
+    // @ts-expect-error TS(2339): Property 'filter_by_height' does not exist on type... Remove this comment to see the full error message
     params.filter_by_height = txQuery.getMinHeight() !== undefined || txQuery.getMaxHeight() !== undefined;
     if (query.getAccountIndex() === undefined) {
       assert(query.getSubaddressIndex() === undefined && query.getSubaddressIndices() === undefined, "Query specifies a subaddress index but not an account index");
+      // @ts-expect-error TS(2339): Property 'all_accounts' does not exist on type '{}... Remove this comment to see the full error message
       params.all_accounts = true;
     } else {
+      // @ts-expect-error TS(2339): Property 'account_index' does not exist on type '{... Remove this comment to see the full error message
       params.account_index = query.getAccountIndex();
       
       // set subaddress indices param
       let subaddressIndices = new Set();
       if (query.getSubaddressIndex() !== undefined) subaddressIndices.add(query.getSubaddressIndex());
-      if (query.getSubaddressIndices() !== undefined) query.getSubaddressIndices().map(subaddressIdx => subaddressIndices.add(subaddressIdx));
+      if (query.getSubaddressIndices() !== undefined) query.getSubaddressIndices().map((subaddressIdx: any) => subaddressIndices.add(subaddressIdx));
+      // @ts-expect-error TS(2339): Property 'subaddr_indices' does not exist on type ... Remove this comment to see the full error message
       if (subaddressIndices.size) params.subaddr_indices = Array.from(subaddressIndices);
     }
     
@@ -1671,6 +1858,7 @@ class MoneroWalletRpc extends MoneroWallet {
     for (let key of Object.keys(resp.result)) {
       for (let rpcTx of resp.result[key]) {
         //if (rpcTx.txid === query.debugTxId) console.log(rpcTx);
+        // @ts-expect-error TS(2554): Expected 3 arguments, but got 1.
         let tx = MoneroWalletRpc._convertRpcTxWithTransfer(rpcTx);
         if (tx.isConfirmed()) assert(tx.getBlock().getTxs().indexOf(tx) > -1);
         
@@ -1698,38 +1886,45 @@ class MoneroWalletRpc extends MoneroWallet {
     for (let tx of txs) {
       
       // tx is not incoming/outgoing unless already set
+      // @ts-expect-error TS(2571): Object is of type 'unknown'.
       if (tx.isIncoming() === undefined) tx.setIsIncoming(false);
+      // @ts-expect-error TS(2571): Object is of type 'unknown'.
       if (tx.isOutgoing() === undefined) tx.setIsOutgoing(false);
       
       // sort incoming transfers
+      // @ts-expect-error TS(2571): Object is of type 'unknown'.
       if (tx.getIncomingTransfers() !== undefined) tx.getIncomingTransfers().sort(MoneroWalletRpc._compareIncomingTransfers);
       
       // collect queried transfers, erase if excluded
+      // @ts-expect-error TS(2571): Object is of type 'unknown'.
       for (let transfer of tx.filterTransfers(query)) {
         transfers.push(transfer);
       }
       
       // remove txs without requested transfer
+      // @ts-expect-error TS(2571): Object is of type 'unknown'.
       if (tx.getBlock() !== undefined && tx.getOutgoingTransfer() === undefined && tx.getIncomingTransfers() === undefined) {
+        // @ts-expect-error TS(2571): Object is of type 'unknown'.
         tx.getBlock().getTxs().splice(tx.getBlock().getTxs().indexOf(tx), 1);
       }
     }
     
     return transfers;
   }
-  
-  async _getOutputsAux(query) {
+
+  async _getOutputsAux(query: any) {
     
     // determine account and subaddress indices to be queried
     let indices = new Map();
     if (query.getAccountIndex() !== undefined) {
       let subaddressIndices = new Set();
       if (query.getSubaddressIndex() !== undefined) subaddressIndices.add(query.getSubaddressIndex());
-      if (query.getSubaddressIndices() !== undefined) query.getSubaddressIndices().map(subaddressIdx => subaddressIndices.add(subaddressIdx));
+      if (query.getSubaddressIndices() !== undefined) query.getSubaddressIndices().map((subaddressIdx: any) => subaddressIndices.add(subaddressIdx));
       indices.set(query.getAccountIndex(), subaddressIndices.size ? Array.from(subaddressIndices) : undefined);  // undefined will fetch from all subaddresses
     } else {
       assert.equal(query.getSubaddressIndex(), undefined, "Query specifies a subaddress index but not an account index")
       assert(query.getSubaddressIndices() === undefined || query.getSubaddressIndices().length === 0, "Query specifies subaddress indices but not an account index");
+      // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
       indices = await this._getAccountIndices();  // fetch all account indices without subaddresses
     }
     
@@ -1739,12 +1934,16 @@ class MoneroWalletRpc extends MoneroWallet {
     
     // collect txs with outputs for each indicated account using `incoming_transfers` rpc call
     let params = {};
+    // @ts-expect-error TS(2339): Property 'transfer_type' does not exist on type '{... Remove this comment to see the full error message
     params.transfer_type = query.isSpent() === true ? "unavailable" : query.isSpent() === false ? "available" : "all";
+    // @ts-expect-error TS(2339): Property 'verbose' does not exist on type '{}'.
     params.verbose = true;
     for (let accountIdx of indices.keys()) {
     
       // send request
+      // @ts-expect-error TS(2339): Property 'account_index' does not exist on type '{... Remove this comment to see the full error message
       params.account_index = accountIdx;
+      // @ts-expect-error TS(2339): Property 'subaddr_indices' does not exist on type ... Remove this comment to see the full error message
       params.subaddr_indices = indices.get(accountIdx);
       let resp = await this.rpc.sendJsonRequest("incoming_transfers", params);
       
@@ -1765,66 +1964,91 @@ class MoneroWalletRpc extends MoneroWallet {
     for (let tx of txs) {
       
       // sort outputs
+      // @ts-expect-error TS(2571): Object is of type 'unknown'.
       if (tx.getOutputs() !== undefined) tx.getOutputs().sort(MoneroWalletRpc._compareOutputs);
       
       // collect queried outputs, erase if excluded
+      // @ts-expect-error TS(2571): Object is of type 'unknown'.
       for (let output of tx.filterOutputs(query)) outputs.push(output);
       
       // remove excluded txs from block
+      // @ts-expect-error TS(2571): Object is of type 'unknown'.
       if (tx.getOutputs() === undefined && tx.getBlock() !== undefined) {
+        // @ts-expect-error TS(2571): Object is of type 'unknown'.
         tx.getBlock().getTxs().splice(tx.getBlock().getTxs().indexOf(tx), 1);
       }
     }
     return outputs;
   }
-  
+
   /**
    * Common method to get key images.
    * 
    * @param all - pecifies to get all xor only new images from last import
    * @return {MoneroKeyImage[]} are the key images
    */
-  async _rpcExportKeyImages(all) {
+  async _rpcExportKeyImages(all: any) {
     let resp = await this.rpc.sendJsonRequest("export_key_images", {all: all});
     if (!resp.result.signed_key_images) return [];
-    return resp.result.signed_key_images.map(rpcImage => new MoneroKeyImage(rpcImage.key_image, rpcImage.signature));
+    return resp.result.signed_key_images.map((rpcImage: any) => new MoneroKeyImage(rpcImage.key_image, rpcImage.signature));
   }
-  
-  async _rpcSweepAccount(config) {
+
+  async _rpcSweepAccount(config: any) {
     
     // validate config
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (config === undefined) throw new MoneroError("Must provide sweep config");
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (config.getAccountIndex() === undefined) throw new MoneroError("Must provide an account index to sweep from");
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (config.getDestinations() === undefined || config.getDestinations().length != 1) throw new MoneroError("Must provide exactly one destination to sweep to");
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (config.getDestinations()[0].getAddress() === undefined) throw new MoneroError("Must provide destination address to sweep to");
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (config.getDestinations()[0].getAmount() !== undefined) throw new MoneroError("Cannot specify amount in sweep config");
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (config.getKeyImage() !== undefined) throw new MoneroError("Key image defined; use sweepOutput() to sweep an output by its key image");
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (config.getSubaddressIndices() !== undefined && config.getSubaddressIndices().length === 0) throw new MoneroError("Empty list given for subaddresses indices to sweep");
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (config.getSweepEachSubaddress()) throw new MoneroError("Cannot sweep each subaddress with RPC `sweep_all`");
     
     // sweep from all subaddresses if not otherwise defined
     if (config.getSubaddressIndices() === undefined) {
       config.setSubaddressIndices([]);
+      // @ts-expect-error TS(2554): Expected 3 arguments, but got 1.
       for (let subaddress of await this.getSubaddresses(config.getAccountIndex())) {
         config.getSubaddressIndices().push(subaddress.getIndex());
       }
     }
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (config.getSubaddressIndices().length === 0) throw new MoneroError("No subaddresses to sweep from");
     
     // common config params
     let params = {};
     let relay = config.getRelay() === true;
+    // @ts-expect-error TS(2339): Property 'account_index' does not exist on type '{... Remove this comment to see the full error message
     params.account_index = config.getAccountIndex();
+    // @ts-expect-error TS(2339): Property 'subaddr_indices' does not exist on type ... Remove this comment to see the full error message
     params.subaddr_indices = config.getSubaddressIndices();
+    // @ts-expect-error TS(2339): Property 'address' does not exist on type '{}'.
     params.address = config.getDestinations()[0].getAddress();
     assert(config.getPriority() === undefined || config.getPriority() >= 0 && config.getPriority() <= 3);
+    // @ts-expect-error TS(2339): Property 'priority' does not exist on type '{}'.
     params.priority = config.getPriority();
+    // @ts-expect-error TS(2339): Property 'unlock_time' does not exist on type '{}'... Remove this comment to see the full error message
     params.unlock_time = config.getUnlockHeight();
+    // @ts-expect-error TS(2339): Property 'payment_id' does not exist on type '{}'.
     params.payment_id = config.getPaymentId();
+    // @ts-expect-error TS(2339): Property 'do_not_relay' does not exist on type '{}... Remove this comment to see the full error message
     params.do_not_relay = !relay;
+    // @ts-expect-error TS(2339): Property 'below_amount' does not exist on type '{}... Remove this comment to see the full error message
     params.below_amount = config.getBelowAmount();
+    // @ts-expect-error TS(2339): Property 'get_tx_keys' does not exist on type '{}'... Remove this comment to see the full error message
     params.get_tx_keys = true;
+    // @ts-expect-error TS(2339): Property 'get_tx_hex' does not exist on type '{}'.
     params.get_tx_hex = true;
+    // @ts-expect-error TS(2339): Property 'get_tx_metadata' does not exist on type ... Remove this comment to see the full error message
     params.get_tx_metadata = true;
     
     // invoke wallet rpc `sweep_all`
@@ -1832,6 +2056,7 @@ class MoneroWalletRpc extends MoneroWallet {
     let result = resp.result;
     
     // initialize txs from response
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     let txSet = MoneroWalletRpc._convertRpcSentTxsToTxSet(result);
     
     // initialize remaining known fields
@@ -1844,6 +2069,7 @@ class MoneroWalletRpc extends MoneroWallet {
       tx.setIsRelayed(relay);
       tx.setIsMinerTx(false);
       tx.setIsFailed(false);
+      // @ts-expect-error TS(2339): Property 'RING_SIZE' does not exist on type 'typeo... Remove this comment to see the full error message
       tx.setRingSize(MoneroUtils.RING_SIZE);
       let transfer = tx.getOutgoingTransfer();
       transfer.setAccountIndex(config.getAccountIndex());
@@ -1860,37 +2086,40 @@ class MoneroWalletRpc extends MoneroWallet {
     }
     return txSet.getTxs();
   }
-  
+
   _refreshListening() {
     if (this.walletPoller == undefined && this.listeners.length) this.walletPoller = new WalletPoller(this);
     if (this.walletPoller !== undefined) this.walletPoller.setIsPolling(this.listeners.length > 0);
   }
-  
+
   /**
    * Poll if listening.
    */
   async _poll() {
     if (this.walletPoller !== undefined && this.walletPoller._isPolling) await this.walletPoller.poll();
   }
-  
+
   // ---------------------------- PRIVATE STATIC ------------------------------
-  
-  static _normalizeConfig(uriOrConfigOrConnection, username, password, rejectUnauthorized) {
+
+  static _normalizeConfig(uriOrConfigOrConnection: any, username: any, password: any, rejectUnauthorized: any) {
     let config;
     if (typeof uriOrConfigOrConnection === "string") config = {uri: uriOrConfigOrConnection, username: username, password: password, rejectUnauthorized: rejectUnauthorized};
     else {
+      // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
       if (typeof uriOrConfigOrConnection !== "object") throw new MoneroError("Invalid configuration to create rpc client; must be string, object, or MoneroRpcConnection");
+      // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
       if (username || password || rejectUnauthorized) throw new MoneroError("Can provide config object or params or new MoneroDaemonRpc(...) but not both");
       if (uriOrConfigOrConnection instanceof MoneroRpcConnection) config = Object.assign({}, uriOrConfigOrConnection.getConfig());
       else config = Object.assign({}, uriOrConfigOrConnection);
     }
     if (config.server) {
+      // @ts-expect-error TS(2554): Expected 5 arguments, but got 1.
       config = Object.assign(config, new MoneroRpcConnection(config.server).getConfig());
       delete config.server;
     }
     return config;
   }
-  
+
   /**
    * Remove criteria which requires looking up other transfers/outputs to
    * fulfill query.
@@ -1898,7 +2127,7 @@ class MoneroWalletRpc extends MoneroWallet {
    * @param {MoneroTxQuery} query - the query to decontextualize
    * @return {MoneroTxQuery} a reference to the query for convenience
    */
-  static _decontextualize(query) {
+  static _decontextualize(query: any) {
     query.setIsIncoming(undefined);
     query.setIsOutgoing(undefined);
     query.setTransferQuery(undefined);
@@ -1906,8 +2135,8 @@ class MoneroWalletRpc extends MoneroWallet {
     query.setOutputQuery(undefined);
     return query;
   }
-  
-  static _isContextual(query) {
+
+  static _isContextual(query: any) {
     if (!query) return false;
     if (!query.getTxQuery()) return false;
     if (query.getTxQuery().isIncoming() !== undefined) return true; // requires getting other transfers
@@ -1917,12 +2146,14 @@ class MoneroWalletRpc extends MoneroWallet {
     } else if (query instanceof MoneroOutputQuery) {
       if (query.getTxQuery().getTransferQuery() !== undefined) return true; // requires getting other transfers
     } else {
+      // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
       throw new MoneroError("query must be tx or transfer query");
     }
     return false;
   }
-  
-  static _convertRpcAccount(rpcAccount) {
+
+  static _convertRpcAccount(rpcAccount: any) {
+    // @ts-expect-error TS(2554): Expected 5 arguments, but got 0.
     let account = new MoneroAccount();
     for (let key of Object.keys(rpcAccount)) {
       let val = rpcAccount[key];
@@ -1937,8 +2168,9 @@ class MoneroWalletRpc extends MoneroWallet {
     if ("" === account.getTag()) account.setTag(undefined);
     return account;
   }
-  
-  static _convertRpcSubaddress(rpcSubaddress) {
+
+  static _convertRpcSubaddress(rpcSubaddress: any) {
+    // @ts-expect-error TS(2554): Expected 3 arguments, but got 0.
     let subaddress = new MoneroSubaddress();
     for (let key of Object.keys(rpcSubaddress)) {
       let val = rpcSubaddress[key];
@@ -1956,7 +2188,7 @@ class MoneroWalletRpc extends MoneroWallet {
     }
     return subaddress;
   }
-  
+
   /**
    * Initializes a sent transaction.
    * 
@@ -1965,7 +2197,8 @@ class MoneroWalletRpc extends MoneroWallet {
    * @param {boolean} copyDestinations - copies config destinations if true
    * @return {MoneroTxWallet} is the initialized send tx
    */
-  static _initSentTxWallet(config, tx, copyDestinations) {
+  static _initSentTxWallet(config: any, tx: any, copyDestinations: any) {
+    // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
     if (!tx) tx = new MoneroTxWallet();
     let relay = config.getRelay() === true;
     tx.setIsOutgoing(true);
@@ -1977,7 +2210,9 @@ class MoneroWalletRpc extends MoneroWallet {
     tx.setIsMinerTx(false);
     tx.setIsFailed(false);
     tx.setIsLocked(true);
+    // @ts-expect-error TS(2339): Property 'RING_SIZE' does not exist on type 'typeo... Remove this comment to see the full error message
     tx.setRingSize(MoneroUtils.RING_SIZE);
+    // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
     let transfer = new MoneroOutgoingTransfer().setTx(tx);
     if (config.getSubaddressIndices() && config.getSubaddressIndices().length === 1) transfer.setSubaddressIndices(config.getSubaddressIndices().slice(0)); // we know src subaddress indices iff config specifies 1
     if (copyDestinations) {
@@ -1994,7 +2229,7 @@ class MoneroWalletRpc extends MoneroWallet {
     }
     return tx;
   }
-  
+
   /**
    * Initializes a tx set from a RPC map excluding txs.
    * 
@@ -2002,7 +2237,8 @@ class MoneroWalletRpc extends MoneroWallet {
    * @return MoneroTxSet - initialized tx set
    * @return the resulting tx set
    */
-  static _convertRpcTxSet(rpcMap) {
+  static _convertRpcTxSet(rpcMap: any) {
+    // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
     let txSet = new MoneroTxSet();
     txSet.setMultisigTxHex(rpcMap.multisig_txset);
     txSet.setUnsignedTxHex(rpcMap.unsigned_txset);
@@ -2012,7 +2248,7 @@ class MoneroWalletRpc extends MoneroWallet {
     if (txSet.getSignedTxHex() !== undefined && txSet.getSignedTxHex().length === 0) txSet.setSignedTxHex(undefined);
     return txSet;
   }
-  
+
   /**
    * Initializes a MoneroTxSet from from a list of rpc txs.
    * 
@@ -2020,7 +2256,7 @@ class MoneroWalletRpc extends MoneroWallet {
    * @param txs - existing txs to further initialize (optional)
    * @return the converted tx set
    */
-  static _convertRpcSentTxsToTxSet(rpcTxs, txs) {
+  static _convertRpcSentTxsToTxSet(rpcTxs: any, txs: any) {
     
     // build shared tx set
     let txSet = MoneroWalletRpc._convertRpcTxSet(rpcTxs);
@@ -2038,6 +2274,7 @@ class MoneroWalletRpc extends MoneroWallet {
     if (txs) txSet.setTxs(txs);
     else {
       txs = [];
+      // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
       for (let i = 0; i < numTxs; i++) txs.push(new MoneroTxWallet());
     }
     for (let tx of txs) {
@@ -2058,6 +2295,7 @@ class MoneroWalletRpc extends MoneroWallet {
       else if (key === "amount_list") {
         for (let i = 0; i < val.length; i++) {
           if (txs[i].getOutgoingTransfer() !== undefined) txs[i].getOutgoingTransfer().setAmount(BigInt(val[i]));
+          // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
           else txs[i].setOutgoingTransfer(new MoneroOutgoingTransfer().setTx(txs[i]).setAmount(BigInt(val[i])));
         }
       }
@@ -2065,9 +2303,11 @@ class MoneroWalletRpc extends MoneroWallet {
       else if (key === "spent_key_images_list") {
         let inputKeyImagesList = val;
         for (let i = 0; i < inputKeyImagesList.length; i++) {
+          // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
           GenUtils.assertTrue(txs[i].getInputs() === undefined);
           txs[i].setInputs([]);
           for (let inputKeyImage of inputKeyImagesList[i]["key_images"]) {
+            // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
             txs[i].getInputs().push(new MoneroOutputWallet().setKeyImage(new MoneroKeyImage().setHex(inputKeyImage)).setTx(txs[i]));
           }
         }
@@ -2077,7 +2317,7 @@ class MoneroWalletRpc extends MoneroWallet {
     
     return txSet;
   }
-  
+
   /**
    * Converts a rpc tx with a transfer to a tx set with a tx and transfer.
    * 
@@ -2086,12 +2326,12 @@ class MoneroWalletRpc extends MoneroWallet {
    * @param isOutgoing - specifies if the tx is outgoing if true, incoming if false, or decodes from type if undefined
    * @returns the initialized tx set with a tx
    */
-  static _convertRpcTxToTxSet(rpcTx, tx, isOutgoing) {
+  static _convertRpcTxToTxSet(rpcTx: any, tx: any, isOutgoing: any) {
     let txSet = MoneroWalletRpc._convertRpcTxSet(rpcTx);
     txSet.setTxs([MoneroWalletRpc._convertRpcTxWithTransfer(rpcTx, tx, isOutgoing).setTxSet(txSet)]);
     return txSet;
   }
-  
+
   /**
    * Builds a MoneroTxWallet from a RPC tx.
    * 
@@ -2100,9 +2340,10 @@ class MoneroWalletRpc extends MoneroWallet {
    * @param isOutgoing - specifies if the tx is outgoing if true, incoming if false, or decodes from type if undefined
    * @returns {MoneroTxWallet} is the initialized tx
    */
-  static _convertRpcTxWithTransfer(rpcTx, tx, isOutgoing) {  // TODO: change everything to safe set
+  static _convertRpcTxWithTransfer(rpcTx: any, tx: any, isOutgoing: any) {  // TODO: change everything to safe set
         
     // initialize tx to return
+    // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
     if (!tx) tx = new MoneroTxWallet();
     
     // initialize tx state from rpc type
@@ -2130,12 +2371,14 @@ class MoneroWalletRpc extends MoneroWallet {
       else if (key === "double_spend_seen") tx.setIsDoubleSpend(val);
       else if (key === "block_height" || key === "height") {
         if (tx.isConfirmed()) {
+          // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
           if (!header) header = new MoneroBlockHeader();
           header.setHeight(val);
         }
       }
       else if (key === "timestamp") {
         if (tx.isConfirmed()) {
+          // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
           if (!header) header = new MoneroBlockHeader();
           header.setTimestamp(val);
         } else {
@@ -2144,34 +2387,43 @@ class MoneroWalletRpc extends MoneroWallet {
       }
       else if (key === "confirmations") tx.setNumConfirmations(val);
       else if (key === "suggested_confirmations_threshold") {
+        // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
         if (transfer === undefined) transfer = (isOutgoing ? new MoneroOutgoingTransfer() : new MoneroIncomingTransfer()).setTx(tx);
+        // @ts-expect-error TS(2339): Property 'setNumSuggestedConfirmations' does not e... Remove this comment to see the full error message
         if (!isOutgoing) transfer.setNumSuggestedConfirmations(val);
       }
       else if (key === "amount") {
+        // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
         if (transfer === undefined) transfer = (isOutgoing ? new MoneroOutgoingTransfer() : new MoneroIncomingTransfer()).setTx(tx);
         transfer.setAmount(BigInt(val));
       }
       else if (key === "amounts") {}  // ignoring, amounts sum to amount
       else if (key === "address") {
         if (!isOutgoing) {
+          // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
           if (!transfer) transfer = new MoneroIncomingTransfer().setTx(tx);
+          // @ts-expect-error TS(2339): Property 'setAddress' does not exist on type 'Mone... Remove this comment to see the full error message
           transfer.setAddress(val);
         }
       }
       else if (key === "payment_id") {
+        // @ts-expect-error TS(2339): Property 'DEFAULT_PAYMENT_ID' does not exist on ty... Remove this comment to see the full error message
         if ("" !== val && MoneroTxWallet.DEFAULT_PAYMENT_ID !== val) tx.setPaymentId(val);  // default is undefined
       }
       else if (key === "subaddr_index") assert(rpcTx.subaddr_indices);  // handled by subaddr_indices
       else if (key === "subaddr_indices") {
+        // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
         if (!transfer) transfer = (isOutgoing ? new MoneroOutgoingTransfer() : new MoneroIncomingTransfer()).setTx(tx);
         let rpcIndices = val;
         transfer.setAccountIndex(rpcIndices[0].major);
         if (isOutgoing) {
           let subaddressIndices = [];
           for (let rpcIndex of rpcIndices) subaddressIndices.push(rpcIndex.minor);
+          // @ts-expect-error TS(2339): Property 'setSubaddressIndices' does not exist on ... Remove this comment to see the full error message
           transfer.setSubaddressIndices(subaddressIndices);
         } else {
           assert.equal(rpcIndices.length, 1);
+          // @ts-expect-error TS(2339): Property 'setSubaddressIndex' does not exist on ty... Remove this comment to see the full error message
           transfer.setSubaddressIndex(rpcIndices[0].minor);
         }
       }
@@ -2179,15 +2431,18 @@ class MoneroWalletRpc extends MoneroWallet {
         assert(isOutgoing);
         let destinations = [];
         for (let rpcDestination of val) {
+          // @ts-expect-error TS(2554): Expected 2 arguments, but got 0.
           let destination = new MoneroDestination();
           destinations.push(destination);
           for (let destinationKey of Object.keys(rpcDestination)) {
             if (destinationKey === "address") destination.setAddress(rpcDestination[destinationKey]);
             else if (destinationKey === "amount") destination.setAmount(BigInt(rpcDestination[destinationKey]));
+            // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
             else throw new MoneroError("Unrecognized transaction destination field: " + destinationKey);
           }
         }
         if (transfer === undefined) transfer = new MoneroOutgoingTransfer({tx: tx});
+        // @ts-expect-error TS(2339): Property 'setDestinations' does not exist on type ... Remove this comment to see the full error message
         transfer.setDestinations(destinations);
       }
       else if (key === "multisig_txset" && val !== undefined) {} // handled elsewhere; this method only builds a tx wallet
@@ -2201,9 +2456,11 @@ class MoneroWalletRpc extends MoneroWallet {
       else if (key === "ring_size") tx.setRingSize(val);
       else if (key === "spent_key_images") {
         let inputKeyImages = val.key_images;
+        // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
         GenUtils.assertTrue(tx.getInputs() === undefined);
         tx.setInputs([]);
         for (let inputKeyImage of inputKeyImages) {
+          // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
           tx.getInputs().push(new MoneroOutputWallet().setKeyImage(new MoneroKeyImage().setHex(inputKeyImage)).setTx(tx));
         }
       }
@@ -2211,6 +2468,7 @@ class MoneroWalletRpc extends MoneroWallet {
     }
     
     // link block and tx
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (header) tx.setBlock(new MoneroBlock(header).setTxs([tx]));
     
     // initialize final fields
@@ -2230,10 +2488,11 @@ class MoneroWalletRpc extends MoneroWallet {
     // return initialized transaction
     return tx;
   }
-  
-  static _convertRpcTxWalletWithOutput(rpcOutput) {
+
+  static _convertRpcTxWalletWithOutput(rpcOutput: any) {
     
     // initialize tx
+    // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
     let tx = new MoneroTxWallet();
     tx.setIsConfirmed(true);
     tx.setIsRelayed(true);
@@ -2245,6 +2504,7 @@ class MoneroWalletRpc extends MoneroWallet {
       let val = rpcOutput[key];
       if (key === "amount") output.setAmount(BigInt(val));
       else if (key === "spent") output.setIsSpent(val);
+      // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
       else if (key === "key_image") { if ("" !== val) output.setKeyImage(new MoneroKeyImage(val)); }
       else if (key === "global_index") output.setIndex(val);
       else if (key === "tx_hash") tx.setHash(val);
@@ -2255,6 +2515,7 @@ class MoneroWalletRpc extends MoneroWallet {
         output.setAccountIndex(val.major);
         output.setSubaddressIndex(val.minor);
       }
+      // @ts-expect-error TS(2554): Expected 2 arguments, but got 0.
       else if (key === "block_height") tx.setBlock(new MoneroBlock().setHeight(val).setTxs([tx]));
       else console.log("WARNING: ignoring unexpected transaction field: " + key + ": " + val);
     }
@@ -2263,8 +2524,9 @@ class MoneroWalletRpc extends MoneroWallet {
     tx.setOutputs([output]);
     return tx;
   }
-  
-  static _convertRpcDescribeTransfer(rpcDescribeTransferResult) {
+
+  static _convertRpcDescribeTransfer(rpcDescribeTransferResult: any) {
+    // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
     let txSet = new MoneroTxSet();
     for (let key of Object.keys(rpcDescribeTransferResult)) {
       let val = rpcDescribeTransferResult[key];
@@ -2281,7 +2543,7 @@ class MoneroWalletRpc extends MoneroWallet {
     }
     return txSet;
   }
-  
+
   /**
    * Decodes a "type" from monero-wallet-rpc to initialize type and state
    * fields in the given transaction.
@@ -2292,7 +2554,7 @@ class MoneroWalletRpc extends MoneroWallet {
    * @param tx is the transaction to decode known fields to
    * @return {boolean} true if the rpc type indicates outgoing xor incoming
    */
-  static _decodeRpcType(rpcType, tx) {
+  static _decodeRpcType(rpcType: any, tx: any) {
     let isOutgoing;
     if (rpcType === "in") {
       isOutgoing = false;
@@ -2343,11 +2605,12 @@ class MoneroWalletRpc extends MoneroWallet {
       tx.setIsFailed(true);
       tx.setIsMinerTx(false);
     } else {
+      // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
       throw new MoneroError("Unrecognized transfer type: " + rpcType);
     }
     return isOutgoing;
   }
-  
+
   /**
    * Merges a transaction into a unique set of transactions.
    *
@@ -2355,7 +2618,7 @@ class MoneroWalletRpc extends MoneroWallet {
    * @param {Object} txMap - maps tx hashes to txs
    * @param {Object} blockMap - maps block heights to blocks
    */
-  static _mergeTx(tx, txMap, blockMap) {
+  static _mergeTx(tx: any, txMap: any, blockMap: any) {
     assert(tx.getHash() !== undefined);
     
     // merge tx
@@ -2370,11 +2633,11 @@ class MoneroWalletRpc extends MoneroWallet {
       else aBlock.merge(tx.getBlock()); // merge with existing block
     }
   }
-  
+
   /**
    * Compares two transactions by their height.
    */
-  static _compareTxsByHeight(tx1, tx2) {
+  static _compareTxsByHeight(tx1: any, tx2: any) {
     if (tx1.getHeight() === undefined && tx2.getHeight() === undefined) return 0; // both unconfirmed
     else if (tx1.getHeight() === undefined) return 1;   // tx1 is unconfirmed
     else if (tx2.getHeight() === undefined) return -1;  // tx2 is unconfirmed
@@ -2382,20 +2645,20 @@ class MoneroWalletRpc extends MoneroWallet {
     if (diff !== 0) return diff;
     return tx1.getBlock().getTxs().indexOf(tx1) - tx2.getBlock().getTxs().indexOf(tx2); // txs are in the same block so retain their original order
   }
-  
+
   /**
    * Compares two transfers by ascending account and subaddress indices.
    */
-  static _compareIncomingTransfers(t1, t2) {
+  static _compareIncomingTransfers(t1: any, t2: any) {
     if (t1.getAccountIndex() < t2.getAccountIndex()) return -1;
     else if (t1.getAccountIndex() === t2.getAccountIndex()) return t1.getSubaddressIndex() - t2.getSubaddressIndex();
     return 1;
   }
-  
+
   /**
    * Compares two outputs by ascending account and subaddress indices.
    */
-  static _compareOutputs(o1, o2) {
+  static _compareOutputs(o1: any, o2: any) {
     
     // compare by height
     let heightComparison = MoneroWalletRpc._compareTxsByHeight(o1.getTx(), o2.getTx());
@@ -2419,8 +2682,17 @@ class MoneroWalletRpc extends MoneroWallet {
  * @ignore
  */
 class WalletPoller {
-  
-  constructor(wallet) {
+  _isPolling: any;
+  _looper: any;
+  _numPolling: any;
+  _prevBalances: any;
+  _prevConfirmedNotifications: any;
+  _prevLockedTxs: any;
+  _prevUnconfirmedNotifications: any;
+  _threadPool: any;
+  _wallet: any;
+
+  constructor(wallet: any) {
     let that = this;
     this._wallet = wallet;
     this._looper = new TaskLooper(async function() { await that.poll(); });
@@ -2430,17 +2702,17 @@ class WalletPoller {
     this._threadPool = new ThreadPool(1); // synchronize polls
     this._numPolling = 0;
   }
-  
-  setIsPolling(isPolling) {
+
+  setIsPolling(isPolling: any) {
     this._isPolling = isPolling;
     if (isPolling) this._looper.start(this._wallet.syncPeriodInMs);
     else this._looper.stop();
   }
-  
-  setPeriodInMs(periodInMs) {
+
+  setPeriodInMs(periodInMs: any) {
     this._looper.setPeriodInMs(periodInMs);
   }
-  
+
   async poll() {
     
     // synchronize polls
@@ -2456,8 +2728,11 @@ class WalletPoller {
         if (await that._wallet.isClosed()) return;
         
         // take initial snapshot
+        // @ts-expect-error TS(2339): Property '_prevHeight' does not exist on type 'Wal... Remove this comment to see the full error message
         if (that._prevHeight === undefined) {
+          // @ts-expect-error TS(2339): Property '_prevHeight' does not exist on type 'Wal... Remove this comment to see the full error message
           that._prevHeight = await that._wallet.getHeight();
+          // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
           that._prevLockedTxs = await that._wallet.getTxs(new MoneroTxQuery().setIsLocked(true));
           that._prevBalances = await that._wallet._getBalances();
           that._numPolling--;
@@ -2466,13 +2741,17 @@ class WalletPoller {
         
         // announce height changes
         let height = await that._wallet.getHeight();
+        // @ts-expect-error TS(2339): Property '_prevHeight' does not exist on type 'Wal... Remove this comment to see the full error message
         if (that._prevHeight !== height) {
+          // @ts-expect-error TS(2339): Property '_prevHeight' does not exist on type 'Wal... Remove this comment to see the full error message
           for (let i = that._prevHeight; i < height; i++) await that._onNewBlock(i);
+          // @ts-expect-error TS(2339): Property '_prevHeight' does not exist on type 'Wal... Remove this comment to see the full error message
           that._prevHeight = height;
         }
         
         // get locked txs for comparison to previous
         let minHeight = Math.max(0, height - 70); // only monitor recent txs
+        // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
         let lockedTxs = await that._wallet.getTxs(new MoneroTxQuery().setIsLocked(true).setMinHeight(minHeight).setIncludeOutputs(true));
         
         // collect hashes of txs no longer locked
@@ -2487,6 +2766,7 @@ class WalletPoller {
         that._prevLockedTxs = lockedTxs;
         
         // fetch txs which are no longer locked
+        // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
         let unlockedTxs = noLongerLockedHashes.length === 0 ? [] : await that._wallet.getTxs(new MoneroTxQuery().setIsLocked(false).setMinHeight(minHeight).setHashes(noLongerLockedHashes).setIncludeOutputs(true), []); // ignore missing tx hashes which could be removed due to re-org
          
         // announce new unconfirmed and confirmed outputs
@@ -2509,20 +2789,21 @@ class WalletPoller {
         that._numPolling--;
       } catch (err) {
         that._numPolling--;
-        console.error("Failed to background poll " + await that._wallet.getPath());
+        console.error("Failed to background poll " + (await that._wallet.getPath()));
       }
     });
   }
-  
-  async _onNewBlock(height) {
+
+  async _onNewBlock(height: any) {
     for (let listener of this._wallet.getListeners()) await listener.onNewBlock(height);
   }
-  
-  async _notifyOutputs(tx) {
+
+  async _notifyOutputs(tx: any) {
   
     // notify spent outputs // TODO (monero-project): monero-wallet-rpc does not allow scrape of tx inputs so providing one input with outgoing amount
     if (tx.getOutgoingTransfer() !== undefined) {
       assert(tx.getInputs() === undefined);
+      // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
       let output = new MoneroOutputWallet()
           .setAmount(tx.getOutgoingTransfer().getAmount() + tx.getFee())
           .setAccountIndex(tx.getOutgoingTransfer().getAccountIndex())
@@ -2541,6 +2822,7 @@ class WalletPoller {
       } else { // TODO (monero-project): monero-wallet-rpc does not allow scrape of unconfirmed received outputs so using incoming transfer values
         let outputs = [];
         for (let transfer of tx.getIncomingTransfers()) {
+          // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
           outputs.push(new MoneroOutputWallet()
               .setAccountIndex(transfer.getAccountIndex())
               .setSubaddressIndex(transfer.getSubaddressIndex())
@@ -2554,12 +2836,12 @@ class WalletPoller {
       }
     }
   }
-  
-  _getTx(txs, txHash) {
+
+  _getTx(txs: any, txHash: any) {
     for (let tx of txs) if (txHash === tx.getHash()) return tx;
     return undefined;
   }
-  
+
   async _checkForChangedBalances() {
     let balances = await this._wallet._getBalances();
     if (GenUtils.compareBigInt(balances[0], this._prevBalances[0]) !== 0 || GenUtils.compareBigInt(balances[1], this._prevBalances[1]) !== 0) {
@@ -2571,6 +2853,7 @@ class WalletPoller {
   }
 }
 
+// @ts-expect-error TS(2339): Property 'DEFAULT_SYNC_PERIOD_IN_MS' does not exis... Remove this comment to see the full error message
 MoneroWalletRpc.DEFAULT_SYNC_PERIOD_IN_MS = 20000; // default period between syncs in ms (defined by DEFAULT_AUTO_REFRESH_PERIOD in wallet_rpc_server.cpp)
 
 export default MoneroWalletRpc;

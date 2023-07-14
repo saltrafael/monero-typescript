@@ -15,9 +15,12 @@ import MoneroWalletConfig from "./model/MoneroWalletConfig";
  * @hideconstructor
  */
 class MoneroWalletKeys extends MoneroWallet {
-  
+  _cppAddress: any;
+  _isClosed: any;
+  _module: any;
+
   // --------------------------- STATIC UTILITIES -----------------------------
-  
+
   /**
    * <p>Create a wallet using WebAssembly bindings to monero-project.</p>
    * 
@@ -41,7 +44,7 @@ class MoneroWalletKeys extends MoneroWallet {
    * @param {string} [config.language] - language of the wallet's mnemonic phrase (defaults to "English" or auto-detected)
    * @return {MoneroWalletKeys} the created wallet
    */
-  static async createWallet(config) {
+  static async createWallet(config: any) {
     
     // normalize and validate config
     if (config === undefined) throw new MoneroError("Must provide config to create wallet");
@@ -65,8 +68,8 @@ class MoneroWalletKeys extends MoneroWallet {
       return MoneroWalletKeys._createWalletRandom(config.getNetworkType(), config.getLanguage());
     }
   }
-  
-  static async _createWalletRandom(networkType, language) {
+
+  static async _createWalletRandom(networkType: any, language: any) {
 
     // validate and sanitize params
     MoneroNetworkType.validate(networkType);
@@ -80,7 +83,8 @@ class MoneroWalletKeys extends MoneroWallet {
       return new Promise(function(resolve, reject) {
         
         // define callback for wasm
-        let callbackFn = async function(cppAddress) {
+        let callbackFn = async function(cppAddress: any) {
+          // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
           if (typeof cppAddress === "string") reject(new MoneroError(cppAddress));
           else resolve(new MoneroWalletKeys(cppAddress));
         };
@@ -90,8 +94,8 @@ class MoneroWalletKeys extends MoneroWallet {
       });
     });
   }
-  
-  static async _createWalletFromMnemonic(networkType, mnemonic, seedOffset) {
+
+  static async _createWalletFromMnemonic(networkType: any, mnemonic: any, seedOffset: any) {
     
     // validate and sanitize params
     MoneroNetworkType.validate(networkType);
@@ -106,7 +110,8 @@ class MoneroWalletKeys extends MoneroWallet {
       return new Promise(function(resolve, reject) {
         
         // define callback for wasm
-        let callbackFn = async function(cppAddress) {
+        let callbackFn = async function(cppAddress: any) {
+          // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
           if (typeof cppAddress === "string") reject(new MoneroError(cppAddress));
           else resolve(new MoneroWalletKeys(cppAddress));
         };
@@ -116,8 +121,8 @@ class MoneroWalletKeys extends MoneroWallet {
       });
     });
   }
-  
-  static async _createWalletFromKeys(networkType, address, privateViewKey, privateSpendKey, language) {
+
+  static async _createWalletFromKeys(networkType: any, address: any, privateViewKey: any, privateSpendKey: any, language: any) {
     
     // validate and sanitize params
     MoneroNetworkType.validate(networkType);
@@ -134,7 +139,8 @@ class MoneroWalletKeys extends MoneroWallet {
       return new Promise(function(resolve, reject) {
         
         // define callback for wasm
-        let callbackFn = async function(cppAddress) {
+        let callbackFn = async function(cppAddress: any) {
+          // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
           if (typeof cppAddress === "string") reject(new MoneroError(cppAddress));
           else resolve(new MoneroWalletKeys(cppAddress));
         };
@@ -144,16 +150,16 @@ class MoneroWalletKeys extends MoneroWallet {
       });
     });
   }
-  
+
   static async getMnemonicLanguages() {
     let module = await LibraryUtils.loadKeysModule();
     return module.queueTask(async function() {
       return JSON.parse(module.get_keys_wallet_mnemonic_languages()).languages;
     });
   }
-  
+
   // --------------------------- INSTANCE METHODS -----------------------------
-  
+
   /**
    * Internal constructor which is given the memory address of a C++ wallet
    * instance.
@@ -163,21 +169,24 @@ class MoneroWalletKeys extends MoneroWallet {
    * 
    * @param {number} cppAddress - address of the wallet instance in C++
    */
-  constructor(cppAddress) {
+  constructor(cppAddress: any) {
     super();
     this._cppAddress = cppAddress;
     this._module = LibraryUtils.getWasmModule();
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (!this._module.create_full_wallet) throw new MoneroError("WASM module not loaded - create wallet instance using static utilities");  // static utilites pre-load wasm module
   }
-  
-  async addListener(listener) {
+
+  async addListener(listener: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("MoneroWalletKeys does not support adding listeners");
   }
-  
-  async removeListener(listener) {
+
+  async removeListener(listener: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("MoneroWalletKeys does not support removing listeners");
   }
-  
+
   async isViewOnly() {
     let that = this;
     return that._module.queueTask(async function() {
@@ -185,11 +194,12 @@ class MoneroWalletKeys extends MoneroWallet {
       return that._module.is_view_only(that._cppAddress);
     });
   }
-  
+
+  // @ts-expect-error TS(2416): Property 'isConnectedToDaemon' in type 'MoneroWall... Remove this comment to see the full error message
   async isConnectedToDaemon() {
     return false;
   }
-  
+
   async getVersion() {
     let that = this;
     return that._module.queueTask(async function() {
@@ -199,26 +209,29 @@ class MoneroWalletKeys extends MoneroWallet {
       return new MoneroVersion(versionJson.number, versionJson.isRelease);
     });
   }
-  
+
   /**
    * @ignore
    */
+  // @ts-expect-error TS(2416): Property 'getPath' in type 'MoneroWalletKeys' is n... Remove this comment to see the full error message
   getPath() {
     this._assertNotClosed();
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("MoneroWalletKeys does not support a persisted path");
   }
-  
+
   async getMnemonic() {
     let that = this;
     return that._module.queueTask(async function() {
       that._assertNotClosed();
       let mnemonic = that._module.get_mnemonic(that._cppAddress);
       const errorStr = "error: ";
+      // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
       if (mnemonic.indexOf(errorStr) === 0) throw new MoneroError(mnemonic.substring(errorStr.length));
       return mnemonic ? mnemonic : undefined;
     });
   }
-  
+
   async getMnemonicLanguage() {
     let that = this;
     return that._module.queueTask(async function() {
@@ -227,7 +240,7 @@ class MoneroWalletKeys extends MoneroWallet {
       return mnemonicLanguage ? mnemonicLanguage : undefined;
     });
   }
-  
+
   async getPrivateSpendKey() {
     let that = this;
     return that._module.queueTask(async function() {
@@ -236,7 +249,7 @@ class MoneroWalletKeys extends MoneroWallet {
       return privateSpendKey ? privateSpendKey : undefined;
     });
   }
-  
+
   async getPrivateViewKey() {
     let that = this;
     return that._module.queueTask(async function() {
@@ -244,7 +257,7 @@ class MoneroWalletKeys extends MoneroWallet {
       return that._module.get_private_view_key(that._cppAddress);
     });
   }
-  
+
   async getPublicViewKey() {
     let that = this;
     return that._module.queueTask(async function() {
@@ -252,7 +265,7 @@ class MoneroWalletKeys extends MoneroWallet {
       return that._module.get_public_view_key(that._cppAddress);
     });
   }
-  
+
   async getPublicSpendKey() {
     let that = this;
     return that._module.queueTask(async function() {
@@ -260,8 +273,8 @@ class MoneroWalletKeys extends MoneroWallet {
       return that._module.get_public_spend_key(that._cppAddress);
     });
   }
-  
-  async getAddress(accountIdx, subaddressIdx) {
+
+  async getAddress(accountIdx: any, subaddressIdx: any) {
     this._assertNotClosed();
     assert(typeof accountIdx === "number");
     let that = this;
@@ -270,27 +283,31 @@ class MoneroWalletKeys extends MoneroWallet {
       return that._module.get_address(that._cppAddress, accountIdx, subaddressIdx);
     });
   }
-  
-  async getAddressIndex(address) {
+
+  async getAddressIndex(address: any) {
     this._assertNotClosed();
     let that = this;
     return that._module.queueTask(async function() {
       that._assertNotClosed();
       let resp = that._module.get_address_index(that._cppAddress, address);
+      // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
       if (resp.charAt(0) !== '{') throw new MoneroError(resp);
+      // @ts-expect-error TS(2554): Expected 3 arguments, but got 1.
       return new MoneroSubaddress(JSON.parse(resp));
     });
   }
-  
+
+  // @ts-expect-error TS(2416): Property 'getAccounts' in type 'MoneroWalletKeys' ... Remove this comment to see the full error message
   getAccounts() {
     this._assertNotClosed();
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("MoneroWalletKeys does not support getting an enumerable set of accounts; query specific accounts");
   }
-  
+
   // getIntegratedAddress(paymentId)  // TODO
   // decodeIntegratedAddress
-  
-  async close(save) {
+
+  async close(save: any) {
     if (this._isClosed) return; // closing a closed wallet has no effect
     
     // save wallet if requested
@@ -301,6 +318,7 @@ class MoneroWalletKeys extends MoneroWallet {
     return that._module.queueTask(async function() {
       return new Promise(function(resolve, reject) {
         if (that._isClosed) {
+          // @ts-expect-error TS(2794): Expected 1 arguments, but got 0. Did you forget to... Remove this comment to see the full error message
           resolve();
           return;
         }
@@ -309,6 +327,7 @@ class MoneroWalletKeys extends MoneroWallet {
         let callbackFn = async function() {
           delete that._cppAddress;
           that._isClosed = true;
+          // @ts-expect-error TS(2794): Expected 1 arguments, but got 0. Did you forget to... Remove this comment to see the full error message
           resolve();
         };
         
@@ -317,19 +336,22 @@ class MoneroWalletKeys extends MoneroWallet {
       });
     });
   }
-  
+
   async isClosed() {
     return this._isClosed;
   }
-  
+
   // ----------- ADD JSDOC FOR SUPPORTED DEFAULT IMPLEMENTATIONS --------------
-  
+
+  // @ts-expect-error TS(2556): A spread argument must either have a tuple type or... Remove this comment to see the full error message
   async getPrimaryAddress() { return super.getPrimaryAddress(...arguments); }
+  // @ts-expect-error TS(2556): A spread argument must either have a tuple type or... Remove this comment to see the full error message
   async getSubaddress() { return super.getSubaddress(...arguments); }
-  
+
   // ----------------------------- PRIVATE HELPERS ----------------------------
-  
+
   _assertNotClosed() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (this._isClosed) throw new MoneroError("Wallet is closed");
   }
 }

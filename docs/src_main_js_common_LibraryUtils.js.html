@@ -77,7 +77,7 @@ class LibraryUtils {
   static async getWasmMemoryUsed() {
     let total = 0;
     if (LibraryUtils.WORKER) total += await LibraryUtils.invokeWorker(GenUtils.getUUID(), "getWasmMemoryUsed", []);
-    if (LibraryUtils.getWasmModule() &amp;&amp; LibraryUtils.getWasmModule().HEAP8) total += LibraryUtils.getWasmModule().HEAP8.length;
+    if (LibraryUtils.WASM_MODULE &amp;&amp; LibraryUtils.WASM_MODULE.HEAP8) total += LibraryUtils.WASM_MODULE.HEAP8.length;
     return total;
   }
   

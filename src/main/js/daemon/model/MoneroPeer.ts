@@ -3,23 +3,26 @@
  * Models a peer to the daemon.
  */
 class MoneroPeer {
-  
-  constructor(state) {
+  state: any;
+
+  constructor(state: any) {
     this.state = Object.assign({}, state);
     if (this.state.rpcCreditsPerHash !== undefined && !(this.state.rpcCreditsPerHash instanceof BigInt)) this.state.rpcCreditsPerHash = BigInt(this.state.rpcCreditsPerHash);
   }
-  
+
   toJson() {
     let json = Object.assign({}, this.state);
     if (json.rpcCreditsPerHash !== undefined) json.rpcCreditsPerHash = json.rpcCreditsPerHash.toString();
     return json;
   }
-  
+
+  // @ts-expect-error TS(2393): Duplicate function implementation.
   getId() {
     return this.state.id;
   }
 
-  setId(id) {
+  // @ts-expect-error TS(2393): Duplicate function implementation.
+  setId(id: any) {
     this.state.id = id;
     return this;
   }
@@ -28,7 +31,7 @@ class MoneroPeer {
     return this.state.address;
   }
 
-  setAddress(address) {
+  setAddress(address: any) {
     this.state.address = address;
     return this;
   }
@@ -37,7 +40,7 @@ class MoneroPeer {
     return this.state.host;
   }
 
-  setHost(host) {
+  setHost(host: any) {
     this.state.host = host;
     return this;
   }
@@ -46,11 +49,11 @@ class MoneroPeer {
     return this.state.port;
   }
 
-  setPort(port) {
+  setPort(port: any) {
     this.state.port = port;
     return this;
   }
-  
+
   /**
    * Indicates if the peer was online when last checked (aka "white listed" as
    * opposed to "gray listed").
@@ -60,53 +63,55 @@ class MoneroPeer {
   isOnline() {
     return this.state.isOnline;
   }
-  
-  setIsOnline(isOnline) {
+
+  setIsOnline(isOnline: any) {
     this.state.isOnline = isOnline;
     return this;
   }
-  
+
   getLastSeenTimestamp() {
     return this.state.lastSeenTimestamp;
   }
-  
-  setLastSeenTimestamp(lastSeenTimestamp) {
+
+  setLastSeenTimestamp(lastSeenTimestamp: any) {
     this.state.lastSeenTimestamp = lastSeenTimestamp;
     return this;
   }
-  
+
   getPruningSeed() {
     return this.state.pruningSeed;
   }
-  
-  setPruningSeed(pruningSeed) {
+
+  setPruningSeed(pruningSeed: any) {
     this.state.pruningSeed = pruningSeed;
     return this;
   }
-  
+
   getRpcPort() {
     return this.state.rpcPort;
   }
 
-  setRpcPort(rpcPort) {
+  setRpcPort(rpcPort: any) {
     this.state.rpcPort = rpcPort;
     return this;
   }
-  
+
   getRpcCreditsPerHash() {
     return this.state.rpcCreditsPerHash;
   }
-  
-  setRpcCreditsPerHash(rpcCreditsPerHash) {
+
+  setRpcCreditsPerHash(rpcCreditsPerHash: any) {
     this.state.rpcCreditsPerHash = rpcCreditsPerHash;
     return this;
   }
-  
-    getId() {
-    return this.state.id;
-  }
 
-  setId(id) {
+  // @ts-expect-error TS(2393): Duplicate function implementation.
+  getId() {
+  return this.state.id;
+}
+
+  // @ts-expect-error TS(2393): Duplicate function implementation.
+  setId(id: any) {
     this.state.id = id;
     return this;
   }
@@ -115,7 +120,7 @@ class MoneroPeer {
     return this.state.avgDownload;
   }
 
-  setAvgDownload(avgDownload) {
+  setAvgDownload(avgDownload: any) {
     this.state.avgDownload = avgDownload;
     return this;
   }
@@ -124,7 +129,7 @@ class MoneroPeer {
     return this.state.avgUpload;
   }
 
-  setAvgUpload(avgUpload) {
+  setAvgUpload(avgUpload: any) {
     this.state.avgUpload = avgUpload;
     return this;
   }
@@ -133,7 +138,7 @@ class MoneroPeer {
     return this.state.currentDownload;
   }
 
-  setCurrentDownload(currentDownload) {
+  setCurrentDownload(currentDownload: any) {
     this.state.currentDownload = currentDownload;
     return this;
   }
@@ -142,7 +147,7 @@ class MoneroPeer {
     return this.state.currentUpload;
   }
 
-  setCurrentUpload(currentUpload) {
+  setCurrentUpload(currentUpload: any) {
     this.state.currentUpload = currentUpload;
     return this;
   }
@@ -151,7 +156,7 @@ class MoneroPeer {
     return this.state.height;
   }
 
-  setHeight(height) {
+  setHeight(height: any) {
     this.state.height = height;
     return this;
   }
@@ -160,7 +165,7 @@ class MoneroPeer {
     return this.state.isIncoming;
   }
 
-  setIsIncoming(isIncoming) {
+  setIsIncoming(isIncoming: any) {
     this.state.isIncoming = isIncoming;
     return this;
   }
@@ -169,7 +174,7 @@ class MoneroPeer {
     return this.state.liveTime;
   }
 
-  setLiveTime(liveTime) {
+  setLiveTime(liveTime: any) {
     this.state.liveTime = liveTime;
     return this;
   }
@@ -178,7 +183,7 @@ class MoneroPeer {
     return this.state.isLocalIp;
   }
 
-  setIsLocalIp(isLocalIp) {
+  setIsLocalIp(isLocalIp: any) {
     this.state.isLocalIp = isLocalIp;
     return this;
   }
@@ -187,7 +192,7 @@ class MoneroPeer {
     return this.state.isLocalHost;
   }
 
-  setIsLocalHost(isLocalHost) {
+  setIsLocalHost(isLocalHost: any) {
     this.state.isLocalHost = isLocalHost;
     return this;
   }
@@ -196,7 +201,7 @@ class MoneroPeer {
     return this.state.numReceives;
   }
 
-  setNumReceives(numReceives) {
+  setNumReceives(numReceives: any) {
     this.state.numReceives = numReceives;
     return this;
   }
@@ -205,7 +210,7 @@ class MoneroPeer {
     return this.state.numSends;
   }
 
-  setNumSends(numSends) {
+  setNumSends(numSends: any) {
     this.state.numSends = numSends;
     return this;
   }
@@ -214,7 +219,7 @@ class MoneroPeer {
     return this.state.receiveIdleTime;
   }
 
-  setReceiveIdleTime(receiveIdleTime) {
+  setReceiveIdleTime(receiveIdleTime: any) {
     this.state.receiveIdleTime = receiveIdleTime;
     return this;
   }
@@ -223,7 +228,7 @@ class MoneroPeer {
     return this.state.sendIdleTime;
   }
 
-  setSendIdleTime(sendIdleTime) {
+  setSendIdleTime(sendIdleTime: any) {
     this.state.sendIdleTime = sendIdleTime;
     return this;
   }
@@ -232,7 +237,7 @@ class MoneroPeer {
     return this.state.state;
   }
 
-  setState(state) {
+  setState(state: any) {
     this.state.state = state;
     return this;
   }
@@ -241,16 +246,16 @@ class MoneroPeer {
     return this.state.numSupportFlags;
   }
 
-  setNumSupportFlags(numSupportFlags) {
+  setNumSupportFlags(numSupportFlags: any) {
     this.state.numSupportFlags = numSupportFlags;
     return this;
   }
-  
+
   getType() {
     return this.state.type;
   }
-  
-  setType(type) {
+
+  setType(type: any) {
     this.state.type = type;
     return this;
   }

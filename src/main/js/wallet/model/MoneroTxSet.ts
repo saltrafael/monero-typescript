@@ -12,12 +12,14 @@ import MoneroUtils from "../../common/MoneroUtils";
  * transactions.
  */
 class MoneroTxSet {
-  
-  constructor(state) {
+  state: any;
+
+  constructor(state: any) {
     
     // initialize internal state
     if (!state) state = {};
     else if (typeof state === "object") state = Object.assign({}, state);
+    // @ts-expect-error TS(2304): Cannot find name 'MoneroError'.
     else throw new MoneroError("state must be JavaScript object");
     this.state = state;
     
@@ -29,7 +31,7 @@ class MoneroTxSet {
       }
     }
   }
-  
+
   toJson() {
     let json = Object.assign({}, this.state); // copy state
     if (this.getTxs() !== undefined) {
@@ -43,45 +45,48 @@ class MoneroTxSet {
     return this.state.txs;
   }
 
-  setTxs(txs) {
+  setTxs(txs: any) {
     this.state.txs = txs;
     return this;
   }
-  
+
   getMultisigTxHex() {
     return this.state.multisigTxHex;
   }
-  
-  setMultisigTxHex(multisigTxHex) {
+
+  setMultisigTxHex(multisigTxHex: any) {
     this.state.multisigTxHex = multisigTxHex;
     return this;
   }
-  
+
   getUnsignedTxHex() {
     return this.state.unsignedTxHex;
   }
-  
-  setUnsignedTxHex(unsignedTxHex) {
+
+  setUnsignedTxHex(unsignedTxHex: any) {
     this.state.unsignedTxHex = unsignedTxHex;
     return this;
   }
-  
+
   getSignedTxHex() {
     return this.state.signedTxHex;
   }
-  
-  setSignedTxHex(signedTxHex) {
+
+  setSignedTxHex(signedTxHex: any) {
     this.state.signedTxHex = signedTxHex;
     return this;
   }
-  
-  merge(txSet) {
+
+  merge(txSet: any) {
     assert(txSet instanceof MoneroTxSet);
     if (this === txSet) return this;
     
     // merge sets
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setMultisigTxHex(GenUtils.reconcile(this.getMultisigTxHex(), txSet.getMultisigTxHex()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setUnsignedTxHex(GenUtils.reconcile(this.getUnsignedTxHex(), txSet.getUnsignedTxHex()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setSignedTxHex(GenUtils.reconcile(this.getSignedTxHex(), txSet.getSignedTxHex()));
     
     // merge txs
@@ -94,7 +99,7 @@ class MoneroTxSet {
 
     return this;
   }
-  
+
   toString(indent = 0) {
     let str = "";
     str += GenUtils.kvLine("Multisig tx hex: ", this.getMultisigTxHex(), indent);
