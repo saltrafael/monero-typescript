@@ -7,7 +7,7 @@ import MoneroCheck from "./MoneroCheck";
  */
 class MoneroCheckReserve extends MoneroCheck {
   
-  constructor(state) {
+  constructor(state: any) {
     super(state);
     if (this.state.totalAmount !== undefined && !(this.state.totalAmount instanceof BigInt)) this.state.totalAmount = BigInt(this.state.totalAmount);
     if (this.state.unconfirmedSpentAmount !== undefined && !(this.state.unconfirmedSpentAmount instanceof BigInt)) this.state.unconfirmedSpentAmount = BigInt(this.state.unconfirmedSpentAmount);
@@ -24,7 +24,7 @@ class MoneroCheckReserve extends MoneroCheck {
     return this.state.totalAmount;
   }
 
-  setTotalAmount(totalAmount) {
+  setTotalAmount(totalAmount: any) {
     this.state.totalAmount = totalAmount;
     return this;
   }
@@ -33,7 +33,7 @@ class MoneroCheckReserve extends MoneroCheck {
     return this.state.unconfirmedSpentAmount;
   }
 
-  setUnconfirmedSpentAmount(unconfirmedSpentAmount) {
+  setUnconfirmedSpentAmount(unconfirmedSpentAmount: any) {
     this.state.unconfirmedSpentAmount = unconfirmedSpentAmount;
     return this;
   }

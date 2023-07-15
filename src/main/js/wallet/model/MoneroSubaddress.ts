@@ -5,8 +5,9 @@ import assert from "assert";
  * Monero subaddress model.
  */
 class MoneroSubaddress {
-  
-  constructor(stateOrAddress, accountIndex, index) {
+  state: any;
+
+  constructor(stateOrAddress: any, accountIndex: any, index: any) {
     if (stateOrAddress === undefined || typeof stateOrAddress === "string") {
       this.state = {};
       this.setAddress(stateOrAddress);
@@ -19,19 +20,19 @@ class MoneroSubaddress {
       if (this.state.unlockedBalance !== undefined && !(this.state.unlockedBalance instanceof BigInt)) this.state.unlockedBalance = BigInt(this.state.unlockedBalance);
     }
   }
-  
+
   toJson() {
     let json = Object.assign({}, this.state);
     if (json.balance !== undefined) json.balance = json.balance.toString();
     if (json.unlockedBalance !== undefined) json.unlockedBalance = json.unlockedBalance.toString();
     return json;
   }
-  
+
   getAccountIndex() {
     return this.state.accountIndex;
   }
 
-  setAccountIndex(accountIndex) {
+  setAccountIndex(accountIndex: any) {
     this.state.accountIndex = accountIndex;
     return this;
   }
@@ -40,16 +41,16 @@ class MoneroSubaddress {
     return this.state.index;
   }
 
-  setIndex(index) {
+  setIndex(index: any) {
     this.state.index = index;
     return this;
   }
-  
+
   getAddress() {
     return this.state.address;
   }
 
-  setAddress(address) {
+  setAddress(address: any) {
     this.state.address = address;
     return this;
   }
@@ -58,7 +59,7 @@ class MoneroSubaddress {
     return this.state.label;
   }
 
-  setLabel(label) {
+  setLabel(label: any) {
     this.state.label = label;
     return this;
   }
@@ -67,7 +68,7 @@ class MoneroSubaddress {
     return this.state.balance;
   }
 
-  setBalance(balance) {
+  setBalance(balance: any) {
     this.state.balance = balance;
     return this;
   }
@@ -76,7 +77,7 @@ class MoneroSubaddress {
     return this.state.unlockedBalance;
   }
 
-  setUnlockedBalance(unlockedBalance) {
+  setUnlockedBalance(unlockedBalance: any) {
     this.state.unlockedBalance = unlockedBalance;
     return this;
   }
@@ -85,7 +86,7 @@ class MoneroSubaddress {
     return this.state.numUnspentOutputs;
   }
 
-  setNumUnspentOutputs(numUnspentOutputs) {
+  setNumUnspentOutputs(numUnspentOutputs: any) {
     this.state.numUnspentOutputs = numUnspentOutputs;
     return this;
   }
@@ -94,7 +95,7 @@ class MoneroSubaddress {
     return this.state.isUsed;
   }
 
-  setIsUsed(isUsed) {
+  setIsUsed(isUsed: any) {
     this.state.isUsed = isUsed;
     return this;
   }
@@ -103,12 +104,12 @@ class MoneroSubaddress {
     return this.state.numBlocksToUnlock;
   }
 
-  setNumBlocksToUnlock(numBlocksToUnlock) {
+  setNumBlocksToUnlock(numBlocksToUnlock: any) {
     this.state.numBlocksToUnlock = numBlocksToUnlock;
     return this;
   }
-  
-  toString(indent) {
+
+  toString(indent: any) {
     let str = "";
     str += GenUtils.kvLine("Account index", this.getAccountIndex(), indent);
     str += GenUtils.kvLine("Subaddress index", this.getIndex(), indent);

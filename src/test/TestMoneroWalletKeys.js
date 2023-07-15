@@ -46,9 +46,9 @@ class TestMoneroWalletKeys extends TestMoneroWalletCommon {
     
     // assign defaults
     config = new MoneroWalletConfig(config);
-    if (!config.getPassword()) config.setPassword(TestUtils.WALLET_PASSWORD);
-    if (config.getNetworkType() === undefined) config.setNetworkType(TestUtils.NETWORK_TYPE);
-    if (config.getServer()) throw new Error("Cannot initialize keys wallet with connection");
+    if (!config.password) config.setPassword(TestUtils.WALLET_PASSWORD);
+    if (config.networkType === undefined) config.setNetworkType(TestUtils.NETWORK_TYPE);
+    if (config.server) throw new Error("Cannot initialize keys wallet with connection");
     
     // create wallet
     return await createWalletKeys(config);

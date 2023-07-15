@@ -40,7 +40,7 @@ class MoneroOutputQuery extends MoneroOutputWallet {
    * @param {string} config.keyImage.signature - get outputs with this key image signature
    * @param {object|MoneroTxQuery} config.txQuery - get outputs whose tx match this tx query
    */
-  constructor(config) {
+  constructor(config: any) {
     super(config);
     
     // deserialize if necessary
@@ -49,6 +49,7 @@ class MoneroOutputQuery extends MoneroOutputWallet {
     if (this.state.maxAmount !== undefined && !(this.state.maxAmount instanceof BigInt)) this.state.maxAmount = BigInt(this.state.maxAmount);
     if (this.state.txQuery && !(this.state.txQuery instanceof MoneroTxQuery)) this.state.txQuery = new MoneroTxQuery(this.state.txQuery);
     if (this.state.txQuery) this.state.txQuery.setOutputQuery(this);
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (this.state.isLocked !== undefined) throw new MoneroError("isLocked must be part of tx query, not output query");
   }
   
@@ -68,7 +69,7 @@ class MoneroOutputQuery extends MoneroOutputWallet {
     return this.state.minAmount;
   }
 
-  setMinAmount(minAmount) {
+  setMinAmount(minAmount: any) {
     this.state.minAmount = minAmount;
     return this;
   }
@@ -77,7 +78,7 @@ class MoneroOutputQuery extends MoneroOutputWallet {
     return this.state.maxAmount;
   }
 
-  setMaxAmount(maxAmount) {
+  setMaxAmount(maxAmount: any) {
     this.state.maxAmount = maxAmount;
     return this;
   }
@@ -86,7 +87,7 @@ class MoneroOutputQuery extends MoneroOutputWallet {
     return this.state.txQuery;
   }
   
-  setTxQuery(txQuery) {
+  setTxQuery(txQuery: any) {
     this.state.txQuery = txQuery;
     if (txQuery) txQuery.state.outputQuery = this;
     return this;
@@ -96,12 +97,12 @@ class MoneroOutputQuery extends MoneroOutputWallet {
     return this.state.subaddressIndices;
   }
   
-  setSubaddressIndices(subaddressIndices) {
+  setSubaddressIndices(subaddressIndices: any) {
     this.state.subaddressIndices = subaddressIndices;
     return this;
   }
   
-  meetsCriteria(output, queryParent) {
+  meetsCriteria(output: any, queryParent: any) {
     if (!(output instanceof MoneroOutputWallet)) throw new Error("Output not given to MoneroOutputQuery.meetsCriteria(output)");
     if (queryParent === undefined) queryParent = true;
     
@@ -115,7 +116,7 @@ class MoneroOutputQuery extends MoneroOutputWallet {
     // filter on output's key image
     if (this.getKeyImage() !== undefined) {
       if (output.getKeyImage() === undefined) return false;
-      if (this.getKeyImage().getHex() !== undefined && this.getKeyImage().getHex() !== output.getKeyImage().getHex()) return false;
+      if (this.getKeyImage().hex !== undefined && this.getKeyImage().hex !== output.getKeyImage().hex) return false;
       if (this.getKeyImage().getSignature() !== undefined && this.getKeyImage().getSignature() !== output.getKeyImage().getSignature()) return false;
     }
     
@@ -134,6 +135,7 @@ class MoneroOutputQuery extends MoneroOutputWallet {
   }
 }
 
+// @ts-expect-error TS(2339): Property '_EMPTY_OUTPUT' does not exist on type 't... Remove this comment to see the full error message
 MoneroOutputQuery._EMPTY_OUTPUT = new MoneroOutputWallet();
 
 export default MoneroOutputQuery;

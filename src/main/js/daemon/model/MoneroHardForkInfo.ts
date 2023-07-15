@@ -3,23 +3,24 @@
  * Monero hard fork info.
  */
 class MoneroHardForkInfo {
-  
-  constructor(state) {
+  state: any;
+
+  constructor(state: any) {
     this.state = Object.assign({}, state);
     if (this.state.credits !== undefined && !(this.state.credits instanceof BigInt)) this.state.credits = BigInt(this.state.credits);
   }
-  
+
   toJson() {
     let json = Object.assign({}, this.state);
     if (json.credits !== undefined) json.credits = json.credits.toString();
     return json;
   }
-  
+
   getEarliestHeight() {
     return this.state.earliestHeight;
   }
 
-  setEarliestHeight(earliestHeight) {
+  setEarliestHeight(earliestHeight: any) {
     this.state.earliestHeight = earliestHeight;
     return this;
   }
@@ -28,7 +29,7 @@ class MoneroHardForkInfo {
     return this.state.isEnabled;
   }
 
-  setIsEnabled(isEnabled) {
+  setIsEnabled(isEnabled: any) {
     this.state.isEnabled = isEnabled;
     return this;
   }
@@ -37,7 +38,7 @@ class MoneroHardForkInfo {
     return this.state.state;
   }
 
-  setState(state) {
+  setState(state: any) {
     this.state.state = state;
     return this;
   }
@@ -46,7 +47,7 @@ class MoneroHardForkInfo {
     return this.state.threshold;
   }
 
-  setThreshold(threshold) {
+  setThreshold(threshold: any) {
     this.state.threshold = threshold;
     return this;
   }
@@ -55,7 +56,7 @@ class MoneroHardForkInfo {
     return this.state.version;
   }
 
-  setVersion(version) {
+  setVersion(version: any) {
     this.state.version = version;
     return this;
   }
@@ -64,7 +65,7 @@ class MoneroHardForkInfo {
     return this.state.numVotes;
   }
 
-  setNumVotes(numVotes) {
+  setNumVotes(numVotes: any) {
     this.state.numVotes = numVotes;
     return this;
   }
@@ -73,7 +74,7 @@ class MoneroHardForkInfo {
     return this.state.window;
   }
 
-  setWindow(window) {
+  setWindow(window: any) {
     this.state.window = window;
     return this;
   }
@@ -82,25 +83,25 @@ class MoneroHardForkInfo {
     return this.state.voting;
   }
 
-  setVoting(voting) {
+  setVoting(voting: any) {
     this.state.voting = voting;
     return this;
   }
-  
+
   getCredits() {
     return this.state.credits;
   }
-  
-  setCredits(credits) {
+
+  setCredits(credits: any) {
     this.state.credits = credits;
     return this;
   }
-  
+
   getTopBlockHash() {
     return this.state.topBlockHash;
   }
-  
-  setTopBlockHash(topBlockHash) {
+
+  setTopBlockHash(topBlockHash: any) {
     this.state.topBlockHash = topBlockHash;
     return this;
   }

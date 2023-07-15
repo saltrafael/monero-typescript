@@ -4,8 +4,9 @@
  * @class
  */
 class MoneroCheck {
-  
-  constructor(state) {
+  state: any;
+
+  constructor(state: any) {
     this.state = Object.assign({}, state);
   }
 
@@ -13,7 +14,7 @@ class MoneroCheck {
     return this.state.isGood;
   }
 
-  setIsGood(isGood) {
+  setIsGood(isGood: any) {
     this.state.isGood = isGood;
     return this;
   }

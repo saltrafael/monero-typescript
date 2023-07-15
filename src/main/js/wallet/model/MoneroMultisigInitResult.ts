@@ -4,29 +4,30 @@
  * participants to create the wallet.
  */
 class MoneroMultisigInitResult {
+  state: any;
 
-  constructor(state) {
+  constructor(state: any) {
     this.state = Object.assign({}, state);
   }
-  
+
   toJson() {
     return Object.assign({}, this.state);
   }
-  
+
   getAddress() {
     return this.state.address;
   }
-  
-  setAddress(address) {
+
+  setAddress(address: any) {
     this.state.address = address;
     return this;
   }
-  
+
   getMultisigHex() {
     return this.state.multisigHex;
   }
-  
-  setMultisigHex(multisigHex) {
+
+  setMultisigHex(multisigHex: any) {
     this.state.multisigHex = multisigHex;
     return this;
   }

@@ -8,18 +8,20 @@ import MoneroOutput from "./MoneroOutput";
  * @class
  */
 class MoneroTx {
-  
+  state: any;
+
   /**
    * Construct the model.
    * 
    * @param {MoneroTx|object} [state] is existing state to initialize from (optional)
    */
-  constructor(state) {
+  constructor(state: any) {
     
     // initialize internal state
     if (!state) state = {};
     else if (state instanceof MoneroTx) state = state.toJson();
     else if (typeof state === "object") state = Object.assign({}, state);
+    // @ts-expect-error TS(2304): Cannot find name 'MoneroError'.
     else throw new MoneroError("state must be a MoneroTx or JavaScript object");
     this.state = state;
     
@@ -44,286 +46,286 @@ class MoneroTx {
       }
     }
   }
-  
+
   /**
    * @return {MoneroBlock} tx block
    */
   getBlock() {
     return this.state.block;
   }
-  
+
   /**
    * @param {MoneroBlock} block - tx block
    * @return {MoneroTx} this tx for chaining
    */
-  setBlock(block) {
+  setBlock(block: any) {
     this.state.block = block;
     return this;
   }
-  
+
   /**
    * @return {number} tx height
    */
   getHeight() {
     return this.getBlock() === undefined ? undefined : this.getBlock().getHeight();
   }
-  
+
   /**
    * @return {string} tx hash
    */
   getHash() {
     return this.state.hash;
   }
-  
+
   /**
    * @param {string} hash - tx hash
    * @return {MoneroTx} this tx for chaining
    */
-  setHash(hash) {
+  setHash(hash: any) {
     this.state.hash = hash;
     return this;
   }
-  
+
   /**
    * @return {number} tx version
    */
   getVersion() {
     return this.state.version;
   }
-  
+
   /**
    * @param {number} version - tx version
    * @return {MoneroTx} this tx for chaining
    */
-  setVersion(version) {
+  setVersion(version: any) {
     this.state.version = version;
     return this;
   }
-  
+
   /**
    * @return {boolean} true if the tx is a miner tx, false otherwise
    */
   isMinerTx() {
     return this.state.isMinerTx;
   }
-  
+
   /**
    * @param {boolean} miner - true if the tx is a miner tx, false otherwise
    * @return {MoneroTx} this tx for chaining
    */
-  setIsMinerTx(miner) {
+  setIsMinerTx(miner: any) {
     this.state.isMinerTx = miner;
     return this;
   }
-  
+
   /**
    * @return {string} tx payment id
    */
   getPaymentId() {
     return this.state.paymentId;
   }
-  
+
   /**
    * @param {string} paymentId - tx payment id
    * @return {MoneroTx} this tx for chaining
    */
-  setPaymentId(paymentId) {
+  setPaymentId(paymentId: any) {
     this.state.paymentId = paymentId;
     return this;
   }
-  
+
   /**
    * @return {BigInt} tx fee
    */
   getFee() {
     return this.state.fee;
   }
-  
+
   /**
    * @param {BigInt} fee - tx fee
    * @return {MoneroTx} this tx for chaining
    */
-  setFee(fee) {
+  setFee(fee: any) {
     this.state.fee = fee;
     return this;
   }
-  
+
   /**
    * @return {number} tx ring size
    */
   getRingSize() {
     return this.state.ringSize;
   }
-  
+
   /**
    * @param {number} ringSize - tx ring size
    * @return {MoneroTx} this tx for chaining
    */
-  setRingSize(ringSize) {
+  setRingSize(ringSize: any) {
     this.state.ringSize = ringSize;
     return this;
   }
-  
+
   /**
    * @return {boolean} true if the tx is set to be relayed, false otherwise
    */
   getRelay() {
     return this.state.relay;
   }
-  
+
   /**
    * @param {boolean} relay - true if the tx is set to be relayed, false otherwise
    * @return {MoneroTx} this tx for chaining
    */
-  setRelay(relay) {
+  setRelay(relay: any) {
     this.state.relay = relay;
     return this;
   }
-  
+
   /**
    * @return {boolean} true if the tx is relayed, false otherwise
    */
   isRelayed() {
     return this.state.isRelayed;
   }
-  
+
   /**
    * @param {boolean} isRelayed - true if the tx is relayed, false otherwise
    * @return {MoneroTx} this tx for chaining
    */
-  setIsRelayed(isRelayed) {
+  setIsRelayed(isRelayed: any) {
     this.state.isRelayed = isRelayed;
     return this;
   }
-  
+
   /**
    * @return {boolean} true if the tx is confirmed, false otherwise
    */
   isConfirmed() {
     return this.state.isConfirmed;
   }
-  
+
   /**
    * @param {boolean} isConfirmed - true if the tx is confirmed, false otherwise
    * @return {MoneroTx} this tx for chaining
    */
-  setIsConfirmed(isConfirmed) {
+  setIsConfirmed(isConfirmed: any) {
     this.state.isConfirmed = isConfirmed;
     return this;
   }
-  
+
   /**
    * @return {boolean} true if the tx is in the memory pool, false otherwise
    */
   inTxPool() {
     return this.state.inTxPool;
   }
-  
+
   /**
    * @param {boolean} inTxPool - true if the tx is in the memory pool, false otherwise
    * @return {MoneroTx} this tx for chaining
    */
-  setInTxPool(inTxPool) {
+  setInTxPool(inTxPool: any) {
     this.state.inTxPool = inTxPool;
     return this;
   }
-  
+
   /**
    * @return {number} number of block confirmations
    */
   getNumConfirmations() {
     return this.state.numConfirmations;
   }
-  
+
   /**
    * @param {number} numConfirmations - number of block confirmations
    * @return {MoneroTx} this tx for chaining
    */
-  setNumConfirmations(numConfirmations) {
+  setNumConfirmations(numConfirmations: any) {
     this.state.numConfirmations = numConfirmations;
     return this;
   }
-  
+
   /**
    * @return {number} tx unlock height
    */
   getUnlockHeight() {
     return this.state.unlockHeight;
   }
-  
+
   /**
    * @param {number} unlockHeight - tx unlock height
    * @return {MoneroTx} this tx for chaining
    */
-  setUnlockHeight(unlockHeight) {
+  setUnlockHeight(unlockHeight: any) {
     this.state.unlockHeight = unlockHeight;
     return this;
   }
-  
+
   /**
    * @return {number} timestamp the tx was last relayed from the node
    */
   getLastRelayedTimestamp() {
     return this.state.lastRelayedTimestamp;
   }
-  
+
   /**
    * @param {number} lastRelayedTimestamp - timestamp the tx was last relayed from the node
    * @return {MoneroTx} this tx for chaining
    */
-  setLastRelayedTimestamp(lastRelayedTimestamp) {
+  setLastRelayedTimestamp(lastRelayedTimestamp: any) {
     this.state.lastRelayedTimestamp = lastRelayedTimestamp;
     return this;
   }
-  
+
   /**
    * @return {number} timestamp the tx was received at the node
    */
   getReceivedTimestamp() {
     return this.state.receivedTimestamp;
   }
-  
+
   /**
    * @param {number} receivedTimestamp - timestamp the tx was received at the node
    * @return {MoneroTx} this tx for chaining
    */
-  setReceivedTimestamp(receivedTimestamp) {
+  setReceivedTimestamp(receivedTimestamp: any) {
     this.state.receivedTimestamp = receivedTimestamp;
     return this;
   }
-  
+
   /**
    * @return {boolean} true if a double spend has been seen, false otherwise
    */
   isDoubleSpendSeen() {
     return this.state.isDoubleSpendSeen;
   }
-  
+
   /**
    * @param {boolean} isDoubleSpendSeen - true if a double spend has been seen, false otherwise
    * @return {MoneroTx} this tx for chaining
    */
-  setIsDoubleSpend(isDoubleSpendSeen) {
+  setIsDoubleSpend(isDoubleSpendSeen: any) {
     this.state.isDoubleSpendSeen = isDoubleSpendSeen;
     return this;
   }
-  
+
   /**
    * @return {string} tx key
    */
   getKey() {
     return this.state.key;
   }
-  
+
   /**
    * @param {string} key - tx key
    * @return {MoneroTx} this tx for chaining
    */
-  setKey(key) {
+  setKey(key: any) {
     this.state.key = key;
     return this;
   }
-  
+
   /**
    * Get full transaction hex. Full hex = pruned hex + prunable hex.
    * 
@@ -332,16 +334,16 @@ class MoneroTx {
   getFullHex() {
     return this.state.fullHex;
   }
-  
+
   /**
    * @param {string} fullHex - full tx hex
    * @return {MoneroTx} this tx for chaining
    */
-  setFullHex(fullHex) {
+  setFullHex(fullHex: any) {
     this.state.fullHex = fullHex;
     return this;
   }
-  
+
   /**
    * Get pruned transaction hex. Full hex = pruned hex + prunable hex.
    * 
@@ -350,16 +352,16 @@ class MoneroTx {
   getPrunedHex() {
     return this.state.prunedHex;
   }
-  
+
   /**
    * @param {string} prunedHex - pruned tx hex
    * @return {MoneroTx} this tx for chaining
    */
-  setPrunedHex(prunedHex) {
+  setPrunedHex(prunedHex: any) {
     this.state.prunedHex = prunedHex;
     return this;
   }
-  
+
   /**
    * Get prunable transaction hex which is hex that is removed from a pruned
    * transaction. Full hex = pruned hex + prunable hex.
@@ -369,295 +371,295 @@ class MoneroTx {
   getPrunableHex() {
     return this.state.prunableHex;
   }
-  
+
   /**
    * @param {string} prunableHex - prunable tx hex
    * @return {MoneroTx} this tx for chaining
    */
-  setPrunableHex(prunableHex) {
+  setPrunableHex(prunableHex: any) {
     this.state.prunableHex = prunableHex;
     return this;
   }
-  
+
   /**
    * @return {string} prunable tx hash
    */
   getPrunableHash() {
     return this.state.prunableHash;
   }
-  
+
   /**
    * @param {string} prunableHash - prunable tx hash
    * @return {MoneroTx} this tx for chaining
    */
-  setPrunableHash(prunableHash) {
+  setPrunableHash(prunableHash: any) {
     this.state.prunableHash = prunableHash;
     return this;
   }
-  
+
   /**
    * @return {number} tx size
    */
   getSize() {
     return this.state.size;
   }
-  
+
   /**
    * @param {number} size - tx size
    * @return {MoneroTx} this tx for chaining
    */
-  setSize(size) {
+  setSize(size: any) {
     this.state.size = size;
     return this;
   }
-  
+
   /**
    * @return {number} tx weight
    */
   getWeight() {
     return this.state.weight;
   }
-  
+
   /**
    * @param {number} weight - tx weight
    * @return {MoneroTx} this tx for chaining
    */
-  setWeight(weight) {
+  setWeight(weight: any) {
     this.state.weight = weight;
     return this;
   }
-  
+
   /**
    * @return {MoneroOutput[]} tx inputs
    */
   getInputs() {
     return this.state.inputs;
   }
-  
+
   /**
    * @param {MoneroOutput[]} - tx inputs
    * @return {MoneroTx} this tx for chaining
    */
-  setInputs(inputs) {
+  setInputs(inputs: any) {
     this.state.inputs = inputs;
     return this;
   }
-  
+
   /**
    * @return {MoneroOutput[]} tx outputs
    */
   getOutputs() {
     return this.state.outputs;
   }
-  
+
   /**
    * @param {MoneroOutput[]} outputs - tx outputs
    * @return {MoneroTx} this tx for chaining
    */
-  setOutputs(outputs) {
+  setOutputs(outputs: any) {
     this.state.outputs = outputs;
     return this;
   }
-  
+
   /**
    * @return {number[]} tx output indices
    */
   getOutputIndices() {
     return this.state.outputIndices;
   }
-  
+
   /**
    * @param {number[]} outputIndices - tx output indices
    * @return {MoneroTx} this tx for chaining
    */
-  setOutputIndices(outputIndices) {
+  setOutputIndices(outputIndices: any) {
     this.state.outputIndices = outputIndices;
     return this;
   }
-  
+
   /**
    * @return {string} tx metadata
    */
   getMetadata() {
     return this.state.metadata;
   }
-  
+
   /**
    * @param {string} metadata - tx metadata
    * @return {MoneroTx} this tx for chaining
    */
-  setMetadata(metadata) {
+  setMetadata(metadata: any) {
     this.state.metadata = metadata;
     return this;
   }
-  
+
   /**
    * @return {number[]} tx extra
    */
   getExtra() {
     return this.state.extra;
   }
-  
+
   /**
    * @param {number[]} extra - tx extra
    * @return {MoneroTx} this tx for chaining
    */
-  setExtra(extra) {
+  setExtra(extra: any) {
     this.state.extra = extra;
     return this;
   }
-  
+
   /**
    * @return {object} RCT signatures
    */
   getRctSignatures() {
     return this.state.rctSignatures;
   }
-  
+
   /**
    * @param {object} rctSignatures - RCT signatures
    * @return {MoneroTx} this tx for chaining
    */
-  setRctSignatures(rctSignatures) {
+  setRctSignatures(rctSignatures: any) {
     this.state.rctSignatures = rctSignatures;
     return this;
   }
-  
+
   /**
    * @return {object} prunable RCT signature data
    */
   getRctSigPrunable() {
     return this.state.rctSigPrunable;
   }
-  
+
   /**
    * @param {object} rctSigPrunable - prunable RCT signature data
    * @return {MoneroTx} this tx for chaining
    */
-  setRctSigPrunable(rctSigPrunable) {
+  setRctSigPrunable(rctSigPrunable: any) {
     this.state.rctSigPrunable = rctSigPrunable;
     return this;
   }
-  
+
   /**
    * @return {boolean} true if kept by a block, false otherwise
    */
   isKeptByBlock() {
     return  this.state.isKeptByBlock;
   }
-  
+
   /**
    * @param {boolean} isKeptByBlock - true if kept by a block, false otherwise
    * @return {MoneroTx} this tx for chaining
    */
-  setIsKeptByBlock(isKeptByBlock) {
+  setIsKeptByBlock(isKeptByBlock: any) {
     this.state.isKeptByBlock = isKeptByBlock;
     return this;
   }
-  
+
   /**
    * @return {boolean} true if the tx failed, false otherwise
    */
   isFailed() {
     return this.state.isFailed;
   }
-  
+
   /**
    * @param {boolean} isFailed - true if the tx failed, false otherwise
    * @return {MoneroTx} this tx for chaining
    */
-  setIsFailed(isFailed) {
+  setIsFailed(isFailed: any) {
     this.state.isFailed = isFailed;
     return this;
   }
-  
+
   /**
    * @return {number} block height of the last tx failure
    */
   getLastFailedHeight() {
     return this.state.lastFailedHeight;
   }
-  
+
   /**
    * @param {number} lastFailedHeight - block height of the last tx failure
    * @return {MoneroTx} this tx for chaining
    */
-  setLastFailedHeight(lastFailedHeight) {
+  setLastFailedHeight(lastFailedHeight: any) {
     this.state.lastFailedHeight = lastFailedHeight;
     return this;
   }
-  
+
   /**
    * @return {string} block hash of the last tx failure
    */
   getLastFailedHash() {
     return this.state.lastFailedHash;
   }
-  
+
   /**
    * @param {string} lastFailedHash - block hash of the last tx failure
    * @return {MoneroTx} this tx for chaining
    */
-  setLastFailedHash(lastFailedHash) {
+  setLastFailedHash(lastFailedHash: any) {
     this.state.lastFailedHash = lastFailedHash;
     return this;
   }
-  
+
   /**
    * @return {number} max used block height
    */
   getMaxUsedBlockHeight() {
     return this.state.maxUsedBlockHeight;
   }
-  
+
   /**
    * @param {number} maxUsedBlockHeight - max used block height
    * @return {MoneroTx} this tx for chaining
    */
-  setMaxUsedBlockHeight(maxUsedBlockHeight) {
+  setMaxUsedBlockHeight(maxUsedBlockHeight: any) {
     this.state.maxUsedBlockHeight = maxUsedBlockHeight;
     return this;
   }
-  
+
   /**
    * @return {string} max used block hash
    */
   getMaxUsedBlockHash() {
     return this.state.maxUsedBlockHash;
   }
-  
+
   /**
    * @param {string} maxUsedBlockHash - max used block hash
    * @return {MoneroTx} this tx for chaining
    */
-  setMaxUsedBlockHash(maxUsedBlockHash) {
+  setMaxUsedBlockHash(maxUsedBlockHash: any) {
     this.state.maxUsedBlockHash = maxUsedBlockHash;
     return this;
   }
-  
+
   /**
    * @return {string[]} tx signatures
    */
   getSignatures() {
     return this.state.signatures;
   }
-  
+
   /**
    * @param {string[]} signatures - tx signatures
    * @return {MoneroTx} this tx for chaining
    */
-  setSignatures(signatures) {
+  setSignatures(signatures: any) {
     this.state.signatures = signatures;
     return this;
   }
-  
+
   /**
    * @return {MoneroTx} a copy of this tx
    */
   copy() {
     return new MoneroTx(this);
   }
-  
+
   /**
    * @return {object} json representation of this tx
    */
@@ -676,7 +678,7 @@ class MoneroTx {
     delete json.block;  // do not serialize parent block
     return json;
   }
-  
+
   /**
    * Updates this transaction by merging the latest information from the given
    * transaction.
@@ -684,7 +686,7 @@ class MoneroTx {
    * @param {MoneroTx} tx - the transaction to update this transaction with
    * @return {MoneroTx} this for method chaining
    */
-  merge(tx) {
+  merge(tx: any) {
     assert(tx instanceof MoneroTx);
     if (this === tx) return this;
     
@@ -692,7 +694,7 @@ class MoneroTx {
     if (this.getBlock() !== tx.getBlock()) {
       if (this.getBlock() === undefined) {
         this.setBlock(tx.getBlock());
-        this.getBlock().getTxs[this.getBlock().getTxs().indexOf(tx)] = this; // update block to point to this tx
+        this.getBlock().getTxs[this.getBlock().txs.indexOf(tx)] = this; // update block to point to this tx
       } else if (tx.getBlock() !== undefined) {
         this.getBlock().merge(tx.getBlock()); // comes back to merging txs
         return this;
@@ -700,36 +702,67 @@ class MoneroTx {
     }
     
     // otherwise merge tx fields
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setHash(GenUtils.reconcile(this.getHash(), tx.getHash()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setVersion(GenUtils.reconcile(this.getVersion(), tx.getVersion()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setPaymentId(GenUtils.reconcile(this.getPaymentId(), tx.getPaymentId()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setFee(GenUtils.reconcile(this.getFee(), tx.getFee()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setRingSize(GenUtils.reconcile(this.getRingSize(), tx.getRingSize()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 3.
     this.setIsConfirmed(GenUtils.reconcile(this.isConfirmed(), tx.isConfirmed(), {resolveTrue: true})); // tx can become confirmed
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setIsMinerTx(GenUtils.reconcile(this.isMinerTx(), tx.isMinerTx()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 3.
     this.setRelay(GenUtils.reconcile(this.getRelay(), tx.getRelay(), {resolveTrue: true}));       // tx can become relayed
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 3.
     this.setIsRelayed(GenUtils.reconcile(this.isRelayed(), tx.isRelayed(), {resolveTrue: true})); // tx can become relayed
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 3.
     this.setIsDoubleSpend(GenUtils.reconcile(this.isDoubleSpendSeen(), tx.isDoubleSpendSeen(), {resolveTrue: true})); // double spend can become seen
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setKey(GenUtils.reconcile(this.getKey(), tx.getKey()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setFullHex(GenUtils.reconcile(this.getFullHex(), tx.getFullHex()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setPrunedHex(GenUtils.reconcile(this.getPrunedHex(), tx.getPrunedHex()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setPrunableHex(GenUtils.reconcile(this.getPrunableHex(), tx.getPrunableHex()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setPrunableHash(GenUtils.reconcile(this.getPrunableHash(), tx.getPrunableHash()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setSize(GenUtils.reconcile(this.getSize(), tx.getSize()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setWeight(GenUtils.reconcile(this.getWeight(), tx.getWeight()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setOutputIndices(GenUtils.reconcile(this.getOutputIndices(), tx.getOutputIndices()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setMetadata(GenUtils.reconcile(this.getMetadata(), tx.getMetadata()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setExtra(GenUtils.reconcile(this.getExtra(), tx.getExtra()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setRctSignatures(GenUtils.reconcile(this.getRctSignatures(), tx.getRctSignatures()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setRctSigPrunable(GenUtils.reconcile(this.getRctSigPrunable(), tx.getRctSigPrunable()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setIsKeptByBlock(GenUtils.reconcile(this.isKeptByBlock(), tx.isKeptByBlock()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 3.
     this.setIsFailed(GenUtils.reconcile(this.isFailed(), tx.isFailed(), {resolveTrue: true}));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setLastFailedHeight(GenUtils.reconcile(this.getLastFailedHeight(), tx.getLastFailedHeight()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setLastFailedHash(GenUtils.reconcile(this.getLastFailedHash(), tx.getLastFailedHash()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setMaxUsedBlockHeight(GenUtils.reconcile(this.getMaxUsedBlockHeight(), tx.getMaxUsedBlockHeight()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setMaxUsedBlockHash(GenUtils.reconcile(this.getMaxUsedBlockHash(), tx.getMaxUsedBlockHash()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setSignatures(GenUtils.reconcile(this.getSignatures(), tx.getSignatures()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setUnlockHeight(GenUtils.reconcile(this.getUnlockHeight(), tx.getUnlockHeight()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 3.
     this.setNumConfirmations(GenUtils.reconcile(this.getNumConfirmations(), tx.getNumConfirmations(), {resolveMax: true})); // num confirmations can increase
     
     // merge inputs
@@ -739,7 +772,7 @@ class MoneroTx {
         merger.setTx(this);
         if (!this.getInputs()) this.setInputs([]);
         for (let mergee of this.getInputs()) {
-          if (mergee.getKeyImage().getHex() === merger.getKeyImage().getHex()) {
+          if (mergee.getKeyImage().hex === merger.getKeyImage().hex) {
             mergee.merge(merger);
             merged = true;
             break;
@@ -760,7 +793,7 @@ class MoneroTx {
           let merged = false;
           merger.setTx(this);
           for (let mergee of this.getOutputs()) {
-            if ((merger.getKeyImage() && mergee.getKeyImage().getHex() === merger.getKeyImage().getHex()) ||
+            if ((merger.getKeyImage() && mergee.getKeyImage().hex === merger.getKeyImage().hex) ||
                 (merger.getStealthPublicKey() && mergee.getStealthPublicKey() === merger.getStealthPublicKey())) {
              mergee.merge(merger);
              merged = true;
@@ -778,14 +811,17 @@ class MoneroTx {
       this.setReceivedTimestamp(undefined);
       this.setLastRelayedTimestamp(undefined);
     } else {
+      // @ts-expect-error TS(2554): Expected 4 arguments, but got 3.
       this.setInTxPool(GenUtils.reconcile(this.inTxPool(), tx.inTxPool(), {resolveTrue: true})); // unrelayed -> tx pool
+      // @ts-expect-error TS(2554): Expected 4 arguments, but got 3.
       this.setReceivedTimestamp(GenUtils.reconcile(this.getReceivedTimestamp(), tx.getReceivedTimestamp(), {resolveMax: false})); // take earliest receive time
+      // @ts-expect-error TS(2554): Expected 4 arguments, but got 3.
       this.setLastRelayedTimestamp(GenUtils.reconcile(this.getLastRelayedTimestamp(), tx.getLastRelayedTimestamp(), {resolveMax: true}));  // take latest relay time
     }
     
     return this;  // for chaining
   }
-  
+
   /**
    * @param {number} [indent] - starting indentation
    * @return {string} string representation of this tx
@@ -849,6 +885,7 @@ class MoneroTx {
 }
 
 // default payment id
+// @ts-expect-error TS(2339): Property 'DEFAULT_PAYMENT_ID' does not exist on ty... Remove this comment to see the full error message
 MoneroTx.DEFAULT_PAYMENT_ID = "0000000000000000";
 
 export default MoneroTx;

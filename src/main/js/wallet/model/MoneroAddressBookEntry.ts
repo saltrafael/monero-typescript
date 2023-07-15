@@ -2,47 +2,48 @@
  * Monero address book entry model
  */
 class MoneroAddressBookEntry {
-  
-  constructor(state) {
+  state: any;
+
+  constructor(state: any) {
     this.state = Object.assign({}, state);
   }
-  
+
   toJson() {
     return Object.assign({}, this.state);
   }
-  
+
   getIndex() {
     return this.state.index;
   }
-  
-  setIndex(index) {
+
+  setIndex(index: any) {
     this.state.index = index;
     return this;
   }
-  
+
   getAddress() {
     return this.state.address;
   }
-  
-  setAddress(address) {
+
+  setAddress(address: any) {
     this.state.address = address;
     return this;
   }
-  
+
   getDescription() {
     return this.state.description;
   }
-  
-  setDescription(description) {
+
+  setDescription(description: any) {
     this.state.description = description;
     return this;
   }
-  
+
   getPaymentId() {
     return this.state.paymentId;
   }
-  
-  setPaymentId(paymentId) {
+
+  setPaymentId(paymentId: any) {
     this.state.paymentId = paymentId;
     return this;
   }

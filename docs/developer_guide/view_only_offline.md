@@ -59,7 +59,7 @@ let unsignedTx = await viewOnlyWallet.createTx({
 
 // describe unsigned tx set to confirm details
 let describedTxSet = await offlineWallet.describeTxSet(unsignedTx.getTxSet());
-let fee = describedTxSet.getTxs()[0].getFee();	// "Are you sure you want to send... ?"
+let fee = describedTxSet.txs[0].getFee();	// "Are you sure you want to send... ?"
   
 // sign tx using offline wallet
 let signedTxHex = await offlineWallet.signTxs(unsignedTx.getTxSet().getUnsignedTxHex());

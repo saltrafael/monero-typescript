@@ -15,7 +15,7 @@ class MoneroOutputWallet extends MoneroOutput {
    * 
    * @param {MoneroOutputWallet|object} state is existing state to initialize from (optional)
    */
-  constructor(state) {
+  constructor(state: any) {
     super(state);
   }
   
@@ -23,7 +23,7 @@ class MoneroOutputWallet extends MoneroOutput {
     return this.state.accountIndex;
   }
 
-  setAccountIndex(accountIndex) {
+  setAccountIndex(accountIndex: any) {
     this.state.accountIndex = accountIndex;
     return this;
   }
@@ -32,7 +32,7 @@ class MoneroOutputWallet extends MoneroOutput {
     return this.state.subaddressIndex;
   }
 
-  setSubaddressIndex(subaddressIndex) {
+  setSubaddressIndex(subaddressIndex: any) {
     this.state.subaddressIndex = subaddressIndex;
     return this;
   }
@@ -41,7 +41,7 @@ class MoneroOutputWallet extends MoneroOutput {
     return this.state.isSpent;
   }
 
-  setIsSpent(isSpent) {
+  setIsSpent(isSpent: any) {
     this.state.isSpent = isSpent;
     return this;
   }
@@ -56,7 +56,7 @@ class MoneroOutputWallet extends MoneroOutput {
     return this.state.isFrozen;
   }
 
-  setIsFrozen(isFrozen) {
+  setIsFrozen(isFrozen: any) {
     this.state.isFrozen = isFrozen;
     return this;
   }
@@ -66,6 +66,7 @@ class MoneroOutputWallet extends MoneroOutput {
     return this.getTx().isLocked();
   }
   
+  // @ts-expect-error TS(2416): Property 'copy' in type 'MoneroOutputWallet' is no... Remove this comment to see the full error message
   copy() {
     return new MoneroOutputWallet(this.toJson());
   }
@@ -85,18 +86,23 @@ class MoneroOutputWallet extends MoneroOutput {
    * 
    * @param output is the output to merge into this one
    */
-  merge(output) {
+  // @ts-expect-error TS(2416): Property 'merge' in type 'MoneroOutputWallet' is n... Remove this comment to see the full error message
+  merge(output: any) {
     assert(output instanceof MoneroOutputWallet);
     if (this === output) return;
     super.merge(output);
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setAccountIndex(GenUtils.reconcile(this.getAccountIndex(), output.getAccountIndex()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setSubaddressIndex(GenUtils.reconcile(this.getSubaddressIndex(), output.getSubaddressIndex()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 3.
     this.setIsSpent(GenUtils.reconcile(this.isSpent(), output.isSpent(), {resolveTrue: true})); // output can become spent
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setIsFrozen(GenUtils.reconcile(this.isFrozen(), output.isFrozen()));
     return this;
   }
   
-  toString(indent) {
+  toString(indent: any) {
     let str = super.toString(indent) + "\n"
     str += GenUtils.kvLine("Account index", this.getAccountIndex(), indent);
     str += GenUtils.kvLine("Subaddress index", this.getSubaddressIndex(), indent);

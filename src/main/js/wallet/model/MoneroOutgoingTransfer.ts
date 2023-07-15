@@ -9,42 +9,44 @@ import MoneroTransfer from "./MoneroTransfer";
  * @extends {MoneroTransfer}
  */
 class MoneroOutgoingTransfer extends MoneroTransfer {
+  state: any;
 
   /**
    * Construct the model.
    * 
    * @param {MoneroOutgoingTranser|object} state is existing state to initialize from (optional)
    */
-  constructor(state) {
+  constructor(state: any) {
     super(state);
     state = this.state;
     
     // deserialize destinations
     if (state.destinations) {
       for (let i = 0; i < state.destinations.length; i++) {
+        // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
         if (!(state.destinations[i] instanceof MoneroDestination)) state.destinations[i] = new MoneroDestination(state.destinations[i]);
       }
     }
   }
-  
+
   isIncoming() {
     return false;
   }
-  
+
   getSubaddressIndices() {
     return this.state.subaddressIndices;
   }
 
-  setSubaddressIndices(subaddressIndices) {
+  setSubaddressIndices(subaddressIndices: any) {
     this.state.subaddressIndices = subaddressIndices;
     return this;
   }
-  
+
   getAddresses() {
     return this.state.addresses;
   }
 
-  setAddresses(addresses) {
+  setAddresses(addresses: any) {
     this.state.addresses = addresses;
     return this;
   }
@@ -52,16 +54,16 @@ class MoneroOutgoingTransfer extends MoneroTransfer {
   getDestinations() {
     return this.state.destinations;
   }
-  
-  setDestinations(destinations) {
+
+  setDestinations(destinations: any) {
     this.state.destinations = destinations;
     return this;
   }
-  
+
   copy() {
     return new MoneroOutgoingTransfer(this);
   }
-  
+
   toJson() {
     let json = Object.assign({}, this.state, super.toJson()); // merge json onto inherited state
     if (this.getDestinations() !== undefined) {
@@ -71,7 +73,7 @@ class MoneroOutgoingTransfer extends MoneroTransfer {
     delete json.tx; // parent tx is not serialized
     return json;
   }
-  
+
   /**
    * Updates this transaction by merging the latest information from the given
    * transaction.
@@ -81,12 +83,15 @@ class MoneroOutgoingTransfer extends MoneroTransfer {
    * 
    * @param transfer is the transfer to merge into this one
    */
-  merge(transfer) {
+  merge(transfer: any) {
     super.merge(transfer);
     assert(transfer instanceof MoneroOutgoingTransfer);
     if (this === transfer) return this;
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setSubaddressIndices(GenUtils.reconcile(this.getSubaddressIndices(), transfer.getSubaddressIndices()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setAddresses(GenUtils.reconcile(this.getAddresses(), transfer.getAddresses()));
+    // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
     this.setDestinations(GenUtils.reconcile(this.getDestinations(), transfer.getDestinations()));
     return this;
   }

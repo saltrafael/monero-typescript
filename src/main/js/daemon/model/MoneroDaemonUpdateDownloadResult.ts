@@ -10,7 +10,7 @@ class MoneroDaemonUpdateDownloadResult extends MoneroDaemonUpdateCheckResult {
    * 
    * @param {MoneroDaemonUpdateCheckResult} is an existing result to copy from
    */
-  constructor(result) {
+  constructor(result: any) {
     super(result);
   }
   
@@ -23,7 +23,7 @@ class MoneroDaemonUpdateDownloadResult extends MoneroDaemonUpdateCheckResult {
     return this.state.downloadPath;
   }
   
-  setDownloadPath(downloadPath) {
+  setDownloadPath(downloadPath: any) {
     this.state.downloadPath = downloadPath;
     return this;
   }

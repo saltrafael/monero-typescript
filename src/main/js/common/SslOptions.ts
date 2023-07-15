@@ -2,54 +2,50 @@
  * SSL options for remote endpoints.
  */
 class SslOptions {
-  
-  constructor(state) {
+  state: Partial<SslOptions>;
+
+  constructor(state: Partial<SslOptions> = {}) {
     this.state = Object.assign({}, state);
   }
-  
-  getPrivateKeyPath() {
+
+  get privateKeyPath() {
     return this.state.privateKeyPath;
   }
-  
-  setPrivateKeyPath(privateKeyPath) {
+
+  set privateKeyPath(privateKeyPath: undefined | string) {
     this.state.privateKeyPath = privateKeyPath;
-    return this;
   }
-  
-  getCertificatePath() {
+
+  get certificatePath() {
     return this.state.certificatePath;
   }
-  
-  setCertificatePath(certificatePath) {
+
+  set certificatePath(certificatePath: undefined | string) {
     this.state.certificatePath = certificatePath;
-    return this;
   }
-  
-  getCertificateAuthorityFile() {
+
+  get certificateAuthorityFile() {
     return this.state.certificateAuthorityFile;
   }
-  
-  setCertificateAuthorityFile(certificateAuthorityFile) {
+
+  set certificateAuthorityFile(certificateAuthorityFile: undefined | string) {
     this.state.certificateAuthorityFile = certificateAuthorityFile;
-    return this;
   }
-  
-  getAllowedFingerprints() {
+
+  get allowedFingerprints() {
     return this.state.allowedFingerprints;
   }
-  
-  setAllowedFingerprints(allowedFingerprints) {
+
+  set allowedFingerprints(allowedFingerprints: undefined | string) {
     this.state.allowedFingerprints = allowedFingerprints;
-    return this;
   }
-  
-  getAllowAnyCert() {
+
+  get allowAnyCert() {
     return this.state.allowAnyCert;
   }
-  
-  setAllowAnyCert(allowAnyCert) {
+
+  set allowAnyCert(allowAnyCert: undefined | string) {
     this.state.allowAnyCert = allowAnyCert;
-    return this;
   }
 }
 

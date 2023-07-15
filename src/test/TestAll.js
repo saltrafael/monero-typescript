@@ -9,7 +9,7 @@ import TestMoneroWalletRpc from "./TestMoneroWalletRpc";
 import TestMoneroConnectionManager from "./TestMoneroConnectionManager";
 
 // set log level
-LibraryUtils.setLogLevel(1); // no need for await before worker used
+LibraryUtils.instance.setLogLevel(1); // no need for await before worker used
 
 // test sample code for readme
 new TestSampleCode().runTests();

@@ -5,8 +5,9 @@ import MoneroPeer from "./MoneroPeer";
  * Models daemon synchronization information.
  */
 class MoneroDaemonSyncInfo {
-  
-  constructor(state) {
+  state: any;
+
+  constructor(state: any) {
     
     // copy state
     state = Object.assign({}, state);
@@ -31,7 +32,7 @@ class MoneroDaemonSyncInfo {
     // assign internal state
     this.state = state;
   }
-  
+
   toJson() {
     let json = Object.assign({}, this.state);
     if (json.peers !== undefined) {
@@ -47,75 +48,75 @@ class MoneroDaemonSyncInfo {
     if (json.credits !== undefined) json.credits = json.credits.toString();
     return json;
   }
-  
+
   getHeight() {
     return this.state.height;
   }
-  
-  setHeight(height) {
+
+  setHeight(height: any) {
     this.state.height = height;
     return this;
   }
-  
+
   getPeers() {
     return this.state.peers;
   }
-  
-  setPeers(peers) {
+
+  setPeers(peers: any) {
     this.state.peers = peers;
     return this;
   }
-  
+
   getSpans() {
     return this.state.spans;
   }
-  
-  setSpans(spans) {
+
+  setSpans(spans: any) {
     this.state.spans = spans;
     return this;
   }
-  
+
   getTargetHeight() {
     return this.state.targetHeight;
   }
-  
-  setTargetHeight(targetHeight) {
+
+  setTargetHeight(targetHeight: any) {
     this.state.targetHeight = targetHeight;
     return this;
   }
-  
+
   getNextNeededPruningSeed() {
     return this.state.nextNeededPruningSeed;
   }
-  
-  setNextNeededPruningSeed(nextNeededPruningSeed) {
+
+  setNextNeededPruningSeed(nextNeededPruningSeed: any) {
     this.state.nextNeededPruningSeed = nextNeededPruningSeed;
     return this;
   }
-  
+
   getOverview() {
     return this.state.overview;
   }
-  
-  setOverview(overview) {
+
+  setOverview(overview: any) {
     this.state.overview = overview;
     return this;
   }
-  
+
   getCredits() {
     return this.state.credits;
   }
-  
-  setCredits(credits) {
+
+  setCredits(credits: any) {
     this.state.credits = credits;
     return this;
   }
-  
+
   getTopBlockHash() {
     return this.state.topBlockHash;
   }
-  
-  setTopBlockHash(topBlockHash) {
+
+  setTopBlockHash(topBlockHash: any) {
     this.state.topBlockHash = topBlockHash;
     return this;
   }

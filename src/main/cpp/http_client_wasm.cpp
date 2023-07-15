@@ -13,8 +13,8 @@ EM_JS(const char*, js_send_json_request, (const char* uri, const char* username,
   //console.log("EM_JS js_send_json_request(" + UTF8ToString(uri) + ", " + UTF8ToString(username) + ", " + UTF8ToString(password) + ", " + UTF8ToString(method) + ")");
 
   const monerojs = require("../index");
-  const HttpClient = monerojs.HttpClient;
-  const LibraryUtils = monerojs.LibraryUtils;
+  const HttpClient = monerojs.HttpClient.instance;
+  const LibraryUtils = monerojs.LibraryUtils.instance;
   const GenUtils = monerojs.GenUtils;
 
   // use asyncify to synchronously return to C++
@@ -22,14 +22,14 @@ EM_JS(const char*, js_send_json_request, (const char* uri, const char* username,
 
     // make request and process response or error
     let wakeUpCalled = false;
-    HttpClient.request({
+    HttpClient.instance.request({
       method: UTF8ToString(method),
       uri: UTF8ToString(uri),
       username: UTF8ToString(username),
       password: UTF8ToString(password),
       body: UTF8ToString(body),
       resolveWithFullResponse: true,
-      rejectUnauthorized: LibraryUtils.isRejectUnauthorized(UTF8ToString(reject_unauthorized_fn_id)),
+      rejectUnauthorized: LibraryUtils.instance.isRejectUnauthorized(UTF8ToString(reject_unauthorized_fn_id)),
       requestApi: GenUtils.isFirefox() ? "xhr" : "fetch"  // firefox issue: https://bugzilla.mozilla.org/show_bug.cgi?id=1491010
     }).then(resp => {
 
@@ -68,15 +68,15 @@ EM_JS(const char*, js_send_binary_request, (const char* uri, const char* usernam
   //console.log("EM_JS js_send_binary_request(" + UTF8ToString(uri) + ", " + UTF8ToString(username) + ", " + UTF8ToString(password) + ", " + UTF8ToString(method) + ")");
 
   const monerojs = require("../index");
-  const HttpClient = monerojs.HttpClient;
-  const LibraryUtils = monerojs.LibraryUtils;
+  const HttpClient = monerojs.HttpClient.instance;
+  const LibraryUtils = monerojs.LibraryUtils.instance;
   const GenUtils = monerojs.GenUtils;
 
   // use asyncify to synchronously return to C++
   return Asyncify.handleSleep(function(wakeUp) {
 
     // load full wasm module then convert from json to binary
-    LibraryUtils.loadFullModule().then(module => {
+    LibraryUtils.instance.loadFullModule().then(module => {
 
       // read binary data from heap to Uint8Array
       let ptr = body;
@@ -88,14 +88,14 @@ EM_JS(const char*, js_send_binary_request, (const char* uri, const char* usernam
 
       // make request and process response or error
       let wakeUpCalled = false;
-      HttpClient.request({
+      HttpClient.instance.request({
         method: UTF8ToString(method),
         uri: UTF8ToString(uri),
         username: UTF8ToString(username),
         password: UTF8ToString(password),
         body: view,
         resolveWithFullResponse: true,
-        rejectUnauthorized: LibraryUtils.isRejectUnauthorized(UTF8ToString(reject_unauthorized_fn_id)),
+        rejectUnauthorized: LibraryUtils.instance.isRejectUnauthorized(UTF8ToString(reject_unauthorized_fn_id)),
         requestApi: GenUtils.isFirefox() ? "xhr" : "fetch"  // firefox issue: https://bugzilla.mozilla.org/show_bug.cgi?id=1491010
       }).then(resp => {
 

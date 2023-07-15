@@ -1,64 +1,71 @@
+interface StateOpts {
+  blockHashes: any;
+  difficulty?: bigint | number | string;
+  height: any;
+  length: any;
+  mainChainParentBlockHash: any;
+}
 
 /**
  * Models an alternative chain seen by the node.
  */
 class MoneroAltChain {
-  
-  constructor(state) {
-    state = Object.assign({}, state);
-    if (state.difficulty !== undefined && !(state.difficulty instanceof BigInt)) state.difficulty = BigInt(state.difficulty);
+  state: StateOpts;
+
+  constructor(state: StateOpts) {
+    if (
+      state.difficulty !== undefined &&
+      !(typeof state.difficulty === "bigint")
+    )
+      state.difficulty = BigInt(state.difficulty);
     this.state = state;
   }
-  
+
   toJson() {
-    let json = Object.assign({}, this.state);
-    if (this.getDifficulty() !== undefined) json.difficulty = this.getDifficulty().toString();
+    const json = Object.assign({}, this.state);
+    if (this.difficulty !== undefined)
+      json.difficulty = this.difficulty.toString();
     return json;
   }
-  
-  getBlockHashes(blockHashes) {
+
+  get blockHashes() {
     return this.state.blockHashes;
   }
-  
-  setBlockHashes(blockHashes) {
+
+  set blockHashes(blockHashes: any) {
     this.state.blockHashes = blockHashes;
-    return this;
   }
-  
-  getDifficulty() {
+
+  get difficulty() {
     return this.state.difficulty;
   }
-  
-  setDifficulty(difficulty) {
+
+  set difficulty(difficulty: undefined | bigint | number | string) {
     this.state.difficulty = difficulty;
-    return this;
   }
-  
-  getHeight() {
+
+  get height() {
     return this.state.height;
   }
-  
-  setHeight(height) {
+
+  set height(height: any) {
     this.state.height = height;
-    return this;
   }
-  
-  getLength() {
+
+  get length() {
     return this.state.length;
   }
-  
-  setLength(length) {
+
+  set length(length: any) {
     this.state.length = length;
-    return this;
   }
-  
-  getMainChainParentBlockHash() {
+
+  get mainChainParentBlockHash() {
     return this.state.mainChainParentBlockHash;
   }
-  
-  setMainChainParentBlockHash(mainChainParentBlockHash) {
+
+  set mainChainParentBlockHash(mainChainParentBlockHash: any) {
     this.state.mainChainParentBlockHash = mainChainParentBlockHash;
-    return this;
   }
 }
 

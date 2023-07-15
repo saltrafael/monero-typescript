@@ -73,7 +73,7 @@ class TestSampleCode {
         await walletRpc.openWallet("test_wallet_1", "supersecretpassword123");  // *** CHANGE README TO "sample_wallet_rpc" ***
         let primaryAddress: string = await walletRpc.getPrimaryAddress(); // 555zgduFhmKd2o8rPUz...
         let balance: BigInt = await walletRpc.getBalance();               // 533648366742
-        let txs: Array<MoneroTxWallet> = await walletRpc.getTxs();                       // get transactions containing transfers to/from the wallet
+        let txs: Array<MoneroTxWallet> = await walletRpc.txs;                       // get transactions containing transfers to/from the wallet
         // create wallet from mnemonic phrase using WebAssembly bindings to monero-project
         let walletFull: MoneroWalletFull = await createWalletFull({
           path: "./test_wallets/" + GenUtils.getUUID(),  // *** CHANGE README TO "sample_wallet_full"
@@ -158,7 +158,7 @@ class TestSampleCode {
         await connectionManager.startCheckingConnection(10000);
         
         // automatically switch to best available connection if disconnected
-        connectionManager.setAutoSwitch(true);
+        connectionManager.autoSwitch = true;
         
         // get best available connection in order of priority then response time
         let bestConnection: MoneroRpcConnection = await connectionManager.getBestAvailableConnection();
@@ -175,7 +175,7 @@ class TestSampleCode {
       it("Test developer guide transaction queries", async function() {
         
         // get a transaction by hash
-        let tx: MoneroTxWallet = await wallet.getTx((await wallet.getTxs())[0].getHash()); // REPLACE WITH BELOW FOR MD FILE
+        let tx: MoneroTxWallet = await wallet.getTx((await wallet.txs)[0].getHash()); // REPLACE WITH BELOW FOR MD FILE
         //let tx = await wallet.getTx("9fb2cb7c73743002f131b72874e77b1152891968dc1f2849d3439ace8bae6d8e");
         
         // get unconfirmed transactions
@@ -317,12 +317,12 @@ class TestSampleCode {
         }
         
         // get output by key image
-        let keyImage: string = outputs[0].getKeyImage().getHex();
+        let keyImage: string = outputs[0].getKeyImage().hex;
         outputs = await wallet.getOutputs({
           keyImage: keyImage
         });
         assert.equal(outputs.length, 1);
-        assert.equal(outputs[0].getKeyImage().getHex(), keyImage);
+        assert.equal(outputs[0].getKeyImage().hex, keyImage);
       });
       
       it("Test developer guide send funds", async function() {

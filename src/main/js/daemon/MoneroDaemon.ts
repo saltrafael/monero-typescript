@@ -36,7 +36,8 @@ class MoneroDaemon {
    * 
    * @param {MoneroDaemonListener} listener - listener to receive daemon notifications
    */
-  async addListener(listener) {
+  async addListener(listener: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -45,7 +46,8 @@ class MoneroDaemon {
    * 
    * @param {MoneroDaemonListener} listener - listener to unregister
    */
-  async removeListener(listener) {
+  async removeListener(listener: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -55,6 +57,7 @@ class MoneroDaemon {
    * @return {MoneroDaemonListener[]} the registered listeners
    */
   getListeners() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -64,6 +67,7 @@ class MoneroDaemon {
    * @return {boolean} true if the client is connected to the daemon, false otherwise
    */
   async isConnected() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -73,6 +77,7 @@ class MoneroDaemon {
    * @return {MoneroVersion} the version of the daemon
    */
   async getVersion() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -82,6 +87,7 @@ class MoneroDaemon {
    * @return {boolean} true if the daemon is trusted, false otherwise
    */
   async isTrusted() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -91,6 +97,7 @@ class MoneroDaemon {
    * @return {int} the number of blocks
    */
   async getHeight() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -100,7 +107,8 @@ class MoneroDaemon {
    * @param {number} height - height of the block hash to get
    * @return {string} the block's hash at the given height
    */
-  async getBlockHash(height) {
+  async getBlockHash(height: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -111,7 +119,8 @@ class MoneroDaemon {
    * @param {number} [reserveSize] - reserve size (optional)
    * @return {MoneroBlockTemplate} is a block template for mining a new block
    */
-  async getBlockTemplate(walletAddress, reserveSize) {
+  async getBlockTemplate(walletAddress: any, reserveSize: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -121,6 +130,7 @@ class MoneroDaemon {
    * @return {MoneroBlockHeader} last block's header
    */
   async getLastBlockHeader() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -130,7 +140,8 @@ class MoneroDaemon {
    * @param {string} blockHash - hash of the block to get the header of
    * @return {MoneroBlockHeader} block's header
    */
-  async getBlockHeaderByHash(blockHash) {
+  async getBlockHeaderByHash(blockHash: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -140,7 +151,8 @@ class MoneroDaemon {
    * @param {number} height - height of the block to get the header of
    * @return {MoneroBlockHeader} block's header
    */
-  async getBlockHeaderByHeight(height) {
+  async getBlockHeaderByHeight(height: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -151,7 +163,8 @@ class MoneroDaemon {
    * @param {number} [endHeight] - end height upper bound inclusive (optional)
    * @return {MoneroBlockHeader[]} for the given range
    */
-  async getBlockHeadersByRange(startHeight, endHeight) {
+  async getBlockHeadersByRange(startHeight: any, endHeight: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -161,7 +174,8 @@ class MoneroDaemon {
    * @param {string} blockHash - hash of the block to get
    * @return {MoneroBlock} with the given hash
    */
-  async getBlockByHash(blockHash) {
+  async getBlockByHash(blockHash: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -175,7 +189,8 @@ class MoneroDaemon {
    * @param {boolean} [prune] - specifies if returned blocks should be pruned (defaults to false)  // TODO: test default
    * @return {MoneroBlock[]} retrieved blocks
    */
-  async getBlocksByHash(blockHashes, startHeight, prune) {
+  async getBlocksByHash(blockHashes: any, startHeight: any, prune: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -185,7 +200,8 @@ class MoneroDaemon {
    * @param {number} height - height of the block to get
    * @return {MoneroBlock} with the given height
    */
-  async getBlockByHeight(height) {
+  async getBlockByHeight(height: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -195,7 +211,8 @@ class MoneroDaemon {
    * @param {int[]} heights - heights of the blocks to get
    * @return {MoneroBlock[]} are blocks at the given heights
    */
-  async getBlocksByHeight(heights) {
+  async getBlocksByHeight(heights: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -206,7 +223,8 @@ class MoneroDaemon {
    * @param {number} [endHeight] - end height upper bound inclusive (optional)
    * @return {MoneroBlock[]} are blocks in the given height range
    */
-  async getBlocksByRange(startHeight, endHeight) {
+  async getBlocksByRange(startHeight: any, endHeight: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -219,7 +237,8 @@ class MoneroDaemon {
    * @param {number} [maxChunkSize] - maximum chunk size in any one request (default 3,000,000 bytes)
    * @return {MoneroBlock[]} blocks in the given height range
    */
-  async getBlocksByRangeChunked(startHeight, endHeight, maxChunkSize) {
+  async getBlocksByRangeChunked(startHeight: any, endHeight: any, maxChunkSize: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -232,7 +251,8 @@ class MoneroDaemon {
    * @param {number} startHeight - starting height of block hashes to return
    * @return {string[]} requested block hashes     
    */
-  async getBlockHashes(blockHashes, startHeight) {
+  async getBlockHashes(blockHashes: any, startHeight: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -243,7 +263,8 @@ class MoneroDaemon {
    * @param {boolean} prune - specifies if the returned tx should be pruned (defaults to false)
    * @return {MoneroTx} transaction with the given hash or undefined if not found
    */
-  async getTx(txHash, prune = false) {
+  async getTx(txHash: any, prune = false) {
+    // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     return (await this.getTxs([txHash], prune))[0];
   }
   
@@ -254,7 +275,8 @@ class MoneroDaemon {
    * @param {boolean} prune - specifies if the returned txs should be pruned (defaults to false)
    * @return {MoneroTx[]} found transactions with the given hashes
    */
-  async getTxs(txHashes, prune = false) {
+  async getTxs(txHashes: any, prune = false) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -265,7 +287,8 @@ class MoneroDaemon {
    * @param {boolean} [prune] - specifies if the returned tx hex should be pruned (defaults to false)
    * @return {string} tx hex with the given hash
    */
-  async getTxHex(txHash, prune = false) {
+  async getTxHex(txHash: any, prune = false) {
+    // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     return (await this.getTxHexes([txHash], prune))[0];
   }
   
@@ -276,7 +299,8 @@ class MoneroDaemon {
    * @param {boolean} [prune] - specifies if the returned tx hexes should be pruned (defaults to false)
    * @return {string[]} tx hexes
    */
-  async getTxHexes(txHashes, prune = false) {
+  async getTxHexes(txHashes: any, prune = false) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -287,7 +311,8 @@ class MoneroDaemon {
    * @param {number} numBlocks - number of blocks to include in the sum
    * @return {MoneroMinerTxSum} encapsulates the total emissions and fees since the genesis block
    */
-  async getMinerTxSum(height, numBlocks) {
+  async getMinerTxSum(height: any, numBlocks: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -297,7 +322,8 @@ class MoneroDaemon {
    * @param {number} graceBlocks TODO
    * @return {MoneroFeeEstimate} mining fee estimates per kB
    */
-  async getFeeEstimate(graceBlocks) {
+  async getFeeEstimate(graceBlocks: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -308,7 +334,8 @@ class MoneroDaemon {
    * @param {boolean} doNotRelay specifies if the tx should be relayed (optional)
    * @return {MoneroSubmitTxResult} contains submission results
    */
-  async submitTxHex(txHex, doNotRelay) {
+  async submitTxHex(txHex: any, doNotRelay: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -317,7 +344,7 @@ class MoneroDaemon {
    * 
    * @param {string} txHash - hash of the transaction to relay
    */
-  async relayTxByHash(txHash) {
+  async relayTxByHash(txHash: any) {
     //import assert from "assert";
     assert.equal(typeof txHash, "string", "Must provide a transaction hash");
     await this.relayTxsByHash([txHash]);
@@ -328,7 +355,8 @@ class MoneroDaemon {
    * 
    * @param {string[]} txHashes - hashes of the transactinos to relay
    */
-  async relayTxsByHash(txHashes) {
+  async relayTxsByHash(txHashes: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -339,6 +367,7 @@ class MoneroDaemon {
    * @return {MoneroTx[]} are transactions in the transaction pool
    */
   async getTxPool() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -348,6 +377,7 @@ class MoneroDaemon {
    * @return {string[]} are hashes of transactions in the transaction pool
    */
   async getTxPoolHashes() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -357,6 +387,7 @@ class MoneroDaemon {
    * @return {MoneroTxBacklogEntry[]} backlog entries 
    */
   async getTxPoolBacklog() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -366,6 +397,7 @@ class MoneroDaemon {
    * @return {MoneroTxPoolStats} contains statistics about the transaction pool
    */
   async getTxPoolStats() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -374,7 +406,8 @@ class MoneroDaemon {
    * 
    * @param {(string|string[])} [hashes] - specific transactions to flush (defaults to all)
    */
-  async flushTxPool(hashes) {
+  async flushTxPool(hashes: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -384,7 +417,8 @@ class MoneroDaemon {
    * @param {string} keyImage - key image hex to get the status of
    * @return {MoneroKeyImageSpentStatus} status of the key image
    */
-  async getKeyImageSpentStatus(keyImage) {
+  async getKeyImageSpentStatus(keyImage: any) {
+    // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     return (await this.getKeyImageSpentStatuses([keyImage]))[0];
   }
   
@@ -394,7 +428,8 @@ class MoneroDaemon {
    * @param {string[]} keyImages are hex key images to get the statuses of
    * @return {MoneroKeyImageSpentStatus[]} status for each key image
    */
-  async getKeyImageSpentStatuses(keyImages) {
+  async getKeyImageSpentStatuses(keyImages: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -405,7 +440,8 @@ class MoneroDaemon {
    * @param {MoneroOutput[]} outputs - identify each output by amount and index
    * @return {MoneroOutput[]} identified outputs
    */
-  async getOutputs(outputs) {
+  async getOutputs(outputs: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -421,7 +457,8 @@ class MoneroDaemon {
    * @param {number} recentCutoff - TODO
    * @return {MoneroOutputHistogramEntry[]} are entries meeting the parameters
    */
-  async getOutputHistogram(amounts, minCount, maxCount, isUnlocked, recentCutoff) {
+  async getOutputHistogram(amounts: any, minCount: any, maxCount: any, isUnlocked: any, recentCutoff: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -434,7 +471,8 @@ class MoneroDaemon {
    * @param {number} [endHeight] - end height upper bound inclusive (optional)
    * @return {MoneroOutputDistributionEntry[]} are entries meeting the parameters
    */
-  async getOutputDistribution(amounts, cumulative, startHeight, endHeight) {
+  async getOutputDistribution(amounts: any, cumulative: any, startHeight: any, endHeight: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -444,6 +482,7 @@ class MoneroDaemon {
    * @return {MoneroDaemonInfo} is general information about the node and network
    */
   async getInfo() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -453,6 +492,7 @@ class MoneroDaemon {
    * @return {MoneroDaemonSyncInfo} contains sync information
    */
   async getSyncInfo() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -462,6 +502,7 @@ class MoneroDaemon {
    * @return {MoneroHardForkInfo} contains hard fork information
    */
   async getHardForkInfo() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -471,6 +512,7 @@ class MoneroDaemon {
    * @return {MoneroAltChain[]} alternative chains
    */
   async getAltChains() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -480,6 +522,7 @@ class MoneroDaemon {
    * @return {string[]} known block hashes which are not on the main chain
    */
   async getAltBlockHashes() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -489,6 +532,7 @@ class MoneroDaemon {
    * @return {int} download bandwidth limit
    */
   async getDownloadLimit() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -498,7 +542,8 @@ class MoneroDaemon {
    * @param {number} limit - download limit to set (-1 to reset to default)
    * @return {int} new download limit after setting
    */
-  async setDownloadLimit(limit) {
+  async setDownloadLimit(limit: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -508,6 +553,7 @@ class MoneroDaemon {
    * @return {int} download bandwidth limit after resetting
    */
   async resetDownloadLimit() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -517,6 +563,7 @@ class MoneroDaemon {
    * @return {int} upload bandwidth limit
    */
   async getUploadLimit() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -526,7 +573,8 @@ class MoneroDaemon {
    * @param limit - upload limit to set (-1 to reset to default)
    * @return {int} new upload limit after setting
    */
-  async setUploadLimit(limit) {
+  async setUploadLimit(limit: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -536,6 +584,7 @@ class MoneroDaemon {
    * @return {int} upload bandwidth limit after resetting
    */
   async resetUploadLimit() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -545,6 +594,7 @@ class MoneroDaemon {
    * @return {MoneroPeer[]} the daemon's peers
    */
   async getPeers() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -554,6 +604,7 @@ class MoneroDaemon {
    * @return {MoneroPeer[]} the daemon's known peers
    */
   async getKnownPeers() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -562,7 +613,8 @@ class MoneroDaemon {
    * 
    * @param {number} limit - maximum number of outgoing peers
    */
-  async setOutgoingPeerLimit(limit) {
+  async setOutgoingPeerLimit(limit: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -571,7 +623,8 @@ class MoneroDaemon {
    * 
    * @param {number} limit - maximum number of incoming peers
    */
-  async setIncomingPeerLimit(limit) {
+  async setIncomingPeerLimit(limit: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -581,6 +634,7 @@ class MoneroDaemon {
    * @return {MoneroBan[]} entries about banned peers
    */
   async getPeerBans() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
 
@@ -589,7 +643,7 @@ class MoneroDaemon {
    * 
    * @param {MoneroBan} ban - contains information about a node to ban
    */
-  async setPeerBan(ban) {
+  async setPeerBan(ban: any) {
     return await this.setPeerBans([ban]);
   }
   
@@ -598,7 +652,8 @@ class MoneroDaemon {
    * 
    * @param {MoneroBan[]} bans - specify which peers to ban
    */
-  async setPeerBans(bans) {
+  async setPeerBans(bans: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -610,7 +665,8 @@ class MoneroDaemon {
    * @param {boolean} isBackground - specifies if the miner should run in the background or not
    * @param {boolean} ignoreBattery - specifies if the battery state (e.g. on laptop) should be ignored or not
    */
-  async startMining(address, numThreads, isBackground, ignoreBattery) {
+  async startMining(address: any, numThreads: any, isBackground: any, ignoreBattery: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -618,6 +674,7 @@ class MoneroDaemon {
    * Stop mining.
    */
   async stopMining() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -627,6 +684,7 @@ class MoneroDaemon {
    * @return {MoneroMiningStatus} daemon's mining status
    */
   async getMiningStatus() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -635,7 +693,7 @@ class MoneroDaemon {
    * 
    * @param {string} blockBlob - mined block to submit
    */
-  async submitBlock(blockBlob) {
+  async submitBlock(blockBlob: any) {
     await this.submitBlocks([blockBlob]);
   }
 
@@ -645,7 +703,8 @@ class MoneroDaemon {
    * @param {boolean} check specifies to check the pruning (default false)
    * @return {MoneroPruneResult} the prune result
    */
-  async pruneBlockchain(check) {
+  async pruneBlockchain(check: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -654,7 +713,8 @@ class MoneroDaemon {
    * 
    * @param {string[]} blockBlobs - mined blocks to submit
    */
-  async submitBlocks(blockBlobs) {
+  async submitBlocks(blockBlobs: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -664,6 +724,7 @@ class MoneroDaemon {
    * @return {MoneroDaemonUpdateCheckResult} the result
    */
   async checkForUpdate() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -673,7 +734,8 @@ class MoneroDaemon {
    * @param {string} [path] - path to download the update (optional)
    * @return {MoneroDaemonUpdateDownloadResult} the result
    */
-  async downloadUpdate(path) {
+  async downloadUpdate(path: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -681,6 +743,7 @@ class MoneroDaemon {
    * Safely disconnect and shut down the daemon.
    */
   async stop() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -690,6 +753,7 @@ class MoneroDaemon {
    * @return {MoneroBlockHeader} header of the next block added to the chain
    */
   async waitForNextBlockHeader() {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Subclass must implement");
   }
   
@@ -701,11 +765,15 @@ class MoneroDaemon {
    * @param {string} network - network string to parse
    * @return {MoneroNetworkType} enumerated network type
    */
-  static parseNetworkType(network) {
+  static parseNetworkType(network: any) {
     //import MoneroNetworkType from "./model/MoneroNetworkType";
+    // @ts-expect-error TS(2339): Property 'MAINNET' does not exist on type 'typeof ... Remove this comment to see the full error message
     if (network === "mainnet") return MoneroNetworkType.MAINNET;
+    // @ts-expect-error TS(2339): Property 'TESTNET' does not exist on type 'typeof ... Remove this comment to see the full error message
     if (network === "testnet") return MoneroNetworkType.TESTNET;
+    // @ts-expect-error TS(2339): Property 'STAGENET' does not exist on type 'typeof... Remove this comment to see the full error message
     if (network === "stagenet") return MoneroNetworkType.STAGENET;
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     throw new MoneroError("Invalid network type to parse: " + network);
   }
 }

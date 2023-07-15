@@ -4,8 +4,9 @@
  * @class
  */
 class MoneroMessageSignatureResult {
-  
-  constructor(stateOrIsGood, isOld, signatureType, version) {
+  state: any;
+
+  constructor(stateOrIsGood: any, isOld: any, signatureType: any, version: any) {
     if (typeof stateOrIsGood === "boolean") {
       this.state = {};
       this.state.isGood = stateOrIsGood;
@@ -16,7 +17,7 @@ class MoneroMessageSignatureResult {
       this.state = stateOrIsGood;
     }
   }
-  
+
   toJson() {
     return Object.assign({}, this.state);
   }
@@ -25,34 +26,34 @@ class MoneroMessageSignatureResult {
     return this.state.isGood;
   }
 
-  setIsGood(isGood) {
+  setIsGood(isGood: any) {
     this.state.isGood = isGood;
     return this;
   }
-  
+
   isOld() {
     return this.state.isOld;
   }
 
-  setIsOld(isOld) {
+  setIsOld(isOld: any) {
     this.state.isOld = isOld;
     return this;
   }
-  
+
   getSignatureType() {
     return this.state.signatureType;
   }
 
-  setSignatureType(signatureType) {
+  setSignatureType(signatureType: any) {
     this.state.signatureType = signatureType;
     return this;
   }
-  
+
   getVersion() {
     return this.state.version;
   }
 
-  setVersion(version) {
+  setVersion(version: any) {
     this.state.version = version;
     return this;
   }

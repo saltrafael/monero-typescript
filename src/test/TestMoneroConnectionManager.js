@@ -50,7 +50,7 @@ class TestMoneroConnectionManager {
           assert.equal(listener.changedConnections.length, ++numExpectedChanges);
           
           // auto connect to best available connection
-          connectionManager.setAutoSwitch(true);
+          connectionManager.autoSwitch = true;
           await connectionManager.startCheckingConnection(TestUtils.SYNC_PERIOD_IN_MS);
           assert(connectionManager.isConnected());
           let connection = connectionManager.getConnection();
@@ -58,7 +58,7 @@ class TestMoneroConnectionManager {
           assert(connection === walletRpcs[4].getRpcConnection());
           assert.equal(listener.changedConnections.length, ++numExpectedChanges);
           assert(listener.changedConnections[listener.changedConnections.length - 1] === connection);
-          connectionManager.setAutoSwitch(false);
+          connectionManager.autoSwitch = false;
           connectionManager.stopCheckingConnection();
           connectionManager.disconnect();
           assert.equal(listener.changedConnections.length, ++numExpectedChanges);
@@ -127,7 +127,7 @@ class TestMoneroConnectionManager {
           }
           
           // test auto switch when disconnected
-          connectionManager.setAutoSwitch(true);
+          connectionManager.autoSwitch = false;
           await GenUtils.waitFor(TestUtils.SYNC_PERIOD_IN_MS + 100); // allow time to poll
           assert(connectionManager.isConnected());
           connection = connectionManager.getConnection();
@@ -153,7 +153,7 @@ class TestMoneroConnectionManager {
           assert.equal(listener.changedConnections.length, ++numExpectedChanges);
           
           // connect to specific endpoint with authentication
-          connectionManager.setAutoSwitch(false);
+          connectionManager.autoSwitch = false;
           orderedConnections[1].setCredentials("rpc_user", "abc123");
           await connectionManager.checkConnection();
           assert.equal(connection.getUri(), walletRpcs[1].getRpcConnection().getUri());
@@ -195,7 +195,7 @@ class TestMoneroConnectionManager {
           assert.equal(listener.changedConnections.length, ++numExpectedChanges);
           
           // check all connections and test auto switch
-          connectionManager.setAutoSwitch(true);
+          connectionManager.autoSwitch = true;
           await connectionManager.checkConnections();
           assert.equal(listener.changedConnections.length, ++numExpectedChanges);
           assert(connectionManager.isConnected());

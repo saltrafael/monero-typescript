@@ -8,85 +8,88 @@ import MoneroKeyImage from "./MoneroKeyImage";
  * @class
  */
 class MoneroOutput {
-  
+  state: any;
+
   /**
    * Construct the model.
    * 
    * @param {MoneroOutput|object} state is existing state to initialize from (optional)
    */
-  constructor(state) {
+  constructor(state: any) {
     
     // initialize internal state
     if (!state) state = {};
     else if (state instanceof MoneroOutput) state = state.toJson();
     else if (typeof state === "object") state = Object.assign({}, state);
+    // @ts-expect-error TS(2304): Cannot find name 'MoneroError'.
     else throw new MoneroError("state must be a MoneroOutput or JavaScript object");
     this.state = state;
     
     // deserialize fields if necessary
     if (state.amount !== undefined && !(state.amount instanceof BigInt)) state.amount = BigInt(state.amount);
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
     if (state.keyImage && !(state.keyImage instanceof MoneroKeyImage)) state.keyImage = new MoneroKeyImage(state.keyImage);
   }
-  
+
   getTx() {
     return this.state.tx;
   }
-  
-  setTx(tx) {
+
+  setTx(tx: any) {
     this.state.tx = tx;
     return this;
   }
-  
+
   getKeyImage() {
     return this.state.keyImage;
   }
 
-  setKeyImage(keyImage) {
+  setKeyImage(keyImage: any) {
     assert(keyImage === undefined || keyImage instanceof MoneroKeyImage);
     this.state.keyImage = keyImage;
     return this;
   }
-  
+
   getAmount() {
     return this.state.amount;
   }
 
-  setAmount(amount) {
+  setAmount(amount: any) {
     this.state.amount = amount;
     return this;
   }
-  
+
   getIndex() {
     return this.state.index;
   }
-  
-  setIndex(index) {
+
+  setIndex(index: any) {
     this.state.index = index;
     return this;
   }
-  
+
   getRingOutputIndices() {
     return this.state.ringOutputIndices;
   }
-  
-  setRingOutputIndices(ringOutputIndices) {
+
+  setRingOutputIndices(ringOutputIndices: any) {
     this.state.ringOutputIndices = ringOutputIndices;
     return this;
   }
-  
+
   getStealthPublicKey() {
     return this.state.stealthPublicKey;
   }
-  
-  setStealthPublicKey(stealthPublicKey) {
+
+  setStealthPublicKey(stealthPublicKey: any) {
     this.state.stealthPublicKey = stealthPublicKey;
     return this;
   }
-  
+
   copy() {
     return new MoneroOutput(this);
   }
-  
+
   toJson() {
     let json = Object.assign({}, this.state);
     if (this.getAmount() !== undefined) json.amount = this.getAmount() ? this.getAmount().toString() : undefined;
@@ -94,8 +97,8 @@ class MoneroOutput {
     delete json.tx;
     return json;
   }
-  
-  merge(output) {
+
+  merge(output: any) {
     assert(output instanceof MoneroOutput);
     if (this === output) return this;
     
@@ -106,13 +109,15 @@ class MoneroOutput {
     else {
       if (this.getKeyImage() === undefined) this.setKeyImage(output.getKeyImage());
       else if (output.getKeyImage() !== undefined) this.getKeyImage().merge(output.getKeyImage());
+      // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
       this.setAmount(GenUtils.reconcile(this.getAmount(), output.getAmount()));
+      // @ts-expect-error TS(2554): Expected 4 arguments, but got 2.
       this.setIndex(GenUtils.reconcile(this.getIndex(), output.getIndex()));
     }
 
     return this;
   }
-  
+
   toString(indent = 0) {
     let str = "";
     if (this.getKeyImage() !== undefined) {

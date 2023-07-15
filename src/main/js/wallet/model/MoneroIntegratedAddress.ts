@@ -2,11 +2,12 @@
  * Monero integrated address model.
  */
 class MoneroIntegratedAddress {
-  
-  constructor(state) {
+  state: any;
+
+  constructor(state: any) {
     this.state = Object.assign({}, state);
   }
-  
+
   toJson() {
     return Object.assign({}, this.state);
   }
@@ -14,30 +15,30 @@ class MoneroIntegratedAddress {
   getStandardAddress() {
     return this.state.standardAddress;
   }
-  
-  setStandardAddress(standardAddress) {
+
+  setStandardAddress(standardAddress: any) {
     this.state.standardAddress = standardAddress;
     return this;
   }
-  
+
   getPaymentId() {
     return this.state.paymentId;
   }
-  
-  setPaymentId(paymentId) {
+
+  setPaymentId(paymentId: any) {
     this.state.paymentId = paymentId;
     return this;
   }
-  
+
   getIntegratedAddress() {
     return this.state.integratedAddress;
   }
-  
-  setIntegratedAddress(integratedAddress) {
+
+  setIntegratedAddress(integratedAddress: any) {
     this.state.integratedAddress = integratedAddress;
     return this;
   }
-  
+
   toString() {
     return this.state.integratedAddress;
   }

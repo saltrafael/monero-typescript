@@ -6,249 +6,307 @@ import path from "path";
 
 /**
  * Collection of helper utilities for the library.
- * 
+ *
  * @hideconstructor
  */
 class LibraryUtils {
-  
+  private static _INSTANCE: LibraryUtils | null = null;
+  private _LOG_LEVEL: number = 0;
+  private _WORKER_DIST_PATH_DEFAULT: string;
+  private _WORKER_DIST_PATH: string;
+  WASM_MODULE: any;
+  FULL_LOADED: boolean = false;
+  REJECT_UNAUTHORIZED_FNS: undefined | { [key: string]: () => void };
+  WORKER: undefined | Worker;
+  WORKER_OBJECTS: {
+    [workerId: string]: {
+      callbacks: { [callbackId: string]: (resp?: any) => void };
+    };
+  } = {};
+
+  private constructor() {
+    const that = this;
+    this._WORKER_DIST_PATH_DEFAULT = GenUtils.isBrowser()
+      ? "/monero_web_worker.js"
+      : (function () {
+          return that._prefixWindowsPath(
+            path.join(__dirname, "./MoneroWebWorker.js"),
+          );
+        })();
+    this._WORKER_DIST_PATH = this._WORKER_DIST_PATH_DEFAULT;
+  }
+
+  static get instance() {
+    if (!LibraryUtils._INSTANCE) LibraryUtils._INSTANCE = new LibraryUtils();
+    return LibraryUtils._INSTANCE;
+  }
+
   /**
    * Log a message.
    *
    * @param {number} level - log level of the message
    * @param {string} msg - message to log
    */
-  static log(level, msg) {
-    assert(level === parseInt(level, 10) && level >= 0, "Log level must be an integer >= 0");
-    if (LibraryUtils.LOG_LEVEL >= level) console.log(msg);
+  log(level: number, msg: string) {
+    assert(
+      level === parseInt(String(level), 10) && level >= 0,
+      "Log level must be an integer >= 0",
+    );
+    if (this._LOG_LEVEL >= level) console.log(msg);
   }
-  
+
+  get logLevel() {
+    return this._LOG_LEVEL;
+  }
+
   /**
    * Set the library's log level with 0 being least verbose.
    *
-   * @param {number} level - the library's log level
+   * @param {string | number} level - the library's log level
    */
-  static async setLogLevel(level) {
-    assert(level === parseInt(level, 10) && level >= 0, "Log level must be an integer >= 0");
-    LibraryUtils.LOG_LEVEL = level;
-    if (LibraryUtils.WASM_MODULE) LibraryUtils.WASM_MODULE.set_log_level(level);
-    if (LibraryUtils.WORKER) await LibraryUtils.invokeWorker(GenUtils.getUUID(), "setLogLevel", [level]);
+  async setLogLevel(level: string | number) {
+    assert(
+      level === parseInt(String(level), 10) && level >= 0,
+      "Log level must be an integer >= 0",
+    );
+
+    this._LOG_LEVEL = level;
+    if (this.WASM_MODULE) this.WASM_MODULE.set_log_level(level);
+    if (this.WORKER)
+      await this.invokeWorker(GenUtils.getUUID(), "setLogLevel", [level]);
   }
-  
-  /**
-   * Get the library's log level.
-   *
-   * @return {int} the library's log level
-   */
-  static getLogLevel() {
-    return LibraryUtils.LOG_LEVEL;
-  }
-  
+
   /**
    * Get the total memory used by WebAssembly.
-   * 
-   * @return {int} the total memory used by WebAssembly
+   *
+   * @return {Promise<number>} the total memory used by WebAssembly
    */
-  static async getWasmMemoryUsed() {
+  async getWasmMemoryUsed(): Promise<number> {
     let total = 0;
-    if (LibraryUtils.WORKER) total += await LibraryUtils.invokeWorker(GenUtils.getUUID(), "getWasmMemoryUsed", []);
-    if (LibraryUtils.getWasmModule() && LibraryUtils.getWasmModule().HEAP8) total += LibraryUtils.getWasmModule().HEAP8.length;
+    if (this.WORKER)
+      total += await this.invokeWorker(
+        GenUtils.getUUID(),
+        "getWasmMemoryUsed",
+        [],
+      );
+    if (this.WASM_MODULE && this.WASM_MODULE.HEAP8)
+      total += this.WASM_MODULE.HEAP8.length;
     return total;
   }
-  
-  /**
-   * Get the WebAssembly module in the current context (nodejs, browser main thread or worker).
-   */
-  static getWasmModule() {
-    return LibraryUtils.WASM_MODULE;
-  }
-  
+
   /**
    * Load the WebAssembly keys module with caching.
    */
-  static async loadKeysModule() {
-    
+  async loadKeysModule() {
     // use cache if suitable, full module supersedes keys module because it is superset
-    if (LibraryUtils.WASM_MODULE) return LibraryUtils.WASM_MODULE;
-    
+    if (this.WASM_MODULE) return this.WASM_MODULE;
+
     // load module
-    delete LibraryUtils.WASM_MODULE;
-    LibraryUtils.WASM_MODULE = require("../../../../dist/monero_wallet_keys")();
-    return new Promise(function(resolve, reject) {
-      LibraryUtils.WASM_MODULE.then(module => {
-        LibraryUtils.WASM_MODULE = module
-        delete LibraryUtils.WASM_MODULE.then;
-        LibraryUtils._initWasmModule(LibraryUtils.WASM_MODULE);
-        resolve(LibraryUtils.WASM_MODULE);
-      });
+    delete this.WASM_MODULE;
+    const that = this;
+
+    return import("../../../../dist/monero_wallet_keys").then((module) => {
+      that.WASM_MODULE = module;
+      delete that.WASM_MODULE.then;
+      that._initWasmModule(that.WASM_MODULE);
+      return that.WASM_MODULE;
     });
   }
-  
+
   /**
    * Load the WebAssembly full module with caching.
-   * 
+   *
    * The full module is a superset of the keys module and overrides it.
-   * 
+   *
    * TODO: this is separate static function from loadKeysModule() because webpack cannot bundle worker using runtime param for conditional import
    */
-  static async loadFullModule() {
-    
+  async loadFullModule() {
     // use cache if suitable, full module supersedes keys module because it is superset
-    if (LibraryUtils.WASM_MODULE && LibraryUtils.FULL_LOADED) return LibraryUtils.WASM_MODULE;
-    
+    if (this.WASM_MODULE && this.FULL_LOADED) return this.WASM_MODULE;
+
     // load module
-    delete LibraryUtils.WASM_MODULE;
-    LibraryUtils.WASM_MODULE = require("../../../../dist/monero_wallet_full")();
-    return new Promise(function(resolve, reject) {
-      LibraryUtils.WASM_MODULE.then(module => {
-        LibraryUtils.WASM_MODULE = module
-        delete LibraryUtils.WASM_MODULE.then;
-        LibraryUtils.FULL_LOADED = true;
-        LibraryUtils._initWasmModule(LibraryUtils.WASM_MODULE);
-        resolve(LibraryUtils.WASM_MODULE);
-      });
+    delete this.WASM_MODULE;
+    const that = this;
+
+    return import("../../../../dist/monero_wallet_full").then((module) => {
+      that.WASM_MODULE = module;
+      delete that.WASM_MODULE.then;
+      that.FULL_LOADED = true;
+      that._initWasmModule(that.WASM_MODULE);
+      return that.WASM_MODULE;
     });
   }
-  
+
   /**
    * Register a function by id which informs if unauthorized requests (e.g.
    * self-signed certificates) should be rejected.
-   * 
+   *
    * @param {string} fnId - unique identifier for the function
    * @param {function} fn - function to inform if unauthorized requests should be rejected
    */
-  static setRejectUnauthorizedFn(fnId, fn) {
-    if (!LibraryUtils.REJECT_UNAUTHORIZED_FNS) LibraryUtils.REJECT_UNAUTHORIZED_FNS = [];
-    if (fn === undefined) delete LibraryUtils.REJECT_UNAUTHORIZED_FNS[fnId];
-    else LibraryUtils.REJECT_UNAUTHORIZED_FNS[fnId] = fn;
+  public setRejectUnauthorizedFn(fnId: string, fn: () => boolean) {
+    if (!this.REJECT_UNAUTHORIZED_FNS) this.REJECT_UNAUTHORIZED_FNS = {};
+    if (fn === undefined) delete this.REJECT_UNAUTHORIZED_FNS[fnId];
+    else this.REJECT_UNAUTHORIZED_FNS[fnId] = fn;
   }
-  
+
   /**
    * Indicate if unauthorized requests should be rejected.
-   * 
+   *
    * @param {string} fnId - uniquely identifies the function
    */
-  static isRejectUnauthorized(fnId) {
-    if (!LibraryUtils.REJECT_UNAUTHORIZED_FNS[fnId]) throw new Error("No function registered with id " + fnId + " to inform if unauthorized reqs should be rejected");
-    return LibraryUtils.REJECT_UNAUTHORIZED_FNS[fnId]();
+  isRejectUnauthorized(fnId: string) {
+    if (!this.REJECT_UNAUTHORIZED_FNS?.[fnId])
+      throw new Error(
+        "No function registered with id " +
+          fnId +
+          " to inform if unauthorized reqs should be rejected",
+      );
+    return this.REJECT_UNAUTHORIZED_FNS[fnId]();
   }
-  
+
   /**
    * Set the path to load the worker. Defaults to "/monero_web_worker.js" in the browser
    * and "./MoneroWebWorker.js" in node.
-   * 
+   *
    * @param {string} workerDistPath - path to load the worker
    */
-  static setWorkerDistPath(workerDistPath) {
-    let path = LibraryUtils._prefixWindowsPath(workerDistPath ? workerDistPath : LibraryUtils.WORKER_DIST_PATH_DEFAULT);
-    if (path !== LibraryUtils.WORKER_DIST_PATH) delete LibraryUtils.WORKER;
-    LibraryUtils.WORKER_DIST_PATH = path;
+  setWorkerDistPath(workerDistPath: string) {
+    const path = this._prefixWindowsPath(
+      workerDistPath ? workerDistPath : this._WORKER_DIST_PATH_DEFAULT,
+    );
+    if (path !== this._WORKER_DIST_PATH) delete this.WORKER;
+    this._WORKER_DIST_PATH = path;
   }
 
   /**
    * Get a singleton instance of a worker to share.
-   * 
-   * @return {Worker} a worker to share among wallet instances
+   *
+   * @return {Promise<Worker>} a worker to share among wallet instances
    */
-  static async getWorker() {
+  async getWorker(): Promise<Worker> {
     // one time initialization
-    if (!LibraryUtils.WORKER) {
-      if (GenUtils.isBrowser()) {
-        LibraryUtils.WORKER = new Worker(LibraryUtils.WORKER_DIST_PATH);
-      } else {
-        const Worker = require("web-worker"); // import web worker if nodejs
-        LibraryUtils.WORKER = new Worker(LibraryUtils.WORKER_DIST_PATH);
-      }
-      LibraryUtils.WORKER_OBJECTS = {};  // store per object running in the worker
-      
+    if (!this.WORKER) {
+      this.WORKER = new Worker(this._WORKER_DIST_PATH);
+      this.WORKER_OBJECTS = {}; // store per object running in the worker
+
       // receive worker errors
-      LibraryUtils.WORKER.onerror = function(err) {
-        console.error("Error posting message to MoneroWebWorker.js; is it copied to the app's build directory (e.g. in the root)?");
+      this.WORKER.onerror = function (err: any) {
+        console.error(
+          "Error posting message to MoneroWebWorker.js; is it copied to the app's build directory (e.g. in the root)?",
+        );
         console.log(err);
       };
-      
+
+      const that = this;
+
       // receive worker messages
-      LibraryUtils.WORKER.onmessage = function(e) {
-        
+      this.WORKER.onmessage = function (e: any) {
         // lookup object id, callback function, and this arg
         let thisArg = null;
-        let callbackFn = LibraryUtils.WORKER_OBJECTS[e.data[0]].callbacks[e.data[1]]; // look up by object id then by function name
-        if (callbackFn === undefined) throw new Error("No worker callback function defined for key '" + e.data[1] + "'");
-        if (callbackFn instanceof Array) {  // this arg may be stored with callback function
+        let callbackFn = that.WORKER_OBJECTS[e.data[0]].callbacks[e.data[1]]; // look up by object id then by function name
+        if (callbackFn === undefined)
+          throw new Error(
+            "No worker callback function defined for key '" + e.data[1] + "'",
+          );
+        if (callbackFn instanceof Array) {
+          // this arg may be stored with callback function
           thisArg = callbackFn[1];
           callbackFn = callbackFn[0];
         }
-        
+
         // invoke callback function with this arg and arguments
         callbackFn.apply(thisArg, e.data.slice(2));
-      }
+      };
     }
-    return LibraryUtils.WORKER;
+    return this.WORKER;
   }
-  
+
   /**
    * Terminate monero-javascript's singleton worker.
    */
-  static async terminateWorker() {
-    if (LibraryUtils.WORKER) {
-      LibraryUtils.WORKER.terminate();
-      delete LibraryUtils.WORKER;
-      LibraryUtils.WORKER = undefined;
+  async terminateWorker() {
+    if (this.WORKER) {
+      this.WORKER.terminate();
+      delete this.WORKER;
+      this.WORKER = undefined;
     }
   }
-  
+
   /**
    * Invoke a worker function and get the result with error handling.
-   * 
-   * @param {objectId} identifies the worker object to invoke
+   *
+   * @param {string} objectId identifies the worker object to invoke
    * @param {string} fnName is the name of the function to invoke
    * @param {Object[]} args are function arguments to invoke with
    * @return {any} resolves with response payload from the worker or an error
    */
-  static async invokeWorker(objectId, fnName, args) {
+  async invokeWorker(
+    objectId: string,
+    fnName: string,
+    args: any,
+  ): Promise<any> {
     assert(fnName.length >= 2);
-    let worker;
-    worker = await LibraryUtils.getWorker();
-    if (!LibraryUtils.WORKER_OBJECTS[objectId]) LibraryUtils.WORKER_OBJECTS[objectId] = {callbacks: {}};
-    return await new Promise(function(resolve, reject) {
-      let callbackId = GenUtils.getUUID();
-      LibraryUtils.WORKER_OBJECTS[objectId].callbacks[callbackId] = function(resp) {  // TODO: this defines function once per callback
-        resp ? (resp.error ? reject(LibraryUtils.deserializeError(resp.error)) : resolve(resp.result)) : resolve();
-        delete LibraryUtils.WORKER_OBJECTS[objectId].callbacks[callbackId];
+    const worker = await this.getWorker();
+    if (!this.WORKER_OBJECTS[objectId])
+      this.WORKER_OBJECTS[objectId] = { callbacks: {} };
+
+    const that = this;
+    return await new Promise(function (resolve, reject) {
+      const callbackId = GenUtils.getUUID();
+      that.WORKER_OBJECTS[objectId].callbacks[callbackId] = function (
+        resp: any,
+      ) {
+        // TODO: this defines function once per callback
+        resp
+          ? resp.error
+            ? reject(this.deserializeError(resp.error))
+            : resolve(resp.result)
+          : resolve(undefined);
+        delete that.WORKER_OBJECTS[objectId].callbacks[callbackId];
       };
-      worker.postMessage([objectId, fnName, callbackId].concat(args === undefined ? [] : GenUtils.listify(args)));
+      worker.postMessage(
+        [objectId, fnName, callbackId].concat(
+          args === undefined ? [] : GenUtils.listify(args),
+        ),
+      );
     });
   }
 
-  static serializeError(err) {
-    const serializedErr = { name: err.name, message: err.message, stack: err.stack };
-    if (err instanceof MoneroError) serializedErr.type = "MoneroError";
+  serializeError(err: any) {
+    const serializedErr = {
+      name: err.name,
+      message: err.message,
+      stack: err.stack,
+      type: err instanceof MoneroError ? "MoneroError" : "Error",
+    };
     return serializedErr;
   }
 
-  static deserializeError(serializedErr) {
-    const err = serializedErr.type === "MoneroError" ? new MoneroError(serializedErr.message) : new Error(serializedErr.message);
+  deserializeError(serializedErr: any) {
+    const err =
+      serializedErr.type === "MoneroError"
+        ? new MoneroError(serializedErr.message)
+        : new Error(serializedErr.message);
     err.name = serializedErr.name;
     err.stack = serializedErr.stack;
     return err;
   }
-  
+
   // ------------------------------ PRIVATE HELPERS ---------------------------
-  
-  static _initWasmModule(wasmModule) {
+
+  private _initWasmModule(wasmModule: any) {
     wasmModule.taskQueue = new ThreadPool(1);
-    wasmModule.queueTask = async function(asyncFn) { return wasmModule.taskQueue.submit(asyncFn); }
+    wasmModule.queueTask = async function (asyncFn: any) {
+      return wasmModule.taskQueue.submit(asyncFn);
+    };
   }
-  
-  static _prefixWindowsPath(path) {
-    if (path.indexOf("C:") == 0 && path.indexOf("file://") == -1) path = "file://" + path; // prepend C: paths with file://
+
+  private _prefixWindowsPath(path: any) {
+    if (path.indexOf("C:") == 0 && path.indexOf("file://") == -1)
+      path = "file://" + path; // prepend C: paths with file://
     return path;
   }
 }
-
-LibraryUtils.LOG_LEVEL = 0;
-LibraryUtils.WORKER_DIST_PATH_DEFAULT = GenUtils.isBrowser() ? "/monero_web_worker.js" : function() {
-    return LibraryUtils._prefixWindowsPath(path.join(__dirname, "./MoneroWebWorker.js"));
-}();
-LibraryUtils.WORKER_DIST_PATH = LibraryUtils.WORKER_DIST_PATH_DEFAULT;
 
 export default LibraryUtils;

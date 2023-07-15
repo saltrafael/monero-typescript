@@ -3,23 +3,24 @@
  * Entry in a Monero output histogram (see get_output_histogram of Daemon RPC documentation).
  */
 class MoneroOutputHistogramEntry {
-  
-  constructor(state) {
+  state: any;
+
+  constructor(state: any) {
     this.state = Object.assign({}, state);
     if (this.state.amount !== undefined && !(this.state.amount instanceof BigInt)) this.state.amount = BigInt(this.state.amount);
   }
-  
+
   toJson() {
     let json = Object.assign({}, this.state);
     if (json.amount !== undefined) json.amount = json.amount.toString();
     return json;
   }
-  
+
   getAmount() {
     return this.state.amount;
   }
-  
-  setAmount(amount) {
+
+  setAmount(amount: any) {
     this.state.amount = amount;
     return this;
   }
@@ -28,7 +29,7 @@ class MoneroOutputHistogramEntry {
     return this.state.numInstances;
   }
 
-  setNumInstances(numInstances) {
+  setNumInstances(numInstances: any) {
     this.state.numInstances = numInstances;
     return this;
   }
@@ -37,7 +38,7 @@ class MoneroOutputHistogramEntry {
     return this.state.numUnlockedInstances;
   }
 
-  setNumUnlockedInstances(numUnlockedInstances) {
+  setNumUnlockedInstances(numUnlockedInstances: any) {
     this.state.numUnlockedInstances = numUnlockedInstances;
     return this;
   }
@@ -46,7 +47,7 @@ class MoneroOutputHistogramEntry {
     return this.state.numRecentInstances;
   }
 
-  setNumRecentInstances(numRecentInstances) {
+  setNumRecentInstances(numRecentInstances: any) {
     this.state.numRecentInstances = numRecentInstances;
     return this;
   }

@@ -177,7 +177,7 @@ class MoneroUtils {
    * @return {Promise&lt;MoneroIntegratedAddress>} the integrated address
    */
   static async getIntegratedAddress(networkType, standardAddress, paymentId) {
-    if (MoneroUtils.PROXY_TO_WORKER) return new MoneroIntegratedAddress(await LibraryUtils.invokeWorker(undefined, "moneroUtilsGetIntegratedAddress", Array.from(arguments)));
+    if (MoneroUtils.PROXY_TO_WORKER) return new MoneroIntegratedAddress(await LibraryUtils.instance.invokeWorker(undefined, "moneroUtilsGetIntegratedAddress", Array.from(arguments)));
   
     // validate inputs
     MoneroNetworkType.validate(networkType);
@@ -186,11 +186,11 @@ class MoneroUtils {
     assert(GenUtils.isBase58(standardAddress), "Address is not base 58");
     
     // load keys module by default
-    if (LibraryUtils.getWasmModule() === undefined) await LibraryUtils.loadKeysModule();
+    if (LibraryUtils.instance.WASM_MODULE === undefined) await LibraryUtils.instance.loadKeysModule();
     
     // get integrated address in queue
-    return LibraryUtils.getWasmModule().queueTask(async function() {
-      let integratedAddressJson = LibraryUtils.getWasmModule().get_integrated_address_util(networkType, standardAddress, paymentId ? paymentId : "");
+    return LibraryUtils.instance.WASM_MODULE.queueTask(async function() {
+      let integratedAddressJson = LibraryUtils.instance.WASM_MODULE.get_integrated_address_util(networkType, standardAddress, paymentId ? paymentId : "");
       if (integratedAddressJson.charAt(0) !== '{') throw new MoneroError(integratedAddressJson);
       return new MoneroIntegratedAddress(JSON.parse(integratedAddressJson));
     });
@@ -219,7 +219,7 @@ class MoneroUtils {
    * @param {MoneroNetworkType} networkType - network type of the address to validate
    */
   static async validateAddress(address, networkType) {
-    if (MoneroUtils.PROXY_TO_WORKER) return LibraryUtils.invokeWorker(undefined, "moneroUtilsValidateAddress", Array.from(arguments));
+    if (MoneroUtils.PROXY_TO_WORKER) return LibraryUtils.instance.invokeWorker(undefined, "moneroUtilsValidateAddress", Array.from(arguments));
     
     // validate inputs
     assert(typeof address === "string", "Address is not string");
@@ -228,11 +228,11 @@ class MoneroUtils {
     MoneroNetworkType.validate(networkType);
     
     // load keys module by default
-    if (LibraryUtils.getWasmModule() === undefined) await LibraryUtils.loadKeysModule();
+    if (LibraryUtils.instance.WASM_MODULE === undefined) await LibraryUtils.instance.loadKeysModule();
     
     // validate address in queue
-    return LibraryUtils.getWasmModule().queueTask(async function() {
-      let errMsg = LibraryUtils.getWasmModule().validate_address(address, networkType);
+    return LibraryUtils.instance.WASM_MODULE.queueTask(async function() {
+      let errMsg = LibraryUtils.instance.WASM_MODULE.validate_address(address, networkType);
       if (errMsg) throw new MoneroError(errMsg);
     });
   }
@@ -329,16 +329,16 @@ class MoneroUtils {
    * @return {Promise&lt;Uint8Array>} the json converted to portable storage binary
    */
   static async jsonToBinary(json) {
-    if (MoneroUtils.PROXY_TO_WORKER) return LibraryUtils.invokeWorker(undefined, "moneroUtilsJsonToBinary", Array.from(arguments));
+    if (MoneroUtils.PROXY_TO_WORKER) return LibraryUtils.instance.invokeWorker(undefined, "moneroUtilsJsonToBinary", Array.from(arguments));
     
     // load keys module by default
-    if (LibraryUtils.getWasmModule() === undefined) await LibraryUtils.loadKeysModule();
+    if (LibraryUtils.instance.WASM_MODULE === undefined) await LibraryUtils.instance.loadKeysModule();
     
     // use wasm in queue
-    return LibraryUtils.getWasmModule().queueTask(async function() {
+    return LibraryUtils.instance.WASM_MODULE.queueTask(async function() {
       
       // serialize json to binary which is stored in c++ heap
-      let binMemInfoStr = LibraryUtils.getWasmModule().malloc_binary_from_json(JSON.stringify(json));
+      let binMemInfoStr = LibraryUtils.instance.WASM_MODULE.malloc_binary_from_json(JSON.stringify(json));
       
       // sanitize binary memory address info
       let binMemInfo = JSON.parse(binMemInfoStr);
@@ -348,11 +348,11 @@ class MoneroUtils {
       // read binary data from heap to Uint8Array
       let view = new Uint8Array(binMemInfo.length);
       for (let i = 0; i &lt; binMemInfo.length; i++) {
-        view[i] = LibraryUtils.getWasmModule().HEAPU8[binMemInfo.ptr / Uint8Array.BYTES_PER_ELEMENT + i];
+        view[i] = LibraryUtils.instance.WASM_MODULE.HEAPU8[binMemInfo.ptr / Uint8Array.BYTES_PER_ELEMENT + i];
       }
       
       // free binary on heap
-      LibraryUtils.getWasmModule()._free(binMemInfo.ptr);
+      LibraryUtils.instance.WASM_MODULE._free(binMemInfo.ptr);
       
       // return json from binary data
       return view;
@@ -366,17 +366,17 @@ class MoneroUtils {
    * @return {Promise&lt;object>} JSON object converted from the binary data
    */
   static async binaryToJson(uint8arr) {
-    if (MoneroUtils.PROXY_TO_WORKER) return LibraryUtils.invokeWorker(undefined, "moneroUtilsBinaryToJson", Array.from(arguments));
+    if (MoneroUtils.PROXY_TO_WORKER) return LibraryUtils.instance.invokeWorker(undefined, "moneroUtilsBinaryToJson", Array.from(arguments));
     
     // load keys module by default
-    if (LibraryUtils.getWasmModule() === undefined) await LibraryUtils.loadKeysModule();
+    if (LibraryUtils.instance.WASM_MODULE === undefined) await LibraryUtils.instance.loadKeysModule();
     
     // use wasm in queue
-    return LibraryUtils.getWasmModule().queueTask(async function() {
+    return LibraryUtils.instance.WASM_MODULE.queueTask(async function() {
       
       // allocate space in c++ heap for binary
-      let ptr = LibraryUtils.getWasmModule()._malloc(uint8arr.length * uint8arr.BYTES_PER_ELEMENT);
-      let heap = new Uint8Array(LibraryUtils.getWasmModule().HEAPU8.buffer, ptr, uint8arr.length * uint8arr.BYTES_PER_ELEMENT);
+      let ptr = LibraryUtils.instance.WASM_MODULE._malloc(uint8arr.length * uint8arr.BYTES_PER_ELEMENT);
+      let heap = new Uint8Array(LibraryUtils.instance.WASM_MODULE.HEAPU8.buffer, ptr, uint8arr.length * uint8arr.BYTES_PER_ELEMENT);
       if (ptr !== heap.byteOffset) throw new MoneroError("Memory ptr !== heap.byteOffset"); // should be equal
       
       // write binary to heap
@@ -386,10 +386,10 @@ class MoneroUtils {
       let binMemInfo = { ptr: ptr, length: uint8arr.length };
       
       // convert binary to json str
-      const ret_string = LibraryUtils.getWasmModule().binary_to_json(JSON.stringify(binMemInfo));
+      const ret_string = LibraryUtils.instance.WASM_MODULE.binary_to_json(JSON.stringify(binMemInfo));
       
       // free binary on heap
-      LibraryUtils.getWasmModule()._free(ptr);
+      LibraryUtils.instance.WASM_MODULE._free(ptr);
       
       // parse and return json
       return JSON.parse(ret_string);
@@ -403,17 +403,17 @@ class MoneroUtils {
    * @return {Promise&lt;object>} JSON object with the blocks data
    */
   static async binaryBlocksToJson(uint8arr) {
-    if (MoneroUtils.PROXY_TO_WORKER) return LibraryUtils.invokeWorker(undefined, "moneroUtilsBinaryBlocksToJson", Array.from(arguments));
+    if (MoneroUtils.PROXY_TO_WORKER) return LibraryUtils.instance.invokeWorker(undefined, "moneroUtilsBinaryBlocksToJson", Array.from(arguments));
     
     // load keys module by default
-    if (LibraryUtils.getWasmModule() === undefined) await LibraryUtils.loadKeysModule();
+    if (LibraryUtils.instance.WASM_MODULE === undefined) await LibraryUtils.instance.loadKeysModule();
     
     // use wasm in queue
-    return LibraryUtils.getWasmModule().queueTask(async function() {
+    return LibraryUtils.instance.WASM_MODULE.queueTask(async function() {
       
       // allocate space in c++ heap for binary
-      let ptr = LibraryUtils.getWasmModule()._malloc(uint8arr.length * uint8arr.BYTES_PER_ELEMENT);
-      let heap = new Uint8Array(LibraryUtils.getWasmModule().HEAPU8.buffer, ptr, uint8arr.length * uint8arr.BYTES_PER_ELEMENT);
+      let ptr = LibraryUtils.instance.WASM_MODULE._malloc(uint8arr.length * uint8arr.BYTES_PER_ELEMENT);
+      let heap = new Uint8Array(LibraryUtils.instance.WASM_MODULE.HEAPU8.buffer, ptr, uint8arr.length * uint8arr.BYTES_PER_ELEMENT);
       if (ptr !== heap.byteOffset) throw new MoneroError("Memory ptr !== heap.byteOffset"); // should be equal
       
       // write binary to heap
@@ -423,10 +423,10 @@ class MoneroUtils {
       let binMemInfo = { ptr: ptr, length: uint8arr.length  }
 
       // convert binary to json str
-      const json_str = LibraryUtils.getWasmModule().binary_blocks_to_json(JSON.stringify(binMemInfo));
+      const json_str = LibraryUtils.instance.WASM_MODULE.binary_blocks_to_json(JSON.stringify(binMemInfo));
       
       // free memory
-      LibraryUtils.getWasmModule()._free(ptr);
+      LibraryUtils.instance.WASM_MODULE._free(ptr);
       
       // parse result to json
       let json = JSON.parse(json_str);                                          // parsing json gives arrays of block and tx strings
@@ -488,7 +488,7 @@ module.exports = MoneroUtils;</code></pre>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ConnectionType.html">ConnectionType</a></li><li><a href="GenUtils.html">GenUtils</a></li><li><a href="HttpClient.html">HttpClient</a></li><li><a href="LibraryUtils.html">LibraryUtils</a></li><li><a href="MoneroAccount.html">MoneroAccount</a></li><li><a href="MoneroAccountTag.html">MoneroAccountTag</a></li><li><a href="MoneroAddressBookEntry.html">MoneroAddressBookEntry</a></li><li><a href="MoneroAltChain.html">MoneroAltChain</a></li><li><a href="MoneroBan.html">MoneroBan</a></li><li><a href="MoneroBlock.html">MoneroBlock</a></li><li><a href="MoneroBlockHeader.html">MoneroBlockHeader</a></li><li><a href="MoneroBlockTemplate.html">MoneroBlockTemplate</a></li><li><a href="MoneroCheck.html">MoneroCheck</a></li><li><a href="MoneroCheckReserve.html">MoneroCheckReserve</a></li><li><a href="MoneroCheckTx.html">MoneroCheckTx</a></li><li><a href="MoneroConnectionManager.html">MoneroConnectionManager</a></li><li><a href="MoneroConnectionManagerListener.html">MoneroConnectionManagerListener</a></li><li><a href="MoneroConnectionSpan.html">MoneroConnectionSpan</a></li><li><a href="MoneroDaemonInfo.html">MoneroDaemonInfo</a></li><li><a href="MoneroDaemonListener.html">MoneroDaemonListener</a></li><li><a href="MoneroDaemonRpc.html">MoneroDaemonRpc</a></li><li><a href="MoneroDaemonSyncInfo.html">MoneroDaemonSyncInfo</a></li><li><a href="MoneroDaemonUpdateCheckResult.html">MoneroDaemonUpdateCheckResult</a></li><li><a href="MoneroDaemonUpdateDownloadResult.html">MoneroDaemonUpdateDownloadResult</a></li><li><a href="MoneroDestination.html">MoneroDestination</a></li><li><a href="MoneroError.html">MoneroError</a></li><li><a href="MoneroFeeEstimate.html">MoneroFeeEstimate</a></li><li><a href="MoneroHardForkInfo.html">MoneroHardForkInfo</a></li><li><a href="MoneroIncomingTransfer.html">MoneroIncomingTransfer</a></li><li><a href="MoneroIntegratedAddress.html">MoneroIntegratedAddress</a></li><li><a href="MoneroKeyImage.html">MoneroKeyImage</a></li><li><a href="MoneroKeyImageImportResult.html">MoneroKeyImageImportResult</a></li><li><a href="MoneroKeyImageSpentStatus.html">MoneroKeyImageSpentStatus</a></li><li><a href="MoneroMessageSignatureResult.html">MoneroMessageSignatureResult</a></li><li><a href="MoneroMessageSignatureType.html">MoneroMessageSignatureType</a></li><li><a href="MoneroMinerTxSum.html">MoneroMinerTxSum</a></li><li><a href="MoneroMiningStatus.html">MoneroMiningStatus</a></li><li><a href="MoneroMultisigInfo.html">MoneroMultisigInfo</a></li><li><a href="MoneroMultisigInitResult.html">MoneroMultisigInitResult</a></li><li><a href="MoneroMultisigSignResult.html">MoneroMultisigSignResult</a></li><li><a href="MoneroNetworkType.html">MoneroNetworkType</a></li><li><a href="MoneroOutgoingTransfer.html">MoneroOutgoingTransfer</a></li><li><a href="MoneroOutput.html">MoneroOutput</a></li><li><a href="MoneroOutputHistogramEntry.html">MoneroOutputHistogramEntry</a></li><li><a href="MoneroOutputQuery.html">MoneroOutputQuery</a></li><li><a href="MoneroOutputWallet.html">MoneroOutputWallet</a></li><li><a href="MoneroPeer.html">MoneroPeer</a></li><li><a href="MoneroPruneResult.html">MoneroPruneResult</a></li><li><a href="MoneroRpcConnection.html">MoneroRpcConnection</a></li><li><a href="MoneroRpcError.html">MoneroRpcError</a></li><li><a href="MoneroSubaddress.html">MoneroSubaddress</a></li><li><a href="MoneroSubmitTxResult.html">MoneroSubmitTxResult</a></li><li><a href="MoneroSyncResult.html">MoneroSyncResult</a></li><li><a href="MoneroTransfer.html">MoneroTransfer</a></li><li><a href="MoneroTransferQuery.html">MoneroTransferQuery</a></li><li><a href="MoneroTx.html">MoneroTx</a></li><li><a href="MoneroTxConfig.html">MoneroTxConfig</a></li><li><a href="MoneroTxPoolStats.html">MoneroTxPoolStats</a></li><li><a href="MoneroTxPriority.html">MoneroTxPriority</a></li><li><a href="MoneroTxQuery.html">MoneroTxQuery</a></li><li><a href="MoneroTxSet.html">MoneroTxSet</a></li><li><a href="MoneroTxWallet.html">MoneroTxWallet</a></li><li><a href="MoneroUtils.html">MoneroUtils</a></li><li><a href="MoneroVersion.html">MoneroVersion</a></li><li><a href="MoneroWalletConfig.html">MoneroWalletConfig</a></li><li><a href="MoneroWalletFull.html">MoneroWalletFull</a></li><li><a href="MoneroWalletKeys.html">MoneroWalletKeys</a></li><li><a href="MoneroWalletListener.html">MoneroWalletListener</a></li><li><a href="MoneroWalletRpc.html">MoneroWalletRpc</a></li><li><a href="SslOptions.html">SslOptions</a></li><li><a href="TaskLooper.html">TaskLooper</a></li><li><a href="ThreadPool.html">ThreadPool</a></li></ul><h3>Interfaces</h3><ul><li><a href="MoneroDaemon.html">MoneroDaemon</a></li><li><a href="MoneroWallet.html">MoneroWallet</a></li></ul><h3>Global</h3><ul><li><a href="global.html#connectToDaemonRpc">connectToDaemonRpc</a></li><li><a href="global.html#connectToWalletRpc">connectToWalletRpc</a></li><li><a href="global.html#createWalletFull">createWalletFull</a></li><li><a href="global.html#createWalletKeys">createWalletKeys</a></li><li><a href="global.html#getVersion">getVersion</a></li><li><a href="global.html#openWalletFull">openWalletFull</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ConnectionType.html">ConnectionType</a></li><li><a href="GenUtils.html">GenUtils</a></li><li><a href="HttpClient.html">HttpClient</a></li><li><a href="LibraryUtils.instance.html">LibraryUtils</a></li><li><a href="MoneroAccount.html">MoneroAccount</a></li><li><a href="MoneroAccountTag.html">MoneroAccountTag</a></li><li><a href="MoneroAddressBookEntry.html">MoneroAddressBookEntry</a></li><li><a href="MoneroAltChain.html">MoneroAltChain</a></li><li><a href="MoneroBan.html">MoneroBan</a></li><li><a href="MoneroBlock.html">MoneroBlock</a></li><li><a href="MoneroBlockHeader.html">MoneroBlockHeader</a></li><li><a href="MoneroBlockTemplate.html">MoneroBlockTemplate</a></li><li><a href="MoneroCheck.html">MoneroCheck</a></li><li><a href="MoneroCheckReserve.html">MoneroCheckReserve</a></li><li><a href="MoneroCheckTx.html">MoneroCheckTx</a></li><li><a href="MoneroConnectionManager.html">MoneroConnectionManager</a></li><li><a href="MoneroConnectionManagerListener.html">MoneroConnectionManagerListener</a></li><li><a href="MoneroConnectionSpan.html">MoneroConnectionSpan</a></li><li><a href="MoneroDaemonInfo.html">MoneroDaemonInfo</a></li><li><a href="MoneroDaemonListener.html">MoneroDaemonListener</a></li><li><a href="MoneroDaemonRpc.html">MoneroDaemonRpc</a></li><li><a href="MoneroDaemonSyncInfo.html">MoneroDaemonSyncInfo</a></li><li><a href="MoneroDaemonUpdateCheckResult.html">MoneroDaemonUpdateCheckResult</a></li><li><a href="MoneroDaemonUpdateDownloadResult.html">MoneroDaemonUpdateDownloadResult</a></li><li><a href="MoneroDestination.html">MoneroDestination</a></li><li><a href="MoneroError.html">MoneroError</a></li><li><a href="MoneroFeeEstimate.html">MoneroFeeEstimate</a></li><li><a href="MoneroHardForkInfo.html">MoneroHardForkInfo</a></li><li><a href="MoneroIncomingTransfer.html">MoneroIncomingTransfer</a></li><li><a href="MoneroIntegratedAddress.html">MoneroIntegratedAddress</a></li><li><a href="MoneroKeyImage.html">MoneroKeyImage</a></li><li><a href="MoneroKeyImageImportResult.html">MoneroKeyImageImportResult</a></li><li><a href="MoneroKeyImageSpentStatus.html">MoneroKeyImageSpentStatus</a></li><li><a href="MoneroMessageSignatureResult.html">MoneroMessageSignatureResult</a></li><li><a href="MoneroMessageSignatureType.html">MoneroMessageSignatureType</a></li><li><a href="MoneroMinerTxSum.html">MoneroMinerTxSum</a></li><li><a href="MoneroMiningStatus.html">MoneroMiningStatus</a></li><li><a href="MoneroMultisigInfo.html">MoneroMultisigInfo</a></li><li><a href="MoneroMultisigInitResult.html">MoneroMultisigInitResult</a></li><li><a href="MoneroMultisigSignResult.html">MoneroMultisigSignResult</a></li><li><a href="MoneroNetworkType.html">MoneroNetworkType</a></li><li><a href="MoneroOutgoingTransfer.html">MoneroOutgoingTransfer</a></li><li><a href="MoneroOutput.html">MoneroOutput</a></li><li><a href="MoneroOutputHistogramEntry.html">MoneroOutputHistogramEntry</a></li><li><a href="MoneroOutputQuery.html">MoneroOutputQuery</a></li><li><a href="MoneroOutputWallet.html">MoneroOutputWallet</a></li><li><a href="MoneroPeer.html">MoneroPeer</a></li><li><a href="MoneroPruneResult.html">MoneroPruneResult</a></li><li><a href="MoneroRpcConnection.html">MoneroRpcConnection</a></li><li><a href="MoneroRpcError.html">MoneroRpcError</a></li><li><a href="MoneroSubaddress.html">MoneroSubaddress</a></li><li><a href="MoneroSubmitTxResult.html">MoneroSubmitTxResult</a></li><li><a href="MoneroSyncResult.html">MoneroSyncResult</a></li><li><a href="MoneroTransfer.html">MoneroTransfer</a></li><li><a href="MoneroTransferQuery.html">MoneroTransferQuery</a></li><li><a href="MoneroTx.html">MoneroTx</a></li><li><a href="MoneroTxConfig.html">MoneroTxConfig</a></li><li><a href="MoneroTxPoolStats.html">MoneroTxPoolStats</a></li><li><a href="MoneroTxPriority.html">MoneroTxPriority</a></li><li><a href="MoneroTxQuery.html">MoneroTxQuery</a></li><li><a href="MoneroTxSet.html">MoneroTxSet</a></li><li><a href="MoneroTxWallet.html">MoneroTxWallet</a></li><li><a href="MoneroUtils.html">MoneroUtils</a></li><li><a href="MoneroVersion.html">MoneroVersion</a></li><li><a href="MoneroWalletConfig.html">MoneroWalletConfig</a></li><li><a href="MoneroWalletFull.html">MoneroWalletFull</a></li><li><a href="MoneroWalletKeys.html">MoneroWalletKeys</a></li><li><a href="MoneroWalletListener.html">MoneroWalletListener</a></li><li><a href="MoneroWalletRpc.html">MoneroWalletRpc</a></li><li><a href="SslOptions.html">SslOptions</a></li><li><a href="TaskLooper.html">TaskLooper</a></li><li><a href="ThreadPool.html">ThreadPool</a></li></ul><h3>Interfaces</h3><ul><li><a href="MoneroDaemon.html">MoneroDaemon</a></li><li><a href="MoneroWallet.html">MoneroWallet</a></li></ul><h3>Global</h3><ul><li><a href="global.html#connectToDaemonRpc">connectToDaemonRpc</a></li><li><a href="global.html#connectToWalletRpc">connectToWalletRpc</a></li><li><a href="global.html#createWalletFull">createWalletFull</a></li><li><a href="global.html#createWalletKeys">createWalletKeys</a></li><li><a href="global.html#getVersion">getVersion</a></li><li><a href="global.html#openWalletFull">openWalletFull</a></li></ul>
 </nav>
 
 <br class="clear">
